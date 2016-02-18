@@ -1,4 +1,10 @@
 function initApp() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            $('#lat').val(position.coords.latitude);
+            $('#long').val(position.coords.longitude);
+        });
+    }
     $(".add-info-dialog-button").on("click", openAddInfoDialog);
     $("#save-add-info-button").on("click", saveDataInfo);
     $("#cancel-add-info-button").on("click", closeAddInfoDialog);
@@ -9,7 +15,8 @@ function openAddInfoDialog(e) {
     var button = $(e.currentTarget);
     var dialog = $('#add-data-info-dialog');
     dialog.find("h3").text(button.data("data-info-text") + " toevoegen");
-    dialog.find("#add-data-info-type").val(button.data("data-inf-type"));
+    dialog.find("#add-data-info-type").val(button.data("data-info-type"));
+    console.log(button.data("data-info-type"));
     dialog[0].MaterialDialog.show(true);
 }
 
@@ -23,11 +30,39 @@ function saveDataInfo() {
             type: type
         },
         url: "includes/dataInfo.php",
-        method: "POST"
-    }).success(function (output) {
-        console.log(output);
-    })
-    closeAddInfoDialog();
+        method: "POST",
+        success: function (id) {
+            addDataInfoToList(type, id, name);
+            closeAddInfoDialog();
+        }
+    });
+}
+
+function addDataInfoToList(type, id, name) {
+    switch (type) {
+        case "category":
+            var item = "<li class=\"mdl-menu__item category-item\">" +
+                            "<input id=\"category-" + id + "\" value=\"" + id + "\" name=\"category\" type=\"radio\">" +
+                            "<label for=\"category-" + id + "\">" + name + "</label>" +
+                        "</li>";
+            $("#category-list").append(item);
+            break;
+        case "dataType":
+            var item = "<label class=\"mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect\" for=\"datatype-" + id + "\">" +
+                            "<input type=\"checkbox\" id=\"datatype-" + id + "\" name=\"data-types\" class=\"mdl-checkbox__input\">" +
+                            "<span class=\"mdl-checkbox__label\">" + name + "</span>" +
+                        "</label>";
+            $("#data-type-list").append(item);
+            break;
+        case "company":
+            var item = "<label class=\"mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect\" for=\"company-" + id + "\">" +
+                            "<input type=\"checkbox\" id=\"company-" + id + "\" name=\"companies\" class=\"mdl-checkbox__input\">" +
+                            "<span class=\"mdl-checkbox__label\">" + name + "</span>" +
+                        "</label>";
+            $("#company-list").append(item);
+            break;
+    }
+    componentHandler.upgradeAllRegistered();
 }
 
 function closeAddInfoDialog() {
