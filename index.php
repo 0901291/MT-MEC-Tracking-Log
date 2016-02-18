@@ -44,7 +44,7 @@ if (isLoggedIn()) {
         <div class="page-content">
             <?php if (isLoggedIn()) : ?>
                 <section class="content-section mdl-card mdl-shadow--2dp centerab" id="add-item">
-                    <form action="#">
+                    <form action="includes/addData.php" method="post">
                         <div class="section-header mdl-color--primary">
                             <h1 class="mdl-typography--title valign">Item toevoegen</h1>
                             <label id="quick-entry" class="mdl-switch mdl-js-switch mdl-js-ripple-effect valign" for="quick-entry-switch">
@@ -53,7 +53,7 @@ if (isLoggedIn()) {
                             </label>
                         </div>
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-item">
-                            <input class="mdl-textfield__input" type="text" id="title">
+                            <input class="mdl-textfield__input" type="text" id="title" name="title">
                             <label class="mdl-textfield__label" for="title">Titel</label>
                         </div>
                         <div class="field-add-button-container form-item">
@@ -81,13 +81,13 @@ if (isLoggedIn()) {
                         <div id="data-type-list" class="checkbox-container">
                             <?php foreach($dataTypes as $dataType) : ?>
                                 <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="datatype-<?= $dataType["id"] ?>">
-                                    <input type="checkbox" id="datatype-<?= $dataType["id"] ?>" name="data-types" class="mdl-checkbox__input">
+                                    <input type="checkbox" id="datatype-<?= $dataType["id"] ?>" name="data-types[]" class="mdl-checkbox__input" value="<?= $dataType["id"] ?>">
                                     <span class="mdl-checkbox__label"><?= $dataType["name"] ?></span>
                                 </label>
                             <?php endforeach ?>
                         </div>
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-item">
-                            <textarea class="mdl-textfield__input" type="text" rows= "3" id="description"></textarea>
+                            <textarea class="mdl-textfield__input" type="text" rows= "3" id="description" name="description"></textarea>
                             <label class="mdl-textfield__label" for="description">Omschrijving</label>
                         </div>
                         Bedrijf
@@ -97,23 +97,22 @@ if (isLoggedIn()) {
                         <div id="company-list" class="checkbox-container">
                             <?php foreach($companies as $company) : ?>
                                 <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="company-<?= $company["id"] ?>">
-                                    <input type="checkbox" id="company-<?= $company["id"] ?>" name="companies" class="mdl-checkbox__input">
+                                    <input type="checkbox" id="company-<?= $company["id"] ?>" name="companies[]" class="mdl-checkbox__input" value="<?= $company["id"] ?>">
                                     <span class="mdl-checkbox__label"><?= $company["name"] ?></span>
                                 </label>
                             <?php endforeach ?>
                         </div>
                         <div id="date-field" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-item">
-                            <input class="mdl-textfield__input" type="text" id="date">
+                            <input class="mdl-textfield__input" type="text" id="date" name="date">
                             <label class="mdl-textfield__label" for="date">Datum</label>
                         </div>
                         <div id="time-field" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-item date-item">
-                            <input class="mdl-textfield__input" type="text" id="time">
+                            <input class="mdl-textfield__input" type="text" id="time" name="time">
                             <label class="mdl-textfield__label" for="time">Tijd</label>
                         </div>
-                        Lat (input field)
-                        Long (input field)
-                        Button current | Button map
-                        Send
+                        <input class="mdl-textfield__input" type="text" id="lat" name="lat">
+                        <input class="mdl-textfield__input" type="text" id="long" name="lng">
+                        <input type="submit">
                     </form>
                 </section>
             <?php else: ?>
