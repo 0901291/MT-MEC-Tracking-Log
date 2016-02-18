@@ -12,6 +12,6 @@ function onSignIn(googleUser) {
         url: "includes/login.php",
         method: "POST"
     }).success(function (output) {
-        console.log(output);
+        location.reload();
     })
 };
