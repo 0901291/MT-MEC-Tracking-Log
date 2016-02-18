@@ -44,6 +44,13 @@ button.form-item {
     transform: translateY(-50%);
 }
 
+.centerab {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+}
+
 .category-item input {
     position: absolute;
     left: -10000px;

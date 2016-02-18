@@ -43,7 +43,7 @@ if (isLoggedIn()) {
     <main class="mdl-layout__content">
         <div class="page-content">
             <?php if (isLoggedIn()) : ?>
-                <section class="content-section mdl-card mdl-shadow--2dp" id="add-item">
+                <section class="content-section mdl-card mdl-shadow--2dp centerab" id="add-item">
                     <form action="#">
                         <div class="section-header mdl-color--primary">
                             <h1 class="mdl-typography--title valign">Item toevoegen</h1>
@@ -56,28 +56,52 @@ if (isLoggedIn()) {
                             <input class="mdl-textfield__input" type="text" id="title">
                             <label class="mdl-textfield__label" for="title">Titel</label>
                         </div>
-                        <button type="button" id="category-select" class="mdl-button mdl-js-button mdl-js-ripple-effect form-item">
-                            <span>Categorie <i class="material-icons">keyboard_arrow_down</i></span>
-                        </button>
-                        <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" data-mdl-for="category-select">
-                            <?php foreach($categories as $category) : ?>
-                                <li class="mdl-menu__item category-item">
-                                    <input id="category-<?= $category["id"] ?>" value="<?= $category["id"] ?>" name="category" type="radio">
-                                    <label for="category-<?= $category["id"] ?>"><?= $category["name"] ?></label>
-                                </li>
+                        <div class="field-add-button-container form-item">
+                            <button type="button" id="category-select" class="mdl-button mdl-js-button mdl-js-ripple-effect">
+                                <span>Categorie <i class="material-icons">keyboard_arrow_down</i></span>
+                            </button>
+                            <button type="button" data-data-info-type="category" data-data-info-text="Categorie" class="add-info-dialog-button mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect">
+                                <i class="material-icons">add</i>
+                            </button>
+                            <ul id="category-list" class="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" data-mdl-for="category-select">
+                                <?php foreach($categories as $category) : ?>
+                                    <li class="mdl-menu__item category-item">
+                                        <input id="category-<?= $category["id"] ?>" value="<?= $category["id"] ?>" name="category" type="radio">
+                                        <label for="category-<?= $category["id"] ?>"><?= $category["name"] ?></label>
+                                    </li>
+                                <?php endforeach ?>
+                            </ul>
+                        </div>
+                        <div class="field-add-button-container form-item">
+                            Data types
+                            <button type="button" data-data-info-type="dataType" data-data-info-text="Data type" class="add-info-dialog-button mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect">
+                                <i class="material-icons">add</i>
+                            </button>
+                        </div>
+                        <div id="data-type-list" class="checkbox-container">
+                            <?php foreach($dataTypes as $dataType) : ?>
+                                <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="datatype-<?= $dataType["id"] ?>">
+                                    <input type="checkbox" id="datatype-<?= $dataType["id"] ?>" name="data-types" class="mdl-checkbox__input">
+                                    <span class="mdl-checkbox__label"><?= $dataType["name"] ?></span>
+                                </label>
                             <?php endforeach ?>
-                        </ul>
-                        <button type="button" data-data-info-item="category" data-data-info-text="Categorie" class="add-info-dialog-button mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect">
-                            <i class="material-icons">add</i></button>
-                        <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="checkbox-2">
-                            <input type="checkbox" id="checkbox-2" class="mdl-checkbox__input">
-                            <span class="mdl-checkbox__label">Checkbox</span>
-                        </label>
+                        </div>
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-item">
                             <textarea class="mdl-textfield__input" type="text" rows= "3" id="description"></textarea>
                             <label class="mdl-textfield__label" for="description">Omschrijving</label>
                         </div>
-                        companies
+                        Bedrijf
+                        <button type="button" data-data-info-type="company" data-data-info-text="Bedrijf" class="add-info-dialog-button mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect">
+                            <i class="material-icons">add</i>
+                        </button>
+                        <div id="company-list" class="checkbox-container">
+                            <?php foreach($companies as $company) : ?>
+                                <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="company-<?= $company["id"] ?>">
+                                    <input type="checkbox" id="company-<?= $company["id"] ?>" name="companies" class="mdl-checkbox__input">
+                                    <span class="mdl-checkbox__label"><?= $company["name"] ?></span>
+                                </label>
+                            <?php endforeach ?>
+                        </div>
                         <div id="date-field" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-item">
                             <input class="mdl-textfield__input" type="text" id="date">
                             <label class="mdl-textfield__label" for="date">Datum</label>
