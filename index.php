@@ -108,7 +108,7 @@ if (isLoggedIn()) {
         <h3></h3>
     </div>
     <div class="mdl-dialog__content">
-        
+
             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-item">
                 <input class="mdl-textfield__input" type="text" id="add-data-info">
                 <label class="mdl-textfield__label" for="add-data-info">Naam</label>
