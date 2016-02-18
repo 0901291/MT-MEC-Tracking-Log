@@ -10,9 +10,9 @@
     margin: 0 auto 16px;
     max-width: 460px;
     width: 100%;
-    padding: 74px 16px 16px;
+    padding: 74px 16px 40px;
     position: relative;
-    transition: max-height 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
     overflow: hidden;
     min-height: 0;
 }
@@ -24,7 +24,7 @@
 }
 
 #add-item.quick-entry-mode {
-    max-height: 150px !important;
+    max-height: 190px !important;
 }
 
 #add-item.quick-entry-mode.hide-items form > *:not(.show-quick-entry) {
@@ -81,8 +81,12 @@ button.form-item {
     font-weight: 600;
 }
 
-/* SWITCH */
+#submit-entry {
+    position: absolute;
+    bottom: 8px;
+}
 
+/* SWITCH */
 #quick-entry {
     right: 0;
     position: absolute;

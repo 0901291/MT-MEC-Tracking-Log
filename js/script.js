@@ -1,8 +1,8 @@
 function initApp() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
-            $("#lat").val(position.coords.latitude);
-            $("#long").val(position.coords.longitude);
+            $("#lat").val(position.coords.latitude).parent().addClass("is-focused");
+            $("#lng").val(position.coords.longitude).parent().addClass("is-focused");
         });
     }
     $(".add-info-dialog-button").on("click", openAddInfoDialog);
@@ -54,14 +54,14 @@ function addDataInfoToList(type, id, name) {
             break;
         case "dataType":
             var item = "<label class=\"mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect\" for=\"datatype-" + id + "\">" +
-                            "<input type=\"checkbox\" id=\"datatype-" + id + "\" name=\"data-types[]\" class=\"mdl-checkbox__input\">" +
+                            "<input type=\"checkbox\" id=\"datatype-" + id + "\" name=\"data-types[]\" class=\"mdl-checkbox__input\" value=\"" + id + "\">" +
                             "<span class=\"mdl-checkbox__label\">" + name + "</span>" +
                         "</label>";
             $("#data-type-list").append(item);
             break;
         case "company":
             var item = "<label class=\"mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect\" for=\"company-" + id + "\">" +
-                            "<input type=\"checkbox\" id=\"company-" + id + "\" name=\"companies[]\" class=\"mdl-checkbox__input\">" +
+                            "<input type=\"checkbox\" id=\"company-" + id + "\" name=\"companies[]\" class=\"mdl-checkbox__input\" value=\"" + id + "\">" +
                             "<span class=\"mdl-checkbox__label\">" + name + "</span>" +
                         "</label>";
             $("#company-list").append(item);
@@ -100,11 +100,15 @@ function toggleQuickEntry() {
         content.addClass("quick-entry-mode");
         setTimeout(function () {
             content.addClass("hide-items");
+            positionResize();
         }, 300);
     } else {
         content.removeClass("hide-items");
         setTimeout(function () {
             content.removeClass("quick-entry-mode");
+            setTimeout(function () {
+                positionResize();
+            }, 300);
         }, 10);
     }
 }
