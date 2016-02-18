@@ -39,6 +39,13 @@ if (isLoggedIn()) {
                 <i id="logout" class="material-icons">exit_to_app</i>
             </label>
         </div>
+        <div id="header-section-header" class="section-header mdl-color--primary show-quick-entry hidden">
+            <h1 class="mdl-typography--title valign">Item toevoegen</h1>
+            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect valign quick-entry" for="quick-entry-switch-mobile">
+                <input type="checkbox" id="quick-entry-switch-mobile" class="mdl-switch__input">
+                <span class="mdl-switch__label">Quick entry</span>
+            </label>
+        </div>
     </header>
     <main class="mdl-layout__content">
         <div class="page-content">
@@ -47,8 +54,8 @@ if (isLoggedIn()) {
                     <form action="includes/addData.php" method="post">
                         <div class="section-header mdl-color--primary show-quick-entry">
                             <h1 class="mdl-typography--title valign">Item toevoegen</h1>
-                            <label id="quick-entry" class="mdl-switch mdl-js-switch mdl-js-ripple-effect valign" for="quick-entry-switch">
-                                <input type="checkbox" id="quick-entry-switch" class="mdl-switch__input">
+                            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect valign quick-entry" for="quick-entry-switch-desktop">
+                                <input type="checkbox" id="quick-entry-switch-desktop" class="mdl-switch__input">
                                 <span class="mdl-switch__label">Quick entry</span>
                             </label>
                         </div>
@@ -90,7 +97,7 @@ if (isLoggedIn()) {
                             <textarea class="mdl-textfield__input" type="text" rows= "3" id="description" name="description"></textarea>
                             <label class="mdl-textfield__label" for="description">Omschrijving</label>
                         </div>
-                        Bedrijf
+                        <span>Bedrijf</span>
                         <button type="button" data-data-info-type="company" data-data-info-text="Bedrijf" class="add-info-dialog-button mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect">
                             <i class="material-icons">add</i>
                         </button>
@@ -125,7 +132,7 @@ if (isLoggedIn()) {
                 </section>
             <?php else: ?>
                 <section class="content-section mdl-card mdl-shadow--2dp" id="login-section">
-                    <div class="section-header mdl-color--primary">
+                    <div class="section-header valign mdl-color--primary">
                         <h1 class="mdl-typography--title">Inloggen</h1>
                     </div>
                     <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
