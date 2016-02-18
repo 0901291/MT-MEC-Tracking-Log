@@ -8,7 +8,7 @@ function initApp() {
     $(".add-info-dialog-button").on("click", openAddInfoDialog);
     $("#save-add-info-button").on("click", saveDataInfo);
     $("#cancel-add-info-button").on("click", closeAddInfoDialog);
-    $("#quick-entry-switch").on("change", toggleQuickEntry);
+    $("#quick-entry-switch-mobile, #quick-entry-switch-desktop").on("change", toggleQuickEntry);
     initDateTimePicker();
     positionResize();
     $(window).on("resize", positionResize);
@@ -68,6 +68,9 @@ function addDataInfoToList(type, id, name) {
             break;
     }
     componentHandler.upgradeAllRegistered();
+    var content = $("#add-item");
+    content.css("max-height", "initial");
+    content.css("max-height", content.height() + parseInt(content.css("padding-top")) + parseInt(content.css("padding-bottom")));
 }
 
 function closeAddInfoDialog() {
@@ -94,15 +97,23 @@ function initDateTimePicker() {
 }
 
 function toggleQuickEntry() {
-    var toggle = $("#quick-entry-switch");
+    var toggle1 = $("#quick-entry-switch-mobile");
+    var toggle2 = $("#quick-entry-switch-desktop");
+    var toggle = isMobile() ? $toggle1 : $toggle2;
     var content = $("#add-item");
     if (toggle.prop("checked")) {
+        toggle1.prop("checked", true);
+        toggl2.prop("checked", true);
+        $(".quick-entry").addClass("is-checked");
         content.addClass("quick-entry-mode");
         setTimeout(function () {
             content.addClass("hide-items");
             positionResize();
         }, 300);
     } else {
+        $(".quick-entry").removeClass("is-checked");
+        toggle1.prop("checked", false);
+        toggl2.prop("checked", false);
         content.removeClass("hide-items");
         setTimeout(function () {
             content.removeClass("quick-entry-mode");
@@ -116,8 +127,10 @@ function toggleQuickEntry() {
 function positionResize() {
     var content = $("#add-item");
     var max = $(window).height() - $(".mdl-layout__header").height() - 32 - parseInt(content.css("padding-top")) - parseInt(content.css("padding-bottom"));
-    console.log(max);
-    console.log(content.height());
     if (content.height() > max) content.addClass("static").removeClass("absolute");
     else content.addClass("absolute").removeClass("static");
+}
+
+function isMobile () {
+    return $(window).width() < 461;
 }
