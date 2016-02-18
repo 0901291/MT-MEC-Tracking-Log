@@ -1,0 +1,87 @@
+.mdl-layout {
+    background-color: #eee;
+}
+
+.page-content {
+    padding: 16px;
+}
+
+.content-section {
+    margin: 16px auto;
+    max-width: 460px;
+    width: 100%;
+    padding: 74px 16px 16px;
+    position: relative;
+}
+
+.section-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 56px;
+    width: 100%;
+    padding-left: 16px;
+    color: #fff;
+}
+
+.section-header h1 {
+    margin: 0;
+}
+
+.form-item {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+}
+
+button.form-item {
+    width: inherit;
+}
+
+.valign {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.category-item input {
+    position: absolute;
+    left: -10000px;
+}
+
+.category-item label {
+    display: block;
+}
+
+.category-item input:checked + label {
+    font-weight: 600;
+}
+
+/* SWITCH */
+
+#quick-entry {
+    right: 0;
+    position: absolute;
+    width: 170px;
+}
+
+.mdl-switch.is-checked .mdl-switch__track {
+    background: rgba(255, 255, 255, .5);
+}
+
+.mdl-switch__thumb {
+    background: rgba(190, 190, 210, 1);
+}
+
+.mdl-switch.is-checked .mdl-switch__thumb {
+    background: rgb(255, 255, 255);
+}
+
+.mdl-switch.is-focused.is-checked .mdl-switch__focus-helper {
+    box-shadow: 0 0 0 20px rgba(255, 255, 255, .26);
+    background-color: rgba(255, 255, 255, .26);
+}
+
+.mdl-switch__ripple-container .mdl-ripple {
+    background: rgb(255, 255, 255);
+}
