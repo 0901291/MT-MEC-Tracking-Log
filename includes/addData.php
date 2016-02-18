@@ -1,5 +1,5 @@
 <?php
-require("dataInfo.php");
+require("initialize.php");
 
 $description = (isset($_POST['description']) || !empty($_POST['description']) ? $_POST['description'] : null);
 $category = (isset($_POST['category']) ? $_POST['category'] : null);
