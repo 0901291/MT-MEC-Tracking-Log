@@ -1,6 +1,5 @@
 <?php
 include ("initialize.php");
-include ("functions.php");
 
 $name = (isset($_POST['name']) ? $_POST['name'] : null);
 $function = (isset($_POST['function']) ? $_POST['function'] : null);
