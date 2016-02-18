@@ -39,6 +39,6 @@ if (isLoggedIn()) {
             }
         }
 
-        var_dump($stmt);
+        header("Location: ../index.php");
     }
 }
