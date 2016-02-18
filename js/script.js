@@ -99,11 +99,11 @@ function initDateTimePicker() {
 function toggleQuickEntry() {
     var toggle1 = $("#quick-entry-switch-mobile");
     var toggle2 = $("#quick-entry-switch-desktop");
-    var toggle = isMobile() ? $toggle1 : $toggle2;
+    var toggle = isMobile() ? toggle1 : toggle2;
     var content = $("#add-item");
     if (toggle.prop("checked")) {
         toggle1.prop("checked", true);
-        toggl2.prop("checked", true);
+        toggle2.prop("checked", true);
         $(".quick-entry").addClass("is-checked");
         content.addClass("quick-entry-mode");
         setTimeout(function () {
@@ -113,7 +113,7 @@ function toggleQuickEntry() {
     } else {
         $(".quick-entry").removeClass("is-checked");
         toggle1.prop("checked", false);
-        toggl2.prop("checked", false);
+        toggle2.prop("checked", false);
         content.removeClass("hide-items");
         setTimeout(function () {
             content.removeClass("quick-entry-mode");
