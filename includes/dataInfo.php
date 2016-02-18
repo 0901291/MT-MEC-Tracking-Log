@@ -32,7 +32,7 @@ function create ($type, $name, $conn) {
 }
 
 function edit ($type, $id, $name, $conn) {
-    $query = "UPDATE $type SET name = ? WHERE id = ?";
+    $query = "UPDATE ".DB_PREFIX."$type SET name = ? WHERE id = ?";
     if ($stmt = $conn -> prepare($query)) {
         $stmt -> bind_param('ss', $name, $id);
         $stmt -> execute();
@@ -45,13 +45,13 @@ function edit ($type, $id, $name, $conn) {
 
 function delete ($type, $id, $conn) {
     if ($type == "company" || $type == "dataType") {
-        $query = "DELETE FROM ".$type."_has_data WHERE ".$type."_id = ?";
+        $query = "DELETE FROM ".DB_PREFIX.$type."_has_data WHERE ".$type."_id = ?";
         if ($stmt = $conn -> prepare($query)) {
             $stmt -> bind_param('s', $id);
             $stmt -> execute();
         }
     }
-    $query = "DELETE FROM ".$type." WHERE id = ?";
+    $query = "DELETE FROM ".DB_PREFIX.$type." WHERE id = ?";
     if ($stmt = $conn -> prepare($query)) {
         $stmt -> bind_param('s', $id);
         $stmt -> execute();

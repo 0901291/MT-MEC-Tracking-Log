@@ -18,7 +18,7 @@ if (isLoggedIn()) {
 }
 
 function create ($name,$conn) {
-    $query = "INSERT INTO category (name, user_id) VALUES (?, ?)";
+    $query = "INSERT INTO ".DB_PREFIX."category (name, user_id) VALUES (?, ?)";
     if ($stmt = $conn -> prepare($query)) {
         $stmt -> bind_param('ss', $name, $_SESSION['userId']);
         $stmt -> execute();
@@ -30,7 +30,7 @@ function create ($name,$conn) {
 }
 
 function edit ($id, $name, $conn) {
-    $query = "UPDATE category SET name = ? WHERE id = ?";
+    $query = "UPDATE ".DB_PREFIX."category SET name = ? WHERE id = ?";
     if ($stmt = $conn -> prepare($query)) {
         $stmt -> bind_param('ss', $name, $id);
         $stmt -> execute();
@@ -42,7 +42,7 @@ function edit ($id, $name, $conn) {
 }
 
 function delete ($id, $conn) {
-    $query = "DELETE FROM category WHERE id = ?";
+    $query = "DELETE FROM ".DB_PREFIX."category WHERE id = ?";
     if ($stmt = $conn -> prepare($query)) {
         $stmt -> bind_param('s', $id);
         $stmt -> execute();

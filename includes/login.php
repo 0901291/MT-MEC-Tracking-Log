@@ -17,7 +17,7 @@ if ($name != null && $imgURL != null && $email != null && $googleId != null) {
 }
 
 function checkUser ($googleId, $conn) {
-    $query = "SELECT * FROM user WHERE user.googleId = ?";
+    $query = "SELECT * FROM ".DB_PREFIX."user WHERE ".DB_PREFIX."user.googleId = ?";
     if ($stmt = $conn -> prepare($query)) {
         $stmt -> bind_param('s', $googleId);
         $stmt -> execute();
@@ -30,7 +30,7 @@ function checkUser ($googleId, $conn) {
 }
 
 function createUser ($googleId, $name, $email, $imgURL, $conn) {
-    $query = "INSERT INTO user (name, imgURL, email, googleId) VALUES(?, ?, ?, ?)";
+    $query = "INSERT INTO ".DB_PREFIX."user (name, imgURL, email, googleId) VALUES(?, ?, ?, ?)";
     if ($stmt = $conn -> prepare($query)) {
         $stmt -> bind_param('ssss', $name, $imgURL, $email, $googleId);
         $stmt -> execute();
@@ -42,7 +42,7 @@ function createUser ($googleId, $name, $email, $imgURL, $conn) {
 }
 
 function logIn ($googleId, $conn) {
-    $query = "SELECT name, imgURL, id FROM user WHERE user.googleId = ?";
+    $query = "SELECT name, imgURL, id FROM ".DB_PREFIX."user WHERE ".DB_PREFIX."user.googleId = ?";
     if ($stmt = $conn -> prepare($query)) {
         $stmt -> bind_param('s', $googleId);
         $stmt -> execute();
