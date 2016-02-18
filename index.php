@@ -5,7 +5,7 @@ if (isLoggedIn()) {
     $getCategories = "SELECT id, name FROM ".DB_PREFIX."category WHERE user_id = '".$_SESSION["userId"]."' ORDER BY name ASC";
     $categories = $conn->query($getCategories);
 
-    $getDataTypes = "SELECT id, name FROM ".DB_PREFIX."dataType WHERE user_id = '".$_SESSION["userId"]."' ORDER BY name ASC";
+    $getDataTypes = "SELECT id, name FROM ".DB_PREFIX."datatype WHERE user_id = '".$_SESSION["userId"]."' ORDER BY name ASC";
     $dataTypes = $conn->query($getDataTypes);
 
     $getCompaniesQuery = "SELECT id, name FROM ".DB_PREFIX."company WHERE user_id = '".$_SESSION["userId"]."' ORDER BY name ASC";
@@ -22,7 +22,7 @@ if (isLoggedIn()) {
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://code.getmdl.io/1.1.1/material.indigo-red.min.css">
     <link rel="stylesheet" href="css/lib/material.min.css">
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
     <link rel="stylesheet" href="css/lib/bootstrap-material-datetimepicker.css">
     <link rel="stylesheet" href="css/style.css">
     <meta name="google-signin-scope" content="profile email">
