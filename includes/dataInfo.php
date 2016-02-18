@@ -44,19 +44,19 @@ function edit ($type, $id, $name, $conn) {
 }
 
 function delete ($type, $id, $conn) {
-    $query = "DELETE FROM ".$type."_has_data WHERE ".$type."_id = ?";
+    if ($type == "company" || $type == "dataType") {
+        $query = "DELETE FROM ".$type."_has_data WHERE ".$type."_id = ?";
+        if ($stmt = $conn -> prepare($query)) {
+            $stmt -> bind_param('s', $id);
+            $stmt -> execute();
+        }
+    }
+    $query = "DELETE FROM ".$type." WHERE id = ?";
     if ($stmt = $conn -> prepare($query)) {
         $stmt -> bind_param('s', $id);
         $stmt -> execute();
         if ($stmt) {
-            $query = "DELETE FROM ".$type." WHERE id = ?";
-            if ($stmt = $conn -> prepare($query)) {
-                $stmt -> bind_param('s', $id);
-                $stmt -> execute();
-                if ($stmt) {
-                    return true;
-                }
-            }
+            return true;
         }
     }
     return false;
