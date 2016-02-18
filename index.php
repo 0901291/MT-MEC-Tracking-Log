@@ -44,15 +44,15 @@ if (isLoggedIn()) {
         <div class="page-content">
             <?php if (isLoggedIn()) : ?>
                 <section class="content-section mdl-card mdl-shadow--2dp centerab" id="add-item">
-                    <form action="#">
-                        <div class="section-header mdl-color--primary">
+                    <form action="#" class="show-quick-entry">
+                        <div class="section-header mdl-color--primary show-quick-entry">
                             <h1 class="mdl-typography--title valign">Item toevoegen</h1>
                             <label id="quick-entry" class="mdl-switch mdl-js-switch mdl-js-ripple-effect valign" for="quick-entry-switch">
                                 <input type="checkbox" id="quick-entry-switch" class="mdl-switch__input">
                                 <span class="mdl-switch__label">Quick entry</span>
                             </label>
                         </div>
-                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-item">
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-item show-quick-entry">
                             <input class="mdl-textfield__input" type="text" id="title">
                             <label class="mdl-textfield__label" for="title">Titel</label>
                         </div>

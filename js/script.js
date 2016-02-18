@@ -8,9 +8,12 @@ function initApp() {
     $(".add-info-dialog-button").on("click", openAddInfoDialog);
     $("#save-add-info-button").on("click", saveDataInfo);
     $("#cancel-add-info-button").on("click", closeAddInfoDialog);
+    $("#quick-entry-switch").on("change", toggleQuickEntry);
     initDateTimePicker();
     positionResize();
     $(window).on("resize", positionResize);
+    var content = $("#add-item");
+    content.css("max-height", content.height() + parseInt(content.css("padding-top")) + parseInt(content.css("padding-bottom")));
 }
 
 function openAddInfoDialog(e) {
@@ -90,9 +93,27 @@ function initDateTimePicker() {
     });
 }
 
-function positionResize() {
-    var max = $(window).height() - $("mdl-layout__header").height() - 32;
+function toggleQuickEntry() {
+    var toggle = $("#quick-entry-switch");
     var content = $("#add-item");
+    if (toggle.prop("checked")) {
+        content.addClass("quick-entry-mode");
+        setTimeout(function () {
+            content.addClass("hide-items");
+        }, 300);
+    } else {
+        content.removeClass("hide-items");
+        setTimeout(function () {
+            content.removeClass("quick-entry-mode");
+        }, 10);
+    }
+}
+
+function positionResize() {
+    var content = $("#add-item");
+    var max = $(window).height() - $(".mdl-layout__header").height() - 32 - parseInt(content.css("padding-top")) - parseInt(content.css("padding-bottom"));
+    console.log(max);
+    console.log(content.height());
     if (content.height() > max) content.addClass("static").removeClass("absolute");
     else content.addClass("absolute").removeClass("static");
 }

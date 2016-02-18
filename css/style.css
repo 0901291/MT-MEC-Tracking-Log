@@ -3,15 +3,32 @@
 }
 
 .page-content {
-    padding: 16px;
+    padding: 0 16px;
 }
 
 .content-section {
-    margin: 16px auto;
+    margin: 0 auto 16px;
     max-width: 460px;
     width: 100%;
     padding: 74px 16px 16px;
     position: relative;
+    transition: max-height 0.3s ease-in-out;
+    overflow: hidden;
+    min-height: 0;
+}
+
+#add-item.static {
+    top: 16px;
+    margin-bottom: 16px;
+    transform: translateX(-50%);
+}
+
+#add-item.quick-entry-mode {
+    max-height: 150px !important;
+}
+
+#add-item.quick-entry-mode.hide-items form > *:not(.show-quick-entry) {
+    display: none;
 }
 
 .section-header {
