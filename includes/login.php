@@ -14,7 +14,6 @@ if ($name != null && $imgURL != null && $email != null && $googleId != null) {
             logIn($googleId, $conn);
         }
     }
-
 }
 
 function checkUser ($googleId, $conn) {
