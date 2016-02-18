@@ -5,3 +5,4 @@ $dbpass = ""; // DB PASSWORD
 $dbname = "tracklog"; // DB NAME
 $conn = new mysqli($dbhost, $dbuser, $dbpass, $dbname);
 define("DB_PREFIX", ""); // DB PREFIX
+define("DEBUG", false);
