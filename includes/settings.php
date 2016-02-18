@@ -1,9 +1,8 @@
 <?php
-$dbhost = "localhost"; // DB HOST
-$dbuser = "root"; // DB USER
-$dbpass = "root"; // DB PASSWORD
-$dbname = "tracklog"; // DB NAME
+$dbhost = ""; // DB HOST
+$dbuser = ""; // DB USER
+$dbpass = ""; // DB PASSWORD
+$dbname = ""; // DB NAME
 $conn = new mysqli($dbhost, $dbuser, $dbpass, $dbname);
 define("DB_PREFIX", ""); // DB PREFIX
-//define("DEBUG", true);
 define("DEBUG", false);
