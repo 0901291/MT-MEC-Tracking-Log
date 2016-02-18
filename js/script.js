@@ -1,14 +1,16 @@
 function initApp() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
-            $('#lat').val(position.coords.latitude);
-            $('#long').val(position.coords.longitude);
+            $("#lat").val(position.coords.latitude);
+            $("#long").val(position.coords.longitude);
         });
     }
     $(".add-info-dialog-button").on("click", openAddInfoDialog);
     $("#save-add-info-button").on("click", saveDataInfo);
     $("#cancel-add-info-button").on("click", closeAddInfoDialog);
     initDateTimePicker();
+    positionResize();
+    $(window).on("resize", positionResize);
 }
 
 function openAddInfoDialog(e) {
@@ -49,14 +51,14 @@ function addDataInfoToList(type, id, name) {
             break;
         case "dataType":
             var item = "<label class=\"mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect\" for=\"datatype-" + id + "\">" +
-                            "<input type=\"checkbox\" id=\"datatype-" + id + "\" name=\"data-types\" class=\"mdl-checkbox__input\">" +
+                            "<input type=\"checkbox\" id=\"datatype-" + id + "\" name=\"data-types[]\" class=\"mdl-checkbox__input\">" +
                             "<span class=\"mdl-checkbox__label\">" + name + "</span>" +
                         "</label>";
             $("#data-type-list").append(item);
             break;
         case "company":
             var item = "<label class=\"mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect\" for=\"company-" + id + "\">" +
-                            "<input type=\"checkbox\" id=\"company-" + id + "\" name=\"companies\" class=\"mdl-checkbox__input\">" +
+                            "<input type=\"checkbox\" id=\"company-" + id + "\" name=\"companies[]\" class=\"mdl-checkbox__input\">" +
                             "<span class=\"mdl-checkbox__label\">" + name + "</span>" +
                         "</label>";
             $("#company-list").append(item);
@@ -86,4 +88,11 @@ function initDateTimePicker() {
         lang: "nl",
         currentDate: moment(new Date())
     });
+}
+
+function positionResize() {
+    var max = $(window).height() - $("mdl-layout__header").height() - 32;
+    var content = $("#add-item");
+    if (content.height() > max) content.addClass("static").removeClass("absolute");
+    else content.addClass("absolute").removeClass("static");
 }
