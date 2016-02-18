@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>MT-MEC Tracking Log</title>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.1.1/material.indigo-red.min.css">
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+            <span class="mdl-layout-title">MT-MEC Tracking Log</span>
+            <div class="mdl-layout-spacer"></div>
+            <div id="login">
+                <i class="material-icons">user</i>
+            </div>
+        </div>
+    </header>
+    <main class="mdl-layout__content">
+        <div class="page-content">
+        </div>
+    </main>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script src="https://code.getmdl.io/1.1.1/material.min.js"></script>
+<script src="js/script.js"></script>
+</body>
+</html>
