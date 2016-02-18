@@ -35,17 +35,25 @@ if (isLoggedIn()) {
         <div class="mdl-layout__header-row">
             <span class="mdl-layout-title">MT-MEC Tracking Log</span>
             <div class="mdl-layout-spacer"></div>
-            <label class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" for="logout">
-                <i id="logout" class="material-icons">exit_to_app</i>
-            </label>
+            <?php if (isLoggedIn()) : ?>
+                <label class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" for="logout">
+                    <i id="logout" class="material-icons">exit_to_app</i>
+                </label>
+            <?php endif; ?>
         </div>
-        <div id="header-section-header" class="section-header mdl-color--primary show-quick-entry hidden">
-            <h1 class="mdl-typography--title valign">Item toevoegen</h1>
-            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect valign quick-entry" for="quick-entry-switch-mobile">
-                <input type="checkbox" id="quick-entry-switch-mobile" class="mdl-switch__input">
-                <span class="mdl-switch__label">Quick entry</span>
-            </label>
-        </div>
+        <?php if (isLoggedIn()) : ?>
+            <div class="section-header header-section-header mdl-color--primary show-quick-entry hidden">
+                <h1 class="mdl-typography--title valign">Item toevoegen</h1>
+                <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect valign quick-entry" for="quick-entry-switch-mobile">
+                    <input type="checkbox" id="quick-entry-switch-mobile" class="mdl-switch__input">
+                    <span class="mdl-switch__label">Quick entry</span>
+                </label>
+            </div>
+        <?php else: ?>
+            <div class="section-header header-section-header mdl-color--primary show-quick-entry hidden">
+                <h1 class="mdl-typography--title valign">Inloggen</h1>
+            </div>
+        <?php endif; ?>
     </header>
     <main class="mdl-layout__content">
         <div class="page-content">
@@ -131,13 +139,13 @@ if (isLoggedIn()) {
                     </form>
                 </section>
             <?php else: ?>
-                <section class="content-section mdl-card mdl-shadow--2dp" id="login-section">
-                    <div class="section-header valign mdl-color--primary">
-                        <h1 class="mdl-typography--title">Inloggen</h1>
+                <section class="content-section mdl-card mdl-shadow--2dp centerab" id="login">
+                    <div class="section-header mdl-color--primary show-quick-entry">
+                        <h1 class="mdl-typography--title valign">Inloggen</h1>
                     </div>
                     <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
                 </section>
-            <?php endif ?>
+            <?php endif; ?>
         </div>
     </main>
 </div>
