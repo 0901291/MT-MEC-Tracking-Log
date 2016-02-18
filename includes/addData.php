@@ -21,7 +21,7 @@ if (isLoggedIn()) {
 
         if ($dataTypes != null) {
             foreach ($dataTypes as $dataType) {
-                $query = "INSERT INTO ".DB_PREFIX."dataType_has_data (dataType_id, data_id) VALUES (?, ".$stmt->insert_id.")";
+                $query = "INSERT INTO ".DB_PREFIX."datatype_has_data (dataType_id, data_id) VALUES (?, ".$stmt->insert_id.")";
                 if ($stm = $conn -> prepare($query)) {
                     $stm -> bind_param('s', $dataType);
                     $stm -> execute();

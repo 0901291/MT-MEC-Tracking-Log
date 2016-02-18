@@ -44,7 +44,7 @@ function edit ($type, $id, $name, $conn) {
 }
 
 function delete ($type, $id, $conn) {
-    if ($type == "company" || $type == "dataType") {
+    if ($type == "company" || $type == "datatype") {
         $query = "DELETE FROM ".DB_PREFIX.$type."_has_data WHERE ".$type."_id = ?";
         if ($stmt = $conn -> prepare($query)) {
             $stmt -> bind_param('s', $id);
