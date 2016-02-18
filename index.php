@@ -108,11 +108,13 @@ if (isLoggedIn()) {
         <h3></h3>
     </div>
     <div class="mdl-dialog__content">
-
+        <form action="#">
             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-item">
                 <input class="mdl-textfield__input" type="text" id="add-data-info">
                 <label class="mdl-textfield__label" for="add-data-info">Naam</label>
             </div>
+            <input type="hidden" id="add-data-info-type">
+        </form>
     </div>
     <div class="mdl-dialog__actions">
         <button type="button" id="save-add-info-button" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">Toevoegen</button>

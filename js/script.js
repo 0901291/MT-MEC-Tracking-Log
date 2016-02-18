@@ -9,12 +9,24 @@ function openAddInfoDialog(e) {
     var button = $(e.currentTarget);
     var dialog = $('#add-data-info-dialog');
     dialog.find("h3").text(button.data("data-info-text") + " toevoegen");
+    dialog.find("#add-data-info-type").val(button.data("data-inf-type"));
     dialog[0].MaterialDialog.show(true);
 }
 
 function saveDataInfo() {
     var name = $("#add-data-info").val();
-    // ajax
+    var type = $("#add-data-info-type").val();
+    $.ajax({
+        data: {
+            name: name,
+            function: "create",
+            type: type
+        },
+        url: "includes/dataInfo.php",
+        method: "POST"
+    }).success(function (output) {
+        console.log(output);
+    })
     closeAddInfoDialog();
 }
 

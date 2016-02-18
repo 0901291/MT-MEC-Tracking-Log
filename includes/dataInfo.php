@@ -19,22 +19,11 @@ if (isLoggedIn()) {
     }
 }
 
-function create ($type, $dataId, $name, $conn) {
+function create ($type, $name, $conn) {
     $query = "INSERT INTO $type (name, user_id) VALUES (?, ?)";
     if ($stmt = $conn -> prepare($query)) {
         $stmt -> bind_param('ss', $name, $_SESSION['userId']);
         $stmt -> execute();
-        if ($stmt) {
-            $typeName = ($type == "company" ? "company_id" : "dataType_id");
-            $query = "INSERT INTO ".$type."_has_data (data_id, ".$typeName.") VALUES (?, (SELECT max(id) FROM $type))";
-            if ($stmt = $conn -> prepare($query)) {
-                $stmt -> bind_param('s', $dataId);
-                $stmt -> execute();
-                if ($stmt) {
-                    return true;
-                }
-            }
-        }
     }
     return false;
 }
