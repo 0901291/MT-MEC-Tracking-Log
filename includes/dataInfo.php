@@ -10,7 +10,7 @@ $type = (isset($_POST['type']) ? $_POST['type'] : null);
 if (isLoggedIn()) {
     if ($function != null) {
         if ($function == "create") {
-            create($type,$dataId, $name, $conn);
+            create($type, $name, $conn);
         } else if ($function == "delete") {
             delete($type, $id, $conn);
         } else if ($function == "edit") {
@@ -41,19 +41,19 @@ function edit ($type, $id, $name, $conn) {
 }
 
 function delete ($type, $id, $conn) {
-    $query = "DELETE FROM ".$type."_has_data WHERE ".$type."_id = ?";
+    if ($type == "company" || $type == "dataType") {
+        $query = "DELETE FROM ".$type."_has_data WHERE ".$type."_id = ?";
+        if ($stmt = $conn -> prepare($query)) {
+            $stmt -> bind_param('s', $id);
+            $stmt -> execute();
+        }
+    }
+    $query = "DELETE FROM ".$type." WHERE id = ?";
     if ($stmt = $conn -> prepare($query)) {
         $stmt -> bind_param('s', $id);
         $stmt -> execute();
         if ($stmt) {
-            $query = "DELETE FROM ".$type." WHERE id = ?";
-            if ($stmt = $conn -> prepare($query)) {
-                $stmt -> bind_param('s', $id);
-                $stmt -> execute();
-                if ($stmt) {
-                    return true;
-                }
-            }
+            return true;
         }
     }
     return false;
