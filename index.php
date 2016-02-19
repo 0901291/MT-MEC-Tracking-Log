@@ -59,7 +59,7 @@ if (isLoggedIn()) {
         <div class="page-content">
             <?php if (isLoggedIn()) : ?>
                 <section class="content-section mdl-card mdl-shadow--2dp centerab" id="add-item">
-                    <form action="includes/addData.php" method="post">
+                    <form action="includes/entry.php" method="post">
                         <div class="section-header mdl-color--primary show-quick-entry">
                             <h1 class="mdl-typography--title valign">Item toevoegen</h1>
                             <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect valign quick-entry" for="quick-entry-switch-desktop">
@@ -134,6 +134,7 @@ if (isLoggedIn()) {
                             <label class="mdl-textfield__label" for="date">Longitude</label>
                         </div>
                         <div id="submit-entry" class="show-quick-entry">
+                            <input type="hidden" name="method" value="create">
                             <button type="submit" id="submit-entry-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised mdl-button--primary">Toevoegen</button>
                         </div>
                     </form>
