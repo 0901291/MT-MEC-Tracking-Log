@@ -9,6 +9,13 @@ function initApp() {
     $("#save-add-info-button").on("click", saveDataInfo);
     $("#cancel-add-info-button").on("click", closeAddInfoDialog);
     $("#quick-entry-switch-mobile, #quick-entry-switch-desktop").on("change", toggleQuickEntry);
+    $(".entry-card").on("click", toggleItem);
+    $.each($(".entry-card"), function (k, v) {
+        $(this).attr("data-max-height", $(this).height());
+        var maxHeight = 56;
+        if (k === 0) maxHeight = $(this).height();
+        $(this).css("max-height", maxHeight + "px");
+    });
     initDateTimePicker();
     positionResize();
     $(window).on("resize", positionResize);
@@ -124,8 +131,39 @@ function toggleQuickEntry() {
     }
 }
 
+function toggleItem() {
+    var item = $(this);
+    var currentItem = $(".entry-card.show");
+    var content = $(".content-section");
+    var maxHeightColl = 56;
+    if (item.hasClass("collapsed")) {
+        currentItem.removeClass("show").css("max-height", maxHeightColl + "px");
+        setTimeout(function () {
+            currentItem.addClass("collapsed");
+            setTimeout(function () {
+                positionResize();
+            }, 10);
+        }, 200);
+        item.removeClass("collapsed");
+        setTimeout(function () {
+            item.addClass("show").css("max-height", item.attr("data-max-height") + "px");
+            setTimeout(function () {
+                positionResize();
+            }, 200);
+        }, 10);
+    } else {
+        item.removeClass("show").css("max-height", maxHeightColl + "px");
+        setTimeout(function () {
+            item.addClass("collapsed");
+            setTimeout(function () {
+                positionResize();
+            }, 10);
+        }, 200);
+    }
+}
+
 function positionResize() {
-    var content = $("#add-item");
+    var content = $(".content-section");
     var max = $(window).height() - $(".mdl-layout__header").height() - 32 - parseInt(content.css("padding-top")) - parseInt(content.css("padding-bottom"));
     if (content.height() > max) content.addClass("static").removeClass("absolute");
     else content.addClass("absolute").removeClass("static");

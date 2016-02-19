@@ -1,8 +1,9 @@
 <?php
-require("includes/initialize.php");
+require_once("includes/initialize.php");
+require("includes/entry.php");
 
 if (isLoggedIn()) {
-    $entries = Entry::getEntries($status = 0, $conn);
+    $entries = Entry::getEntries(0, "php", $conn);
 }
 else {
     header("index.php");
@@ -54,11 +55,11 @@ else {
                         <span class="mdl-switch__label">Concepten</span>
                     </label>
                 </div>
-                <?php foreach($entries as $entry) : ?>
-                    <div class="entry-card mdl-card mdl-shadow--2dp">
+                <?php foreach($entries as $key => $entry): ?>
+                    <div class="entry-card mdl-card mdl-shadow--2dp <?= ($key === 0 ? "show" : "collapsed") ?>">
                         <div class="entry-card-header">
                             <div class="valign">
-                                <h2 class="ellipsis"><?= $entry["name"] ?></h2>
+                                <h2 class="ellipsis"><?= $entry["title"] ?></h2>
                                 <span class="entry-date valign"><?= date("d-m-Y H:m", strtotime($entry["date"])) ?></span>
                                 <div class="form-container valign">
                                     <form action="edit/<?= $entry["id"] ?>">
@@ -67,7 +68,7 @@ else {
                                             <i class="material-icons">mode_edit</i>
                                         </button>
                                     </form>
-                                    <form action="../delete/<?= $entry["id"] ?>">
+                                    <form action="delete/<?= $entry["id"] ?>">
                                         <button type="submit" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect entry-remove">
                                             <input type="hidden" value="<?= $entry["id"] ?>">
                                             <i class="material-icons">delete</i>
@@ -77,7 +78,10 @@ else {
                             </div>
                         </div>
                         <div class="entry-card-content">
-
+                            <div class="entry-location">
+                                <img src="https://maps.googleapis.com/maps/api/staticmap?center=<?= $entry["location"]["lat"] ?>,<?= $entry["location"]["lng"] ?>&zoom=13&size=460x130&maptype=roadmap&markers=color:red%7C<?= $entry["location"]["lat"] ?>,<?= $entry["location"]["lng"] ?>&key=AIzaSyC6VYBFTcvqfDookMW4Hl1J3TphwJxo6nA" alt="">
+                                <div class="shadow"></div>
+                            </div>
                         </div>
                     </div>
                 <?php endforeach; ?>

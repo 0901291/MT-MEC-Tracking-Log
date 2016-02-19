@@ -44,7 +44,7 @@ if (isLoggedIn()) {
         <?php if (isLoggedIn()) : ?>
             <div class="section-header header-section-header mdl-color--primary show-quick-entry hidden">
                 <h1 class="mdl-typography--title valign">Item toevoegen</h1>
-                <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect valign quick-entry" for="quick-entry-switch-mobile">
+                <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect valign quick-entry header-switch" for="quick-entry-switch-mobile">
                     <input type="checkbox" id="quick-entry-switch-mobile" class="mdl-switch__input">
                     <span class="mdl-switch__label">Quick entry</span>
                 </label>
@@ -62,7 +62,7 @@ if (isLoggedIn()) {
                     <form action="includes/entry.php" method="post">
                         <div class="section-header mdl-color--primary show-quick-entry">
                             <h1 class="mdl-typography--title valign">Item toevoegen</h1>
-                            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect valign quick-entry" for="quick-entry-switch-desktop">
+                            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect valign quick-entry header-switch" for="quick-entry-switch-desktop">
                                 <input type="checkbox" id="quick-entry-switch-desktop" class="mdl-switch__input">
                                 <span class="mdl-switch__label">Quick entry</span>
                             </label>
