@@ -1,5 +1,5 @@
 <?php
-require("initialize.php");
+require_once("initialize.php");
 //
 //$description = (isset($_POST['description']) || !empty($_POST['description']) ? $_POST['description'] : null);
 //$category = (isset($_POST['category']) ? $_POST['category'] : null);
@@ -51,24 +51,37 @@ class entry {
 
     }
 
-    public static function getEntries($status, $conn) {
+    public static function getEntries($status, $acceptType, $conn) {
         $status = htmlentities($status);
         $state = ($status != 0 ? "AND WHERE = ".$status : "");
 
         if (is_numeric($status)) {
-            $query = "SELECT d.id, d.title, d.date, d.description, d.imgURL, d.lng, d.lat, group_concat(DISTINCT c.name), group_concat(DISTINCT dt.name), c.name from tracklog_data d
-            LEFT OUTER JOIN (tracklog_datatype_has_data dhd
-                LEFT OUTER JOIN tracklog_datatype dt
-                ON dt.id = dhd.dataType_id)
-            on dhd.data_id = d.id
-            LEFT OUTER JOIN (tracklog_company_has_data chd
-                LEFT OUTER JOIN tracklog_company c
-                ON c.id = chd.company_id)
-            on chd.data_id = d.id
-            LEFT OUTER JOIN tracklog_category ca
-            ON ca.id = d.category_id
-            WHERE d.user_id = ? ".$state."
-            ORDER BY d.id";
+            $query =
+                "SELECT
+                  d.id,
+                  d.title,
+                  d.date,
+                  d.description,
+                  d.imgURL,
+                  d.lng,
+                  d.lat,
+                  group_concat(DISTINCT c.name),
+                  group_concat(DISTINCT dt.name),
+                  ca.name
+                FROM ".DB_PREFIX."data d
+                LEFT OUTER JOIN (".DB_PREFIX."datatype_has_data dhd
+                    LEFT OUTER JOIN ".DB_PREFIX."datatype dt
+                    ON dt.id = dhd.dataType_id)
+                ON dhd.data_id = d.id
+                LEFT OUTER JOIN (".DB_PREFIX."company_has_data chd
+                    LEFT OUTER JOIN ".DB_PREFIX."company c
+                    ON c.id = chd.company_id)
+                ON chd.data_id = d.id
+                LEFT OUTER JOIN ".DB_PREFIX."category ca
+                ON ca.id = d.category_id
+                WHERE d.user_id = ?
+                GROUP BY d.id
+                ORDER BY d.date ASC";
             if ($stmt = $conn -> prepare($query)) {
                 $stmt -> bind_param("i", $_SESSION['userId']);
                 $stmt -> execute();
@@ -93,7 +106,13 @@ class entry {
                         "category" => $category
                     ];
                 }
-                return json_encode($array);
+                switch($acceptType) {
+                    case "json":
+                        return json_encode($array);
+                        break;
+                    default:
+                        return $array;
+                }
             }
         }
         return false;
