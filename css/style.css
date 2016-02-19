@@ -6,6 +6,10 @@
     padding: 0 16px;
 }
 
+.mdl-card {
+    min-height: 0;
+}
+
 .content-section {
     margin: 0 auto 16px;
     max-width: 460px;
@@ -14,7 +18,14 @@
     position: relative;
     transition: all 0.3s ease-in-out;
     overflow: hidden;
-    min-height: 0;
+}
+
+#items {
+    padding: 28px 16px;
+}
+
+#items .section-header {
+    position: relative;
 }
 
 #add-item.static {
@@ -69,6 +80,14 @@ button.form-item {
     transform: translateX(-50%) translateY(-50%);
 }
 
+.ellipsis {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+    overflow: hidden;
+    display: block;
+}
+
 .category-item input {
     position: absolute;
     left: -10000px;
@@ -87,11 +106,51 @@ button.form-item {
     bottom: 8px;
 }
 
+/* ENTRY */
+.entry-card {
+    margin-top: 8px;
+    width: 100%;
+}
+
+.entry-card-header {
+    padding: 16px;
+    height: 28px;
+    position: relative;
+}
+
+.entry-card-header h2 {
+    font-size: 20px;
+    font-weight: 400;
+    margin: 0;
+    line-height: 1.2em;
+    width: 50%;
+}
+
+.entry-card-header .entry-date {
+    font-style: italic;
+    position: absolute;
+    right: 75px;
+    font-size: 14px;
+}
+
+.entry-card-header .form-container {
+    position: absolute;
+    right: 0;
+}
+
+.entry-card-header form {
+    display: inline;
+}
+
 /* SWITCH */
-.quick-entry {
+.header-switch {
     right: 0;
     position: absolute;
     width: 170px;
+}
+
+.concept-switch {
+    width: 150px;
 }
 
 .mdl-switch.is-checked .mdl-switch__track {
