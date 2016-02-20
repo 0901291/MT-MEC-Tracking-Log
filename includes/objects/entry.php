@@ -1,6 +1,6 @@
 <?php
 
-class entry {
+class Entry {
 
     private $conn;
 
