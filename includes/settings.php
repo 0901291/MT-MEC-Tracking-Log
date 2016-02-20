@@ -1,6 +1,7 @@
 <?php
 define("DB_PREFIX", "tracklog_"); // DB PREFIX
 define("DEBUG", false);
+define("ROOT", "http://localhost/TrackLog");
 
 class database {
     private $user = "root"; // DB USER
@@ -19,3 +20,4 @@ class database {
         }
     }
 }
+

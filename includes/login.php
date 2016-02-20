@@ -42,17 +42,19 @@ function createUser ($googleId, $name, $email, $imgURL, $conn) {
 }
 
 function logIn ($googleId, $conn) {
-    $query = "SELECT name, imgURL, id FROM ".DB_PREFIX."user WHERE ".DB_PREFIX."user.googleId = ?";
+    $query = "SELECT name, imgURL, id, email, token FROM ".DB_PREFIX."user WHERE ".DB_PREFIX."user.googleId = ?";
     if ($stmt = $conn -> prepare($query)) {
         $stmt -> bind_param('s', $googleId);
         $stmt -> execute();
         $stmt -> store_result();
-        $stmt -> bind_result($name, $imgURL, $id);
+        $stmt -> bind_result($name, $imgURL, $id, $email, $token);
         if ($stmt -> num_rows == 1) {
             $stmt -> fetch();
             $_SESSION['userId'] = $id;
             $_SESSION['name'] = $name;
             $_SESSION['imgURL'] = $imgURL;
+            $_SESSION['email'] = $email;
+            $_SESSION['token'] = $token;
         }
     }
 }

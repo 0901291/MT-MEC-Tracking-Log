@@ -51,30 +51,45 @@ class entry {
         $state = ($status != 0 ? "AND WHERE = ".$status : "");
 
         if (is_numeric($status)) {
-            $query = "SELECT d.id, d.title, d.date, d.description, d.imgURL, d.lng, d.lat, group_concat(DISTINCT c.name), group_concat(DISTINCT dt.name), ca.name from ".DB_PREFIX."data d
-            LEFT OUTER JOIN (".DB_PREFIX."datatype_has_data dhd
-                LEFT OUTER JOIN ".DB_PREFIX."datatype dt
-                ON dt.id = dhd.dataType_id)
-            on dhd.data_id = d.id
-            LEFT OUTER JOIN (".DB_PREFIX."company_has_data chd
-                LEFT OUTER JOIN ".DB_PREFIX."company c
-                ON c.id = chd.company_id)
-            on chd.data_id = d.id
-            LEFT OUTER JOIN ".DB_PREFIX."category ca
-            ON ca.id = d.category_id
-            WHERE d.user_id = ? ".$state."
-            GROUP BY d.id
-            ORDER BY d.date ASC";
+            $query =
+                "SELECT
+                  d.id,
+                  d.title,
+                  d.date,
+                  d.description,
+                  d.imgURL,
+                  d.lng,
+                  d.lat,
+                  group_concat(DISTINCT c.name),
+                  group_concat(DISTINCT dt.name),
+                  ca.name,
+                  d.state
+                FROM ".DB_PREFIX."data d
+                LEFT OUTER JOIN (".DB_PREFIX."datatype_has_data dhd
+                    LEFT OUTER JOIN ".DB_PREFIX."datatype dt
+                    ON dt.id = dhd.dataType_id)
+                ON dhd.data_id = d.id
+                LEFT OUTER JOIN (".DB_PREFIX."company_has_data chd
+                    LEFT OUTER JOIN ".DB_PREFIX."company c
+                    ON c.id = chd.company_id)
+                ON chd.data_id = d.id
+                LEFT OUTER JOIN ".DB_PREFIX."category ca
+                ON ca.id = d.category_id
+                WHERE d.user_id = ?
+                GROUP BY d.id
+                ORDER BY d.date ASC";
             if ($stmt = $conn -> prepare($query)) {
                 $stmt -> bind_param("i", $_SESSION['userId']);
                 $stmt -> execute();
                 $stmt -> store_result();
-                $stmt -> bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $companyId, $dataType, $dataTypeId, $category);
+                $stmt -> bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $dataType, $category, $state);
                 $array = [];
                 while ($stmt -> fetch()) {
-                    $companies = explode(",", $company);
-                    $dataTypes = explode(",", $dataType);
-                    $array[] = ["id" => $id,
+                    $companies = strlen($company) > 0 ? explode(",", $company) : null;
+                    $dataTypes = strlen($dataType) > 0 ? explode(",", $dataType) : null;
+
+                    $array[] = [
+                        "id" => $id,
                         "title" => $title,
                         "date" => $date,
                         "description" => $description,
@@ -85,7 +100,8 @@ class entry {
                         ],
                         "companies" => $companies,
                         "dataTypes" => $dataTypes,
-                        "category" => $category
+                        "category" => $category,
+                        "state" => $state
                     ];
                 }
                 switch($acceptType) {
