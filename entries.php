@@ -1,6 +1,8 @@
 <?php
 require_once("includes/initialize.php");
-require("includes/entry.php");
+require("includes/entry/entry.php");
+$db = new database();
+$conn = $db->getConnection();
 
 if (isLoggedIn()) {
     if (isset($_GET["method"]) && isset($_GET["data_id"])) {
