@@ -18,8 +18,8 @@ if (isLoggedIn()) {
 
     $edit = false;
     $title = $description = $lat = $lng = $id = "";
-    $date = date("Y/m/d");
-    $time = date("H:m");
+    $date = date("Y-m-d");
+    $time = date("H:i");
     $categoryId = -1;
     $dataTypeIds = $companyIds = [];
 
@@ -35,7 +35,7 @@ if (isLoggedIn()) {
             $lat = $entry["location"]["lat"];
             $lng = $entry["location"]["lng"];
             $date = date("Y-m-d", strtotime($entry["date"]));
-            $time = date("H:m", strtotime($entry["date"]));
+            $time = date("H:i", strtotime($entry["date"]));
             $categoryId = $entry["category"]["id"];
             foreach($entry["dataTypes"] as $dataType) $dataTypeIds[] = $dataType["id"];
             foreach($entry["companies"] as $company) $companyIds[] = $company["id"];
@@ -133,7 +133,7 @@ if (isLoggedIn()) {
                         <div class="field-add-button-container form-item">
                             <label class="add-entry-section-heading" for="datatypes">Data types</label>
                             <div class="input-field row">
-                                <select multiple name="datatypes" id="data-type-list" class="col s11">
+                                <select multiple name="dataTypes[]" id="data-type-list" class="col s11">
                                     <option value="" disabled selected>Data types</option>
                                     <?php foreach($dataTypes as $key => $dataType) : ?>
                                         <option <?= in_array($key, $dataTypeIds) ? "selected" : "" ?> value="<?= $dataType["id"] ?>"><?= $dataType["name"] ?></option>
@@ -149,7 +149,7 @@ if (isLoggedIn()) {
                         <div class="field-add-button-container form-item">
                             <label class="add-entry-section-heading" for="companies">Bedrijven</label>
                             <div class="input-field row">
-                                <select multiple name="companies" id="company-list" class="col s11">
+                                <select multiple name="companies[]" id="company-list" class="col s11">
                                     <option value="" disabled selected>Bedrijven</option>
                                     <?php foreach($companies as $key => $company) : ?>
                                         <option <?= in_array($key, $companyIds) ? "selected" : "" ?> value="<?= $company["id"] ?>"><?= $company["name"] ?></option>

@@ -38,6 +38,7 @@ class entry {
                   group_concat(DISTINCT c.name),
                   group_concat(DISTINCT dt.name),
                   ca.name,
+                  ca.id,
                   d.state
                 FROM ".DB_PREFIX."data d
                 LEFT OUTER JOIN (".DB_PREFIX."datatype_has_data dhd
@@ -57,11 +58,15 @@ class entry {
                 $stmt -> bind_param("i", $_SESSION['userId']);
                 $stmt -> execute();
                 $stmt -> store_result();
-                $stmt -> bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $dataType, $category, $state);
+                $stmt -> bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $dataType, $category, $categoryId, $state);
                 $array = [];
                 while ($stmt -> fetch()) {
                     $companies = strlen($company) > 0 ? explode(",", $company) : null;
                     $dataTypes = strlen($dataType) > 0 ? explode(",", $dataType) : null;
+                    $categoryArray = !empty($category) && !empty($categoryId) ? [
+                        "name" => $category,
+                        "id" => $categoryId
+                    ] : null;
 
                     $array[] = [
                         "id" => $id,
@@ -75,7 +80,7 @@ class entry {
                         ],
                         "companies" => $companies,
                         "dataTypes" => $dataTypes,
-                        "category" => $category,
+                        "category" => $categoryArray,
                         "state" => $state
                     ];
                 }
@@ -105,8 +110,8 @@ class entry {
                     }
                 }
             }
-            if ($this->dataTypes != null) {
-                foreach ($this->dataTypes as $company) {
+            if ($this->companies != null) {
+                foreach ($this->companies as $company) {
                     $query = "INSERT INTO ".DB_PREFIX."company_has_data (company_id, data_id) VALUES (?, ".$stmt->insert_id.")";
                     if ($stm = $this-> conn -> prepare($query)) {
                         $stm -> bind_param('s', $company);
@@ -123,20 +128,30 @@ class entry {
         if ($stmt = $this-> conn -> prepare($query)) {
             $stmt -> bind_param("sssssiiii", $this->title, $this->date, $this->description, $this->lat, $this->lng, $this->category, $_SESSION['userId'], $this ->state, $this->id);
             $stmt -> execute();
+            $query = "DELETE FROM ".DB_PREFIX."company_has_data WHERE data_id = ?";
+            if ($stmt = $this-> conn -> prepare($query)) {
+                $stmt->bind_param("i", $this->id);
+                $stmt->execute();
+            }
+            $query = "DELETE FROM ".DB_PREFIX."datatype_has_data WHERE data_id = ?";
+            if ($stmt = $this-> conn -> prepare($query)) {
+                $stmt -> bind_param("i", $this->id);
+                $stmt -> execute();
+            }
             if ($this->dataTypes != null) {
                 foreach ($this->dataTypes as $dataType) {
-                    $query = "UPDATE ".DB_PREFIX."datatype SET name = ? WHERE id = ?";
+                    $query = "INSERT INTO ".DB_PREFIX."datatype_has_data (dataType_id, data_id) VALUES (?, ?)";
                     if ($stm = $this-> conn -> prepare($query)) {
-                        $stm -> bind_param('si', $dataType['name'], $dataType['id']);
+                        $stm -> bind_param('ss', $dataType, $this->id);
                         $stm -> execute();
                     }
                 }
             }
             if ($this->companies != null) {
                 foreach ($this->companies as $company) {
-                    $query = "UPDATE ".DB_PREFIX."company SET name = ? WHERE id = ?";
+                    $query = "INSERT INTO ".DB_PREFIX."company_has_data (company_id, data_id) VALUES (?, ?)";
                     if ($stm = $this-> conn -> prepare($query)) {
-                        $stm -> bind_param('si', $company['name'], $company['id']);
+                        $stm -> bind_param('ss', $company, $this->id);
                         $stm -> execute();
                     }
                 }

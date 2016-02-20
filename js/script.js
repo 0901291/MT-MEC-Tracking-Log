@@ -13,12 +13,6 @@ function initApp() {
         $("#current-location").removeClass("selected");
     });
     $(".entry-card-header").on("click", toggleItem);
-    $.each($(".entry-card"), function (k, v) {
-        $(this).attr("data-max-height", $(this).height());
-        var maxHeight = 56;
-        if (k === 0) maxHeight = $(this).height();
-        $(this).css("max-height", maxHeight + "px");
-    });
     $("body").on("click", ".select-wrapper", function () {alert()});
     $(".field-add-button-container").on("contentChange", function () {
         $(this).find(".dropdown-content").css("top", 0);
@@ -38,6 +32,14 @@ function initApp() {
         }
     }
     if ($("select").length > 0) $('select').material_select();
+    setTimeout(function () {
+        $.each($(".entry-card"), function (k, v) {
+            $(this).attr("data-max-height", $(this).height());
+            var maxHeight = 56;
+            if (k === 0) maxHeight = $(this).height();
+            $(this).css("max-height", maxHeight + "px");
+        });
+    }, 10);
 }
 
 function initMap() {
