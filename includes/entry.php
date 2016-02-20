@@ -67,7 +67,8 @@ class entry {
                   d.lat,
                   group_concat(DISTINCT c.name),
                   group_concat(DISTINCT dt.name),
-                  ca.name
+                  ca.name,
+                  d.state
                 FROM ".DB_PREFIX."data d
                 LEFT OUTER JOIN (".DB_PREFIX."datatype_has_data dhd
                     LEFT OUTER JOIN ".DB_PREFIX."datatype dt
@@ -86,13 +87,14 @@ class entry {
                 $stmt -> bind_param("i", $_SESSION['userId']);
                 $stmt -> execute();
                 $stmt -> store_result();
-                $stmt -> bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $dataType, $category);
+                $stmt -> bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $dataType, $category, $state);
                 $array = [];
                 while ($stmt -> fetch()) {
-                    $companies = explode(",", $company);
-                    $dataTypes = explode(",", $dataType);
+                    $companies = strlen($company) > 0 ? explode(",", $company) : null;
+                    $dataTypes = strlen($dataType) > 0 ? explode(",", $dataType) : null;
 
-                    $array[] = ["id" => $id,
+                    $array[] = [
+                        "id" => $id,
                         "title" => $title,
                         "date" => $date,
                         "description" => $description,
@@ -103,7 +105,8 @@ class entry {
                         ],
                         "companies" => $companies,
                         "dataTypes" => $dataTypes,
-                        "category" => $category
+                        "category" => $category,
+                        "state" => $state
                     ];
                 }
                 switch($acceptType) {

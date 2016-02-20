@@ -6,6 +6,33 @@
     padding: 0 16px;
 }
 
+.mdl-layout__header-row {
+    position: relative;
+}
+
+/* Google Profile */
+#google-profile {
+    position: absolute;
+    left: 16px;
+    width: 40px;
+}
+
+#google-profile img {
+    border-radius: 50%;
+    width: 100%;
+    cursor: pointer;
+}
+
+#google-profile-inner {
+    position: absolute;
+    padding: 24px 16px 16px;
+    z-index: -1;
+}
+
+#google-profile:hover #google-profile-inner {
+    display: block !important;
+}
+
 .mdl-card {
     min-height: 0;
 }
@@ -14,7 +41,7 @@
     margin: 0 auto 16px;
     max-width: 460px;
     width: 100%;
-    padding: 74px 16px 40px;
+    padding: 74px 16px 48px;
     position: relative;
     transition: all 0.3s ease-in-out;
     overflow: hidden;
@@ -67,6 +94,54 @@ button.form-item {
     width: inherit;
 }
 
+.category-item input {
+    position: absolute;
+    left: -10000px;
+}
+
+.category-item label {
+    display: block;
+}
+
+.category-item input:checked + label {
+    font-weight: 600;
+}
+
+#location {
+    display: flex;
+    position: relative;
+}
+
+#location-fields {
+    flex: 5;
+    display: flex;
+}
+
+#lat-field, #lng-field {
+    flex: 1;
+}
+
+#lat-field {
+    margin-right: 8px;
+}
+
+#location-controls {
+    flex: 1;
+    height: 32px;
+    margin-top: 40px;
+    color: rgba(0, 0, 0, 0.7);
+}
+
+.location-control.selected {
+    color: rgba(6, 11, 255, 0.7);
+}
+
+#submit-entry {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+}
+
 .valign {
     position: relative;
     top: 50%;
@@ -88,36 +163,32 @@ button.form-item {
     display: block;
 }
 
-.category-item input {
-    position: absolute;
-    left: -10000px;
-}
-
-.category-item label {
-    display: block;
-}
-
-.category-item input:checked + label {
-    font-weight: 600;
-}
-
-#submit-entry {
-    position: absolute;
-    bottom: 8px;
-}
-
 /* ENTRY */
+.content-section.concept-mode .entry-card:not(.concept-card) {
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+.content-section.concept-mode.hide-items .entry-card:not(.concept-card) {
+    max-height: 0 !important;
+}
+
+.content-section.concept-mode.hidden-items .entry-card:not(.concept-card) {
+    display: none;
+}
+
 .entry-card {
     margin-top: 8px;
     width: 100%;
-    transition: max-height 0.2s ease-in-out;
-    cursor: pointer;
+    transition: max-height 0.2s ease-in-out, all 0.3s ease-in-out;
+    opacity: 1;
 }
 
 .entry-card-header {
-    padding: 16px;
+    padding: 16px 16px 0;
     height: 28px;
     position: relative;
+    cursor: pointer;
 }
 
 .entry-card-header h2 {
@@ -126,6 +197,12 @@ button.form-item {
     margin: 0;
     line-height: 1.2em;
     width: 50%;
+}
+
+.entry-card-header .concept-icon {
+    position: absolute;
+    margin-left: 10px;
+    color: rgba(0, 0, 0, 0.7);
 }
 
 .entry-card-header .entry-date {
@@ -142,6 +219,23 @@ button.form-item {
 
 .entry-card-header form {
     display: inline;
+}
+
+.entry-card-content {
+    padding: 16px;
+}
+
+.entry-section-heading {
+    font-size: 15px;
+    color: rgba(0, 0, 0, 0.7);
+    font-weight: 600;
+    margin-top: 8px;
+    margin-bottom: 0;
+    line-height: 1.5em;
+}
+
+.entry-category .entry-section-heading {
+    margin-top: 0;
 }
 
 .entry-location {
