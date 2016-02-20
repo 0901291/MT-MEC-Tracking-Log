@@ -1,5 +1,5 @@
 <?php
-require("initialize.php");
+require_once("initialize.php");
 //
 //$description = (isset($_POST['description']) || !empty($_POST['description']) ? $_POST['description'] : null);
 //$category = (isset($_POST['category']) ? $_POST['category'] : null);
@@ -45,12 +45,13 @@ require("initialize.php");
 
 
 class entry {
-    public static function getEntries($status, $conn) {
+
+    public static function getEntries($status, $acceptType, $conn) {
         $status = htmlentities($status);
         $state = ($status != 0 ? "AND WHERE = ".$status : "");
 
         if (is_numeric($status)) {
-            $query = "SELECT d.id, d.title, d.date, d.description, d.imgURL, d.lng, d.lat, group_concat(DISTINCT c.name), group_concat(DISTINCT c.id), group_concat(DISTINCT dt.name), group_concat(DISTINCT dt.id), ca.name from ".DB_PREFIX."data d
+            $query = "SELECT d.id, d.title, d.date, d.description, d.imgURL, d.lng, d.lat, group_concat(DISTINCT c.name), group_concat(DISTINCT dt.name), ca.name from ".DB_PREFIX."data d
             LEFT OUTER JOIN (".DB_PREFIX."datatype_has_data dhd
                 LEFT OUTER JOIN ".DB_PREFIX."datatype dt
                 ON dt.id = dhd.dataType_id)
@@ -87,7 +88,13 @@ class entry {
                         "category" => $category
                     ];
                 }
-                return json_encode($array);
+                switch($acceptType) {
+                    case "json":
+                        return json_encode($array);
+                        break;
+                    default:
+                        return $array;
+                }
             }
         }
         return false;
