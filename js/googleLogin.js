@@ -7,9 +7,10 @@ function onSignIn(googleUser) {
             name: profile.getName(),
             id: profile.getId(),
             email: profile.getEmail(),
-            img: profile.getImageUrl()
+            img: profile.getImageUrl(),
+            method: "logIn"
         },
-        url: "includes/login.php",
+        url: "includes/user/userCall.php",
         method: "POST"
     }).success(function (output) {
         location.reload();

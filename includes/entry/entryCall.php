@@ -22,7 +22,7 @@ if ($_POST) {
                 $time = (isset($_POST['time']) ? $_POST['time'] : date("H:i:s"));
                 $entry -> date = date('Y-m-d H:i:s', strtotime("$date $time"));
                 if($entry -> insert()) {
-                    // Iets?
+                    header("location: ../../index.php");
                 }
                 break;
             case "edit":
@@ -39,7 +39,7 @@ if ($_POST) {
                     $entry -> category = (isset($_POST['category']) ? $_POST['category'] : null);
                     $entry -> state = ($entry -> description == "" ? 1 : 2);
                     if ($entry -> edit()) {
-                        // iets?
+                        header("location: ../../entries.php");
                     }
                 }
                 break;
@@ -47,7 +47,7 @@ if ($_POST) {
                 if (is_numeric($_POST['id'])) {
                     $entry -> id = $_POST['id'];
                     if ($entry -> delete()) {
-                        // iets?
+                        header("location: ../../entries.php");
                     }
                 }
                 break;

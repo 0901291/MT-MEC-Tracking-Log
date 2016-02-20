@@ -207,7 +207,17 @@ class entry {
     }
 
     public function delete () {
-        $query = "DELETE FROM data WHERE id = ? AND user_id = ?";
+        $query = "DELETE FROM ".DB_PREFIX."company_has_data WHERE data_id = ?";
+        if ($stmt = $this-> conn -> prepare($query)) {
+            $stmt->bind_param("i", $this->id);
+            $stmt->execute();
+        }
+        $query = "DELETE FROM ".DB_PREFIX."datatype_has_data WHERE data_id = ?";
+        if ($stmt = $this-> conn -> prepare($query)) {
+            $stmt -> bind_param("i", $this->id);
+            $stmt -> execute();
+        }
+        $query = "DELETE FROM ".DB_PREFIX."data WHERE id = ? AND user_id = ?";
         if ($stmt = $this-> conn -> prepare($query)) {
             $stmt -> bind_param("ii", $this->id, $_SESSION['userId']);
             $stmt -> execute();
