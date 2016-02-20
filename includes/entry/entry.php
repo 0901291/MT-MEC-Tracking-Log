@@ -1,50 +1,25 @@
 <?php
-require_once("initialize.php");
-//
-//$description = (isset($_POST['description']) || !empty($_POST['description']) ? $_POST['description'] : null);
-//$category = (isset($_POST['category']) ? $_POST['category'] : null);
-//$dataTypes = (isset($_POST['data-types']) ? $_POST['data-types'] : null);
-//$companies = (isset($_POST['companies']) ? $_POST['companies'] : null);
-//$title = (isset($_POST['title']) ? $_POST['title'] : null);
-//$date = (isset($_POST['date']) ? $_POST['date'] : null);
-//$time = (isset($_POST['time']) ? $_POST['time'] : null);
-//$lat = (isset($_POST['lat']) ? $_POST['lat'] : null);
-//$lng = (isset($_POST['lng']) ? $_POST['lng'] : null);
-//$state = ($description == null ? 1 : 2);
-//$dateTime = date('Y-m-d H:i:s', strtotime("$date $time"));
-//
-//if (isLoggedIn()) {
-//    $query = "INSERT INTO ".DB_PREFIX."data (title, date, description, lat, lng, category_id, user_id, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-//    if ($stmt = $conn -> prepare($query)) {
-//        $stmt -> bind_param("ssssssss", $title, $dateTime, $description, $lat, $lng, $category, $_SESSION['userId'], $state);
-//        $stmt -> execute();
-//
-//        if ($dataTypes != null) {
-//            foreach ($dataTypes as $dataType) {
-//                $query = "INSERT INTO ".DB_PREFIX."datatype_has_data (dataType_id, data_id) VALUES (?, ".$stmt->insert_id.")";
-//                if ($stm = $conn -> prepare($query)) {
-//                    $stm -> bind_param('s', $dataType);
-//                    $stm -> execute();
-//                }
-//            }
-//        }
-//
-//        if ($companies != null) {
-//            foreach ($companies as $company) {
-//                $query = "INSERT INTO ".DB_PREFIX."company_has_data (company_id, data_id) VALUES (?, ".$stmt->insert_id.")";
-//                if ($stm = $conn -> prepare($query)) {
-//                    $stm -> bind_param('s', $company);
-//                    $stm -> execute();
-//                }
-//            }
-//        }
-//
-//        header("Location: ../index.php");
-//    }
-//}
-
 
 class entry {
+
+    private $conn;
+
+    public $id,
+        $title,
+        $date,
+        $description,
+        $imgURL,
+        $lng,
+        $lat,
+        $companies,
+        $dataTypes,
+        $category,
+        $state;
+
+    public function __construct($db)
+    {
+        $this -> conn = $db;
+    }
 
     public static function getEntries($status, $acceptType, $conn) {
         $status = htmlentities($status);
@@ -75,7 +50,7 @@ class entry {
                 ON chd.data_id = d.id
                 LEFT OUTER JOIN ".DB_PREFIX."category ca
                 ON ca.id = d.category_id
-                WHERE d.user_id = ?
+                WHERE d.user_id = ? ".$state."
                 GROUP BY d.id
                 ORDER BY d.date ASC";
             if ($stmt = $conn -> prepare($query)) {
@@ -116,59 +91,61 @@ class entry {
         return false;
     }
 
-    public function insert ($data, $dataTypes, $companies, $conn) {
+    public function insert () {
         $query = "INSERT INTO ".DB_PREFIX."data (title, date, description, lat, lng, category_id, user_id, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        if ($stmt = $conn -> prepare($query)) {
-            $stmt -> bind_param("ssssssss", $data["title"], $data["dateTime"], $data["description"], $data["lat"], $data["lng"], $data["category"], $_SESSION['userId'], $data["state"]);
+        if ($stmt = $this-> conn -> prepare($query)) {
+            $stmt -> bind_param("ssssssss", $this->title, $this->date, $this->description, $this->lat, $this->lng, $this->category, $_SESSION['userId'], $this ->state);
             $stmt -> execute();
-            if ($dataTypes != null) {
-                foreach ($dataTypes as $dataType) {
+            if ($this->dataTypes != null) {
+                foreach ($this->dataTypes as $dataType) {
                     $query = "INSERT INTO ".DB_PREFIX."datatype_has_data (dataType_id, data_id) VALUES (?, ".$stmt->insert_id.")";
-                    if ($stm = $conn -> prepare($query)) {
+                    if ($stm = $this-> conn -> prepare($query)) {
                         $stm -> bind_param('s', $dataType);
                         $stm -> execute();
                     }
                 }
             }
-            if ($companies != null) {
-                foreach ($companies as $company) {
+            if ($this->dataTypes != null) {
+                foreach ($this->dataTypes as $company) {
                     $query = "INSERT INTO ".DB_PREFIX."company_has_data (company_id, data_id) VALUES (?, ".$stmt->insert_id.")";
-                    if ($stm = $conn -> prepare($query)) {
+                    if ($stm = $this-> conn -> prepare($query)) {
                         $stm -> bind_param('s', $company);
                         $stm -> execute();
                     }
                 }
             }
+            return true;
         }
     }
 
-    public function edit ($data, $id, $conn) {
+    public function edit () {
         $query = "UPDATE ".DB_PREFIX."data SET title = ?, date = ?, description = ?, lat = ?, lng = ?, category_id = ?, user_id = ?, state = ? WHERE id = ?";
-        if ($stmt = $conn -> prepare($query)) {
-            $stmt -> bind_param("ssssssss", $data["title"], $data["dateTime"], $data["description"], $data["lat"], $data["lng"], $data["category"], $_SESSION['userId'], $data["state"], $id);
+        if ($stmt = $this-> conn -> prepare($query)) {
+            $stmt -> bind_param("ssssssss", $this->title, $this->date, $this->description, $this->lat, $this->lng, $this->category, $_SESSION['userId'], $this ->state, $this->id);
             $stmt -> execute();
-            if ($data['dataTypes'] != null) {
-                foreach ($data['dataTypes'] as $dataType) {
+            if ($this->dataTypes != null) {
+                foreach ($this->dataTypes as $dataType) {
                     $query = "UPDATE ".DB_PREFIX."datatype SET name = ? WHERE id = ?";
-                    if ($stm = $conn -> prepare($query)) {
+                    if ($stm = $this-> conn -> prepare($query)) {
                         $stm -> bind_param('si', $dataType['name'], $dataType['id']);
                         $stm -> execute();
                     }
                 }
             }
-            if ($data['companies'] != null) {
-                foreach ($data['companies'] as $company) {
+            if ($this->companies != null) {
+                foreach ($this->companies as $company) {
                     $query = "UPDATE ".DB_PREFIX."company SET name = ? WHERE id = ?";
-                    if ($stm = $conn -> prepare($query)) {
+                    if ($stm = $this-> conn -> prepare($query)) {
                         $stm -> bind_param('si', $company['name'], $company['id']);
                         $stm -> execute();
                     }
                 }
             }
+            return true;
         }
     }
 
-    public function detail ($id, $conn) {
+    public function detail () {
         $query = "SELECT d.id, d.title, d.date, d.description, d.imgURL, d.lng, d.lat, group_concat(DISTINCT c.name), group_concat(DISTINCT c.id), group_concat(DISTINCT dt.name), group_concat(DISTINCT dt.id), ca.name from ".DB_PREFIX."data d
             LEFT OUTER JOIN (".DB_PREFIX."datatype_has_data dhd
                 LEFT OUTER JOIN ".DB_PREFIX."datatype dt
@@ -183,8 +160,8 @@ class entry {
             WHERE d.user_id = ? AND d.id = ?
             GROUP BY d.id
             LIMIT 1";
-        if ($stmt = $conn -> prepare($query)) {
-            $stmt -> bind_param("ii", $_SESSION['userId'], $id);
+        if ($stmt = $this-> conn -> prepare($query)) {
+            $stmt -> bind_param("ii", $_SESSION['userId'], $this->id);
             $stmt -> execute();
             $stmt -> store_result();
             $stmt -> bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $companyId, $dataType, $dataTypeId, $category);
@@ -222,14 +199,18 @@ class entry {
                     "category" => $category
                 ];
             }
+            return $array;
         }
     }
 
-    public function delete ($id, $conn) {
+    public function delete () {
         $query = "DELETE FROM data WHERE id = ? AND user_id = ?";
-        if ($stmt = $conn -> prepare($query)) {
-            $stmt -> bind_param("ii", $id, $_SESSION['userId']);
+        if ($stmt = $this-> conn -> prepare($query)) {
+            $stmt -> bind_param("ii", $this->id, $_SESSION['userId']);
             $stmt -> execute();
+            if($stmt) {
+                return true;
+            }
         }
     }
 }

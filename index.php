@@ -1,6 +1,10 @@
 <?php
-require("includes/initialize.php");
+include_once("includes/initialize.php");
+
 $categories; $dataTypes; $companies;
+$db = new database();
+$conn = $db->getConnection();
+
 if (isLoggedIn()) {
     $getCategories = "SELECT id, name FROM ".DB_PREFIX."category WHERE user_id = '".$_SESSION["userId"]."' ORDER BY name ASC";
     $categories = $conn->query($getCategories);
@@ -75,7 +79,7 @@ if (isLoggedIn()) {
                             <span class="mdl-switch__label">Quick entry</span>
                         </label>
                     </div>
-                    <form action="includes/entry.php" method="post">
+                    <form action="includes/entry/entryCall.php" method="post">
                         <div id="title-field" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-item show-quick-entry">
                             <input class="mdl-textfield__input" type="text" id="title" name="title">
                             <label class="mdl-textfield__label" for="title">Titel</label>
@@ -164,7 +168,7 @@ if (isLoggedIn()) {
                             <div id="map"></div>
                         </div>
                         <div id="submit-entry" class="show-quick-entry">
-                            <input type="hidden" name="method" value="create">
+                            <input type="hidden" name="method" value="insert">
                             <button type="submit" id="submit-entry-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised mdl-button--primary">Toevoegen</button>
                         </div>
                     </form>
