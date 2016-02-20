@@ -46,11 +46,6 @@ require_once("initialize.php");
 
 class entry {
 
-    function __construct()
-    {
-
-    }
-
     public static function getEntries($status, $acceptType, $conn) {
         $status = htmlentities($status);
         $state = ($status != 0 ? "AND WHERE = ".$status : "");
@@ -121,5 +116,120 @@ class entry {
         return false;
     }
 
+    public function insert ($data, $dataTypes, $companies, $conn) {
+        $query = "INSERT INTO ".DB_PREFIX."data (title, date, description, lat, lng, category_id, user_id, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        if ($stmt = $conn -> prepare($query)) {
+            $stmt -> bind_param("ssssssss", $data["title"], $data["dateTime"], $data["description"], $data["lat"], $data["lng"], $data["category"], $_SESSION['userId'], $data["state"]);
+            $stmt -> execute();
+            if ($dataTypes != null) {
+                foreach ($dataTypes as $dataType) {
+                    $query = "INSERT INTO ".DB_PREFIX."datatype_has_data (dataType_id, data_id) VALUES (?, ".$stmt->insert_id.")";
+                    if ($stm = $conn -> prepare($query)) {
+                        $stm -> bind_param('s', $dataType);
+                        $stm -> execute();
+                    }
+                }
+            }
+            if ($companies != null) {
+                foreach ($companies as $company) {
+                    $query = "INSERT INTO ".DB_PREFIX."company_has_data (company_id, data_id) VALUES (?, ".$stmt->insert_id.")";
+                    if ($stm = $conn -> prepare($query)) {
+                        $stm -> bind_param('s', $company);
+                        $stm -> execute();
+                    }
+                }
+            }
+        }
+    }
 
+    public function edit ($data, $id, $conn) {
+        $query = "UPDATE ".DB_PREFIX."data SET title = ?, date = ?, description = ?, lat = ?, lng = ?, category_id = ?, user_id = ?, state = ? WHERE id = ?";
+        if ($stmt = $conn -> prepare($query)) {
+            $stmt -> bind_param("ssssssss", $data["title"], $data["dateTime"], $data["description"], $data["lat"], $data["lng"], $data["category"], $_SESSION['userId'], $data["state"], $id);
+            $stmt -> execute();
+            if ($data['dataTypes'] != null) {
+                foreach ($data['dataTypes'] as $dataType) {
+                    $query = "UPDATE ".DB_PREFIX."datatype SET name = ? WHERE id = ?";
+                    if ($stm = $conn -> prepare($query)) {
+                        $stm -> bind_param('si', $dataType['name'], $dataType['id']);
+                        $stm -> execute();
+                    }
+                }
+            }
+            if ($data['companies'] != null) {
+                foreach ($data['companies'] as $company) {
+                    $query = "UPDATE ".DB_PREFIX."company SET name = ? WHERE id = ?";
+                    if ($stm = $conn -> prepare($query)) {
+                        $stm -> bind_param('si', $company['name'], $company['id']);
+                        $stm -> execute();
+                    }
+                }
+            }
+        }
+    }
+
+    public function detail ($id, $conn) {
+        $query = "SELECT d.id, d.title, d.date, d.description, d.imgURL, d.lng, d.lat, group_concat(DISTINCT c.name), group_concat(DISTINCT c.id), group_concat(DISTINCT dt.name), group_concat(DISTINCT dt.id), ca.name from ".DB_PREFIX."data d
+            LEFT OUTER JOIN (".DB_PREFIX."datatype_has_data dhd
+                LEFT OUTER JOIN ".DB_PREFIX."datatype dt
+                ON dt.id = dhd.dataType_id)
+            on dhd.data_id = d.id
+            LEFT OUTER JOIN (".DB_PREFIX."company_has_data chd
+                LEFT OUTER JOIN ".DB_PREFIX."company c
+                ON c.id = chd.company_id)
+            on chd.data_id = d.id
+            LEFT OUTER JOIN ".DB_PREFIX."category ca
+            ON ca.id = d.category_id
+            WHERE d.user_id = ? AND d.id = ?
+            GROUP BY d.id
+            LIMIT 1";
+        if ($stmt = $conn -> prepare($query)) {
+            $stmt -> bind_param("ii", $_SESSION['userId'], $id);
+            $stmt -> execute();
+            $stmt -> store_result();
+            $stmt -> bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $companyId, $dataType, $dataTypeId, $category);
+            $array = [];
+            while ($stmt -> fetch()) {
+                $companies = explode(",", $company);
+                $dataTypes = explode(",", $dataType);
+                $companiesId = explode(",", $companyId);
+                $dataTypesId = explode(",", $dataTypeId);
+                $companyArray = [];
+                $dataTypesArray = [];
+                for ($i = 0; $i < sizeof($companies); $i++) {
+                    $companyArray[] = [
+                        "name" => $companies[$i],
+                        "id" => $companiesId[$i]
+                    ];
+                }
+                for ($i = 0; $i < sizeof($dataTypes); $i++) {
+                    $dataTypesArray[] = [
+                        "name" => $dataTypes[$i],
+                        "id" => $dataTypesId[$i]
+                    ];
+                }
+                $array[] = ["id" => $id,
+                    "title" => $title,
+                    "date" => $date,
+                    "description" => $description,
+                    "imgURL" => $imgURL,
+                    "location" => [
+                        "lat" => $lat,
+                        "lng" => $lng
+                    ],
+                    "companies" => $companyArray,
+                    "dataTypes" => $dataTypesArray,
+                    "category" => $category
+                ];
+            }
+        }
+    }
+
+    public function delete ($id, $conn) {
+        $query = "DELETE FROM data WHERE id = ? AND user_id = ?";
+        if ($stmt = $conn -> prepare($query)) {
+            $stmt -> bind_param("ii", $id, $_SESSION['userId']);
+            $stmt -> execute();
+        }
+    }
 }
