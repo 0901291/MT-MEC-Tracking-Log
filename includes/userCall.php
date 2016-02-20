@@ -3,10 +3,10 @@ include_once("initialize.php");
 include_once("objects/User.php");
 
 if ($_POST) {
-    $name = (isset($_POST['name']) ? $_POST['name'] : null);
-    $imgURL = (isset($_POST['img']) ? $_POST['img'] : null);
-    $email = (isset($_POST['email']) ? $_POST['email'] : null);
-    $googleId = (isset($_POST['id']) ? $_POST['id'] : null);
+    $name = (isset($_POST['name']) ? htmlentities($_POST['name']) : null);
+    $imgURL = (isset($_POST['img']) ? htmlentities($_POST['img']) : null);
+    $email = (isset($_POST['email']) ? htmlentities($_POST['email']) : null);
+    $googleId = (isset($_POST['id']) ? htmlentities($_POST['id']) : null);
 
     $db = new database();
     $user = new user($db->getConnection());
