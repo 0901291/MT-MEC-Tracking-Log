@@ -14,8 +14,8 @@ if ($_POST) {
                 $entry -> imgURL = (isset($_POST['imgURL']) ? htmlentities($_POST['imgURL']) : null);
                 $entry -> lng = (isset($_POST['lng']) ? htmlentities($_POST['lng']) : null);
                 $entry -> lat = (isset($_POST['lat']) ? htmlentities($_POST['lat']) : null);
-                $entry -> companies = (isset($_POST['companies']) ? htmlentities($_POST['companies']) : null);
-                $entry -> dataTypes = (isset($_POST['dataTypes']) ? htmlentities($_POST['dataTypes']) : null);
+                $entry -> companies = (isset($_POST['companies']) ? $_POST['companies'] : null);
+                $entry -> dataTypes = (isset($_POST['dataTypes']) ? $_POST['dataTypes'] : null);
                 $entry -> category = (isset($_POST['category']) ? htmlentities($_POST['category']) : null);
                 $entry -> state = ($entry -> description == null ? 1 : 2);
                 $date = (isset($_POST['date']) ? htmlentities($_POST['date']) : date("Y-m-d"));
@@ -36,8 +36,8 @@ if ($_POST) {
                     $entry -> imgURL = (isset($_POST['imgURL']) ? htmlentities($_POST['imgURL']) : null);
                     $entry -> lng = (isset($_POST['lng']) ? htmlentities($_POST['lng']) : null);
                     $entry -> lat = (isset($_POST['lat']) ? htmlentities($_POST['lat']) : null);
-                    $entry -> companies = (isset($_POST['companies']) ? htmlentities($_POST['companies']) : null);
-                    $entry -> dataTypes = (isset($_POST['dataTypes']) ? htmlentities($_POST['dataTypes']) : null);
+                    $entry -> companies = (isset($_POST['companies']) ? $_POST['companies'] : null);
+                    $entry -> dataTypes = (isset($_POST['dataTypes']) ? $_POST['dataTypes'] : null);
                     $entry -> category = (isset($_POST['category']) ? htmlentities($_POST['category']) : null);
                     $entry -> state = ($entry -> description == "" ? 1 : 2);
                     if ($entry -> edit()) {

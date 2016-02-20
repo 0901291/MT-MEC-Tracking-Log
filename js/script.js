@@ -15,6 +15,7 @@ function initApp() {
     $("#location-fields").on("keydown", "input[type=text]", function () {
         $("#current-location").removeClass("selected");
     });
+    $(".entry-remove").on("click", confirmDelete);
     $("#logout").on("click", logout);
     $(".entry-card-header").on("click", toggleItem);
     $(".field-add-button-container").on("contentChange", function () {
@@ -42,7 +43,7 @@ function initApp() {
             $(this).css("max-height", maxHeight + "px");
         });
     }, 10);
-    setTimeout(onResize,10);
+    setTimeout(onResize,50);
 }
 
 function loadGoogleLogin() {
@@ -284,6 +285,11 @@ function logout() {
             location.reload();
         }
     })
+}
+
+function confirmDelete(e) {
+    if (confirm("Weet je zeker dat je deze wilt verwijderen?")) $(e.currentTarget).parent().submit();
+
 }
 
 function onResize() {

@@ -8,7 +8,7 @@ if (isLoggedIn()) {
             $entry = new entry($conn);
             $entry->id = $_GET["data_id"];
             $entry->delete();
-            header(ROOT."/entries");
+            header("Location:".ROOT."/entries");
         };
     }
     $entries = Entry::getEntries(0, "php", $conn);
@@ -81,7 +81,7 @@ else {
                 </div>
                 <?php foreach($entries as $key => $entry):
                     $concept = $entry["state"] == 1 ? true : false;
-                    ?>
+                ?>
                     <div class="entry-card mdl-card mdl-shadow--2dp <?= ($key === 0 ? "show" : "collapsed") ?> <?= $concept ? "concept-card" : "" ?>" data-state="<?= $entry["state"] ?>">
                         <div class="entry-card-header">
                             <div class="valign">
@@ -94,8 +94,8 @@ else {
                                             <i class="material-icons">mode_edit</i>
                                         </button>
                                     </form>
-                                    <form action="<?= ROOT?>/entries/<?= $entry["id"] ?>/delete">
-                                        <button type="submit" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect entry-remove entry-control">
+                                    <form action="<?= ROOT?>/entries/<?= $entry["id"] ?>/delete" class="delete-entry">
+                                        <button type="button" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect entry-remove entry-control">
                                             <input type="hidden" value="<?= $entry["id"] ?>">
                                             <i class="material-icons">delete</i>
                                         </button>
