@@ -1,5 +1,6 @@
 <?php
-require("includes/initialize.php");
+//require("includes/initialize.php");
+require("includes/entry.php");
 
 if (isLoggedIn()) {
     $getCategories = "SELECT id, name FROM ".DB_PREFIX."category WHERE user_id = '".$_SESSION["userId"]."' ORDER BY name ASC";
@@ -12,6 +13,7 @@ if (isLoggedIn()) {
     $companies = $conn->query($getCompaniesQuery);
 }
 
+var_dump(entry::getEntries(0, $conn));
 ?>
 <!DOCTYPE html>
 <html>
