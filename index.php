@@ -76,7 +76,7 @@ if (isLoggedIn()) {
                         </label>
                     </div>
                     <form action="includes/entry.php" method="post">
-                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-item show-quick-entry">
+                        <div id="title-field" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-item show-quick-entry">
                             <input class="mdl-textfield__input" type="text" id="title" name="title">
                             <label class="mdl-textfield__label" for="title">Titel</label>
                         </div>
@@ -159,9 +159,9 @@ if (isLoggedIn()) {
                                     <i class="material-icons">map</i>
                                 </button>
                             </div>
-                            <div id="location-map" class="hidden">
-                                <div id="map"></div>
-                            </div>
+                        </div>
+                        <div id="location-map">
+                            <div id="map"></div>
                         </div>
                         <div id="submit-entry" class="show-quick-entry">
                             <input type="hidden" name="method" value="create">
@@ -202,6 +202,7 @@ if (isLoggedIn()) {
 <script src="https://code.getmdl.io/1.1.1/material.min.js"></script>
 <script src="<?= ROOT ?>/js/lib/materialize.min.js"></script>
 <script src="<?= ROOT ?>/js/lib/material.add.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6VYBFTcvqfDookMW4Hl1J3TphwJxo6nA"></script>
 <script src="<?= ROOT ?>/js/script.js"></script>
 <script src="<?= ROOT ?>/js/googleLogin.js"></script>
 <script src="<?= ROOT ?>/js/lib/moment.min.js"></script>

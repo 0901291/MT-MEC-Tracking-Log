@@ -1,4 +1,5 @@
 var map;
+var marker;
 
 function initApp() {
     getCurrentLocation();
@@ -27,15 +28,19 @@ function initApp() {
     if ($(".date-picker").length > 0) initDateTimePicker();
     onResize();
     $(window).on("resize", onResize);
-    var content = $("#add-item");
-    content.css("max-height", content.height() + parseInt(content.css("padding-top")) + parseInt(content.css("padding-bottom")) + 70);
+    resizeContent();
+    initMap();
 }
 
 function initMap() {
+    var image = "https://www.dropbox.com/s/pb99jcgjvrdzk0f/add_marker_icon.png?dl=1";
     map = new google.maps.Map(document.getElementById('map'), {
-        center: {lat: -34.397, lng: 150.644},
-        zoom: 8
+        zoom: 14,
+        mapTypeControl: false,
+        streetViewControl: false,
+        draggableCursor : "url(" + image + ") 24 48, auto"
     });
+    map.addListener('click', getCustomLocation);
 }
 
 function openAddInfoDialog(e) {
@@ -208,28 +213,42 @@ function toggleMap(action) {
     var button = $("#toggle-map-button");
     if (action == "close" || button.hasClass("selected")) {
         button.removeClass("selected");
+        $("#location-map").height(0);
     } else {
         button.addClass("selected");
+        $("#location-map").height(200);
     }
-
+    resizeContent();
 }
 
 function getCurrentLocation() {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(setLocation);
+        navigator.geolocation.getCurrentPosition(function (position) {
+            setLocation({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            });
+        });
         $("#current-location").addClass("selected");
         toggleMap("close");
     }
 }
 
 function getCustomLocation(e) {
-    setLocation(position);
     $("#current-location").removeClass("selected");
+    setLocation(e.latLng);
 }
 
-function setLocation(position) {
-    $("#lat").val(position.coords.latitude).parent().delay(10).addClass("is-focused");
-    $("#lng").val(position.coords.longitude).parent().delay(10).addClass("is-focused");
+function setLocation(pos) {
+    map.setCenter(pos);
+    map.panTo(pos);
+    if(marker) marker.setMap(null);
+    marker = new google.maps.Marker({
+        position: pos,
+        map: map
+    });
+    $("#lat").val(pos.lat).parent().delay(10).addClass("is-focused");
+    $("#lng").val(pos.lng).parent().delay(10).addClass("is-focused");
 }
 
 function onResize() {
@@ -242,4 +261,10 @@ function onResize() {
 
 function isMobile () {
     return $(window).width() < 461;
+}
+
+function resizeContent() {
+    var content = $("#add-item");
+    content.css("max-height", content.height() + parseInt(content.css("padding-top")) + parseInt(content.css("padding-bottom")) + 250);
+    onResize();
 }
