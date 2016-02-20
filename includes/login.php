@@ -1,5 +1,7 @@
 <?php
 include("initialize.php");
+$db = new database();
+$conn = $db ->getConnection();
 
 $name = (isset($_POST['name']) ? $_POST['name'] : null);
 $imgURL = (isset($_POST['img']) ? $_POST['img'] : null);
