@@ -1,10 +1,16 @@
 <?php
 require_once("includes/initialize.php");
-require("includes/entry.php");
-
+require("includes/entry/entry.php");
+$db = new database();
+$conn = $db->getConnection();
 if (isLoggedIn()) {
     if (isset($_GET["method"]) && isset($_GET["data_id"])) {
-        if ($_GET["method"] === "delete") ; // delete entry
+        if ($_GET["method"] === "delete") {
+            $entry = new entry($conn);
+            $entry->id = $_GET["data_id"];
+            $entry->delete();
+            header(ROOT."/entries");
+        };
     }
     $entries = Entry::getEntries(0, "php", $conn);
 }
@@ -70,13 +76,13 @@ else {
                                 <h2 class="ellipsis"><?= $entry["title"] ?><?php if ($concept) echo "<i class=\"material-icons valign concept-icon\">drafts</i>" ?></h2>
                                 <span class="entry-date valign"><?= date("d-m-Y H:m", strtotime($entry["date"])) ?></span>
                                 <div class="form-container valign">
-                                    <form action="edit/<?= $entry["id"] ?>">
+                                    <form action="<?= ROOT?>/entries/<?= $entry["id"] ?>/edit">
                                         <button type="submit" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect entry-edit">
                                             <input type="hidden" value="<?= $entry["id"] ?>">
                                             <i class="material-icons">mode_edit</i>
                                         </button>
                                     </form>
-                                    <form action="delete/<?= $entry["id"] ?>">
+                                    <form action="<?= ROOT?>/entries/<?= $entry["id"] ?>/delete">
                                         <button type="submit" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect entry-remove">
                                             <input type="hidden" value="<?= $entry["id"] ?>">
                                             <i class="material-icons">delete</i>
@@ -89,7 +95,7 @@ else {
                             <?php if(!empty($entry["category"])): ?>
                                 <div class="entry-category">
                                     <h3 class="entry-section-heading">Categorie</h3>
-                                    <span><?= $entry["category"] ?></span>
+                                    <span><?= $entry["category"]["name"] ?></span>
                                 </div>
                             <?php endif; ?>
                             <?php if(!empty($entry["description"])): ?>

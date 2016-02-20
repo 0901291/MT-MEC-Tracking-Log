@@ -1,7 +1,7 @@
 RewriteEngine on
 RewriteRule ^api/?$ api/log.php?method=get&key=$1 [NC,L]
 RewriteRule ^api/([0-9]+)/?$ api/log.php?method=get&key=$2&data_id=$1 [NC,L]
-RewriteRule ^edit/([0-9]+)/?$ index.php?method=edit&data_id=$1 [NC,L]
-RewriteRule ^delete/([0-9]+)/?$ entries.php?method=delete&data_id=$1 [NC,L]
+RewriteRule ^entries/([0-9]+)/edit?$ index.php?method=edit&data_id=$1 [NC,L]
+RewriteRule ^entries/([0-9]+)/delete?$ entries.php?method=delete&data_id=$1 [NC,L]
 RewriteRule ^entries/?$ entries.php?method=get [NC,L]
 RewriteRule ^entries/([0-9]+)/?$ entries.php?method=get&data_id=$1 [NC,L]

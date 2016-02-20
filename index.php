@@ -1,5 +1,6 @@
 <?php
 include_once("includes/initialize.php");
+require("includes/entry/entry.php");
 
 $categories; $dataTypes; $companies;
 $db = new database();
@@ -14,6 +15,32 @@ if (isLoggedIn()) {
 
     $getCompaniesQuery = "SELECT id, name FROM ".DB_PREFIX."company WHERE user_id = '".$_SESSION["userId"]."' ORDER BY name ASC";
     $companies = $conn->query($getCompaniesQuery);
+
+    $edit = false;
+    $title = $description = $lat = $lng = $id = "";
+    $date = date("Y/m/d");
+    $time = date("H:m");
+    $categoryId = -1;
+    $dataTypeIds = $companyIds = [];
+
+    if (isset($_GET["method"]) && isset($_GET["data_id"])) {
+        if ($_GET["method"] == "edit") {
+            $edit = true;
+            $entryInstance = new entry($conn);
+            $entryInstance->id = $_GET["data_id"];
+            $entry = $entryInstance->detail();
+            $id = $entry["id"];
+            $title = $entry["title"];
+            $description = $entry["description"];
+            $lat = $entry["location"]["lat"];
+            $lng = $entry["location"]["lng"];
+            $date = date("Y-m-d", strtotime($entry["date"]));
+            $time = date("H:m", strtotime($entry["date"]));
+            $categoryId = $entry["category"]["id"];
+            foreach($entry["dataTypes"] as $dataType) $dataTypeIds[] = $dataType["id"];
+            foreach($entry["companies"] as $company) $companyIds[] = $company["id"];
+        }
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -27,13 +54,12 @@ if (isLoggedIn()) {
     <link rel="stylesheet" href="https://code.getmdl.io/1.1.1/material.indigo-red.min.css">
     <link rel="stylesheet" href="<?= ROOT ?>/css/lib/material.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
-    <link rel="stylesheet" href="<?= ROOT ?>/css/lib/bootstrap-material-datetimepicker.css">
     <link rel="stylesheet" href="<?= ROOT ?>/css/style.css">
     <meta name="google-signin-scope" content="profile email">
     <meta name="google-signin-client_id" content="953285646027-r3rsel8atqu2g8nbn45ag1jc24lah7lg.apps.googleusercontent.com">
     <script src="https://apis.google.com/js/platform.js" async defer></script>
 </head>
-<body>
+<body class="<?= $edit ? "edit-mode" : ""?>">
 <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
     <header class="mdl-layout__header">
         <div class="mdl-layout__header-row">
@@ -79,9 +105,9 @@ if (isLoggedIn()) {
                             <span class="mdl-switch__label">Quick entry</span>
                         </label>
                     </div>
-                    <form action="includes/entry/entryCall.php" method="post">
+                    <form action="<?= ROOT ?>/includes/entry/entryCall.php" method="post">
                         <div id="title-field" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-item show-quick-entry">
-                            <input class="mdl-textfield__input" type="text" id="title" name="title">
+                            <input class="mdl-textfield__input" type="text" id="title" name="title" value="<?= $title ?>">
                             <label class="mdl-textfield__label" for="title">Titel</label>
                         </div>
                         <div class="field-add-button-container form-item">
@@ -89,8 +115,8 @@ if (isLoggedIn()) {
                             <div class="input-field row">
                                 <select name="category" id="category-list" class="col s11">
                                     <option value="" disabled selected>Category</option>
-                                    <?php foreach($categories as $category) : ?>
-                                        <option value="<?= $category["id"] ?>"><?= $category["name"] ?></option>
+                                    <?php foreach($categories as $key => $category) : ?>
+                                        <option <?= $key === $categoryId ? "selected" : "" ?> value="<?= $category["id"] ?>"><?= $category["name"] ?></option>
                                     <?php endforeach ?>
                                 </select>
                                 <div class="col s1">
@@ -101,7 +127,7 @@ if (isLoggedIn()) {
                             </div>
                         </div>
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-item">
-                            <textarea class="mdl-textfield__input" type="text" rows= "3" id="description" name="description"></textarea>
+                            <textarea class="mdl-textfield__input" type="text" rows= "3" id="description" name="description"><?= $description ?></textarea>
                             <label class="mdl-textfield__label" for="description">Omschrijving</label>
                         </div>
                         <div class="field-add-button-container form-item">
@@ -109,8 +135,8 @@ if (isLoggedIn()) {
                             <div class="input-field row">
                                 <select multiple name="datatypes" id="data-type-list" class="col s11">
                                     <option value="" disabled selected>Data types</option>
-                                    <?php foreach($dataTypes as $dataType) : ?>
-                                        <option value="<?= $dataType["id"] ?>"><?= $dataType["name"] ?></option>
+                                    <?php foreach($dataTypes as $key => $dataType) : ?>
+                                        <option <?= in_array($key, $dataTypeIds) ? "selected" : "" ?> value="<?= $dataType["id"] ?>"><?= $dataType["name"] ?></option>
                                     <?php endforeach ?>
                                 </select>
                                 <div class="col s1">
@@ -125,8 +151,8 @@ if (isLoggedIn()) {
                             <div class="input-field row">
                                 <select multiple name="companies" id="company-list" class="col s11">
                                     <option value="" disabled selected>Bedrijven</option>
-                                    <?php foreach($dataTypes as $dataType) : ?>
-                                        <option value="<?= $dataType["id"] ?>"><?= $dataType["name"] ?></option>
+                                    <?php foreach($companies as $key => $company) : ?>
+                                        <option <?= in_array($key, $companyIds) ? "selected" : "" ?> value="<?= $company["id"] ?>"><?= $company["name"] ?></option>
                                     <?php endforeach ?>
                                 </select>
                                 <div class="col s1">
@@ -137,21 +163,21 @@ if (isLoggedIn()) {
                             </div>
                         </div>
                         <div id="date-field" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-item date-picker">
-                            <input class="mdl-textfield__input" type="text" id="date" name="date">
+                            <input class="mdl-textfield__input" type="date" id="date" name="date" value="<?= $date ?>">
                             <label class="mdl-textfield__label" for="date">Datum</label>
                         </div>
                         <div id="time-field" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-item date-item date-picker">
-                            <input class="mdl-textfield__input" type="text" id="time" name="time">
+                            <input class="mdl-textfield__input" type="text" id="time" name="time" value="<?= $time ?>">
                             <label class="mdl-textfield__label" for="time">Tijd</label>
                         </div>
                         <div id="location">
                             <div id="location-fields">
                                 <div id="lat-field" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-item">
-                                    <input class="mdl-textfield__input" type="text" id="lat" name="lat">
+                                    <input class="mdl-textfield__input" type="text" id="lat" name="lat" value="<?= $lat ?>">
                                     <label class="mdl-textfield__label" for="date">Latitude</label>
                                 </div>
                                 <div id="lng-field" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-item">
-                                    <input class="mdl-textfield__input" type="text" id="lng" name="lng">
+                                    <input class="mdl-textfield__input" type="text" id="lng" name="lng" value="<?= $lng ?>">
                                     <label class="mdl-textfield__label" for="date">Longitude</label>
                                 </div>
                             </div>
@@ -168,8 +194,9 @@ if (isLoggedIn()) {
                             <div id="map"></div>
                         </div>
                         <div id="submit-entry" class="show-quick-entry">
-                            <input type="hidden" name="method" value="insert">
-                            <button type="submit" id="submit-entry-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised mdl-button--primary">Toevoegen</button>
+                            <input type="hidden" name="method" value="<?= $edit ? "edit" : "insert" ?>">
+                            <input type="hidden" name="id" value="<?= $id ?>">
+                            <button type="submit" id="submit-entry-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised mdl-button--primary"><?= $edit ? "Opslaan" : "Toevoegen" ?></button>
                         </div>
                     </form>
                 </section>
@@ -211,7 +238,6 @@ if (isLoggedIn()) {
 <script src="<?= ROOT ?>/js/googleLogin.js"></script>
 <script src="<?= ROOT ?>/js/lib/moment.min.js"></script>
 <script src="<?= ROOT ?>/js/lib/moment.nl.js"></script>
-<script src="<?= ROOT ?>/js/lib/bootstrap-material-datetimepicker.js"></script>
 <script>
     $(initApp);
 </script>

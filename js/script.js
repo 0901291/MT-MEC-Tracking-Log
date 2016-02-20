@@ -2,7 +2,6 @@ var map;
 var marker;
 
 function initApp() {
-    getCurrentLocation();
     $(".add-info-dialog-button").on("click", openAddInfoDialog);
     $("#save-add-info-button").on("click", saveDataInfo);
     $("#cancel-add-info-button").on("click", closeAddInfoDialog);
@@ -13,23 +12,32 @@ function initApp() {
     $("#location-fields").on("keydown", "input[type=text]", function () {
         $("#current-location").removeClass("selected");
     });
-    $(".entry-card").on("click", toggleItem);
+    $(".entry-card-header").on("click", toggleItem);
     $.each($(".entry-card"), function (k, v) {
         $(this).attr("data-max-height", $(this).height());
         var maxHeight = 56;
         if (k === 0) maxHeight = $(this).height();
         $(this).css("max-height", maxHeight + "px");
     });
-    $('select').material_select();
     $("body").on("click", ".select-wrapper", function () {alert()});
     $(".field-add-button-container").on("contentChange", function () {
         $(this).find(".dropdown-content").css("top", 0);
     });
-    if ($(".date-picker").length > 0) initDateTimePicker();
     onResize();
     $(window).on("resize", onResize);
     resizeContent();
-    initMap();
+    if ($("#map").length > 0) {
+        initMap();
+        if ($("body").hasClass("edit-mode")) {
+            setLocation({
+                lat: parseFloat($("#lat").val()),
+                lng: parseFloat($("#lng").val())
+            });
+        } else {
+            getCurrentLocation();
+        }
+    }
+    if ($("select").length > 0) $('select').material_select();
 }
 
 function initMap() {
@@ -97,23 +105,6 @@ function closeAddInfoDialog() {
     $("#add-data-info").val("");
 }
 
-function initDateTimePicker() {
-    $("#date").bootstrapMaterialDatePicker({
-        weekStart: 0,
-        format: "DD/MM/YYYY",
-        time: false,
-        lang: "nl",
-        currentDate: moment(new Date())
-    });
-    $("#time").bootstrapMaterialDatePicker({
-        weekStart: 0,
-        format: "H:mm",
-        date: false,
-        lang: "nl",
-        currentDate: moment(new Date())
-    });
-}
-
 function toggleQuickEntry() {
     var toggle1 = $("#quick-entry-switch-mobile");
     var toggle2 = $("#quick-entry-switch-desktop");
@@ -179,7 +170,7 @@ function toggleConcept() {
 }
 
 function toggleItem() {
-    var item = $(this);
+    var item = $(this).parent(".entry-card");
     var currentItem = $(".entry-card.show");
     var content = $(".content-section");
     var maxHeightColl = 56;
@@ -230,7 +221,6 @@ function getCurrentLocation() {
             });
         });
         $("#current-location").addClass("selected");
-        toggleMap("close");
     }
 }
 
@@ -256,7 +246,7 @@ function onResize() {
     var max = $(window).height() - $(".mdl-layout__header").height() - 32 - parseInt(content.css("padding-top")) - parseInt(content.css("padding-bottom"));
     if (content.height() > max) content.addClass("static").removeClass("absolute");
     else content.addClass("absolute").removeClass("static");
-    $("select").material_select();
+    if ($("select").length > 0) $("select").material_select();
 }
 
 function isMobile () {

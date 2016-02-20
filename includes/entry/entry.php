@@ -121,7 +121,7 @@ class entry {
     public function edit () {
         $query = "UPDATE ".DB_PREFIX."data SET title = ?, date = ?, description = ?, lat = ?, lng = ?, category_id = ?, user_id = ?, state = ? WHERE id = ?";
         if ($stmt = $this-> conn -> prepare($query)) {
-            $stmt -> bind_param("ssssssss", $this->title, $this->date, $this->description, $this->lat, $this->lng, $this->category, $_SESSION['userId'], $this ->state, $this->id);
+            $stmt -> bind_param("sssssiiii", $this->title, $this->date, $this->description, $this->lat, $this->lng, $this->category, $_SESSION['userId'], $this ->state, $this->id);
             $stmt -> execute();
             if ($this->dataTypes != null) {
                 foreach ($this->dataTypes as $dataType) {
@@ -146,7 +146,7 @@ class entry {
     }
 
     public function detail () {
-        $query = "SELECT d.id, d.title, d.date, d.description, d.imgURL, d.lng, d.lat, group_concat(DISTINCT c.name), group_concat(DISTINCT c.id), group_concat(DISTINCT dt.name), group_concat(DISTINCT dt.id), ca.name from ".DB_PREFIX."data d
+        $query = "SELECT d.id, d.title, d.date, d.description, d.imgURL, d.lng, d.lat, group_concat(DISTINCT c.name), group_concat(DISTINCT c.id), group_concat(DISTINCT dt.name), group_concat(DISTINCT dt.id), ca.name, ca.id from ".DB_PREFIX."data d
             LEFT OUTER JOIN (".DB_PREFIX."datatype_has_data dhd
                 LEFT OUTER JOIN ".DB_PREFIX."datatype dt
                 ON dt.id = dhd.dataType_id)
@@ -164,13 +164,13 @@ class entry {
             $stmt -> bind_param("ii", $_SESSION['userId'], $this->id);
             $stmt -> execute();
             $stmt -> store_result();
-            $stmt -> bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $companyId, $dataType, $dataTypeId, $category);
-            $array = [];
+            $stmt -> bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $companyId, $dataType, $dataTypeId, $category, $categoryId);
+            $array;
             while ($stmt -> fetch()) {
-                $companies = explode(",", $company);
-                $dataTypes = explode(",", $dataType);
-                $companiesId = explode(",", $companyId);
-                $dataTypesId = explode(",", $dataTypeId);
+                $companies = strlen($company) > 0 ? explode(",", $company) : null;
+                $dataTypes = strlen($dataType) > 0 ? explode(",", $dataType) : null;
+                $companiesId = strlen($companyId) > 0 ? explode(",", $companyId) : null;
+                $dataTypesId = strlen($dataTypeId) > 0 ? explode(",", $dataTypeId) : null;
                 $companyArray = [];
                 $dataTypesArray = [];
                 for ($i = 0; $i < sizeof($companies); $i++) {
@@ -185,7 +185,7 @@ class entry {
                         "id" => $dataTypesId[$i]
                     ];
                 }
-                $array[] = ["id" => $id,
+                $array = ["id" => $id,
                     "title" => $title,
                     "date" => $date,
                     "description" => $description,
@@ -196,7 +196,10 @@ class entry {
                     ],
                     "companies" => $companyArray,
                     "dataTypes" => $dataTypesArray,
-                    "category" => $category
+                    "category" => [
+                        "name" => $category,
+                        "id" => $categoryId
+                    ]
                 ];
             }
             return $array;

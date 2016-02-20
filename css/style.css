@@ -135,6 +135,7 @@ button.form-item {
     height: 32px;
     margin-top: 40px;
     color: rgba(0, 0, 0, 0.7);
+    min-width: 70px;
 }
 
 .location-control.selected {
@@ -201,7 +202,7 @@ button.form-item {
 }
 
 .entry-card-header {
-    padding: 16px 16px 0;
+    padding: 16px;
     height: 28px;
     position: relative;
     cursor: pointer;
@@ -238,7 +239,7 @@ button.form-item {
 }
 
 .entry-card-content {
-    padding: 16px;
+    padding: 16px 16px 0;
 }
 
 .entry-section-heading {
