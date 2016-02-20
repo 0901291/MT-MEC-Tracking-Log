@@ -10,7 +10,7 @@ function onSignIn(googleUser) {
             img: profile.getImageUrl(),
             method: "logIn"
         },
-        url: "includes/user/userCall.php",
+        url: "includes/userCall.php",
         method: "POST"
     }).success(function (output) {
         location.reload();

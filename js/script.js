@@ -1,7 +1,9 @@
 var map;
 var marker;
+var googleUser = {};
 
 function initApp() {
+    if ($("#google-login-button").length > 0) loadGoogleLogin();
     $(".add-info-dialog-button").on("click", openAddInfoDialog);
     $("#save-add-info-button").on("click", saveDataInfo);
     $("#cancel-add-info-button").on("click", closeAddInfoDialog);
@@ -12,6 +14,7 @@ function initApp() {
     $("#location-fields").on("keydown", "input[type=text]", function () {
         $("#current-location").removeClass("selected");
     });
+    $("#logout").on("click", logout);
     $(".entry-card-header").on("click", toggleItem);
     $("body").on("click", ".select-wrapper", function () {alert()});
     $(".field-add-button-container").on("contentChange", function () {
@@ -40,6 +43,24 @@ function initApp() {
             $(this).css("max-height", maxHeight + "px");
         });
     }, 10);
+}
+
+function loadGoogleLogin() {
+    gapi.load('auth2', function(){
+        // Retrieve the singleton for the GoogleAuth library and set up the client.
+        auth2 = gapi.auth2.init({
+            client_id: '953285646027-r3rsel8atqu2g8nbn45ag1jc24lah7lg.apps.googleusercontent.com',
+            cookiepolicy: 'single_host_origin',
+            // Request scopes in addition to 'profile' and 'email'
+            //scope: 'additional_scope'
+        });
+        attachSignin(document.getElementById('google-login-button'));
+    });
+}
+
+function attachSignin(element) {
+    console.log(element.id);
+    auth2.attachClickHandler(element, {},onSignIn);
 }
 
 function initMap() {
@@ -241,6 +262,19 @@ function setLocation(pos) {
     });
     $("#lat").val(pos.lat).parent().delay(10).addClass("is-focused");
     $("#lng").val(pos.lng).parent().delay(10).addClass("is-focused");
+}
+
+function logout() {
+    $.ajax({
+        url: "includes/userCall.php",
+        method: "post",
+        data: {
+            method: "logOut"
+        },
+        success: function(o) {
+            location.reload();
+        }
+    })
 }
 
 function onResize() {

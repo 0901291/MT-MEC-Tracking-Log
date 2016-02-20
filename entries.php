@@ -1,7 +1,6 @@
 <?php
 require_once("includes/initialize.php");
-require("includes/entry/entry.php");
-$db = new database();
+require("includes/objects/Entry.php");
 $conn = $db->getConnection();
 if (isLoggedIn()) {
     if (isset($_GET["method"]) && isset($_GET["data_id"])) {
@@ -15,7 +14,7 @@ if (isLoggedIn()) {
     $entries = Entry::getEntries(0, "php", $conn);
 }
 else {
-    header("index.php");
+    header("Location: ".ROOT);
     die();
 }
 
@@ -45,9 +44,11 @@ else {
             </div>
             <span class="mdl-layout-title">MT-MEC Tracking Log</span>
             <div class="mdl-layout-spacer"></div>
-            <label class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" for="logout">
-                <i id="logout" class="material-icons">exit_to_app</i>
-            </label>
+            <div id="logout" >
+                <label class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" for="logout">
+                    <i class="material-icons">exit_to_app</i>
+                </label>
+            </div>
         </div>
         <div class="section-header header-section-header mdl-color--primary hidden">
             <h1 class="mdl-typography--title valign">Items</h1>

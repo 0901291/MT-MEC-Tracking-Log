@@ -274,6 +274,12 @@ div:first-child .entry-section-heading {
     box-shadow: inset 0 11px 8px -10px #CCC, inset 0 -11px 8px -10px #CCC;
 }
 
+footer {
+    position: fixed;
+    right: 8px;
+    bottom: 8px;
+}
+
 /* SWITCH */
 .header-switch {
     right: 0;

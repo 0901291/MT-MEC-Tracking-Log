@@ -1,10 +1,11 @@
 <?php
 include_once("includes/initialize.php");
-require("includes/entry/entry.php");
+require("includes/objects/Entry.php");
 
 $categories; $dataTypes; $companies;
-$db = new database();
 $conn = $db->getConnection();
+
+$edit = false;
 
 if (isLoggedIn()) {
     $getCategories = "SELECT id, name FROM ".DB_PREFIX."category WHERE user_id = '".$_SESSION["userId"]."' ORDER BY name ASC";
@@ -16,7 +17,6 @@ if (isLoggedIn()) {
     $getCompaniesQuery = "SELECT id, name FROM ".DB_PREFIX."company WHERE user_id = '".$_SESSION["userId"]."' ORDER BY name ASC";
     $companies = $conn->query($getCompaniesQuery);
 
-    $edit = false;
     $title = $description = $lat = $lng = $id = "";
     $date = date("Y-m-d");
     $time = date("H:i");
@@ -55,9 +55,10 @@ if (isLoggedIn()) {
     <link rel="stylesheet" href="<?= ROOT ?>/css/lib/material.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
     <link rel="stylesheet" href="<?= ROOT ?>/css/style.css">
-    <meta name="google-signin-scope" content="profile email">
-    <meta name="google-signin-client_id" content="953285646027-r3rsel8atqu2g8nbn45ag1jc24lah7lg.apps.googleusercontent.com">
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
+<!--    <meta name="google-signin-scope" content="profile email">-->
+<!--    <meta name="google-signin-client_id" content="953285646027-r3rsel8atqu2g8nbn45ag1jc24lah7lg.apps.googleusercontent.com">-->
+<!--    <script src="https://apis.google.com/js/platform.js" async defer></script>-->
+    <script src="https://apis.google.com/js/api:client.js"></script>
 </head>
 <body class="<?= $edit ? "edit-mode" : ""?>">
 <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
@@ -75,9 +76,11 @@ if (isLoggedIn()) {
             <span class="mdl-layout-title">MT-MEC Tracking Log</span>
             <div class="mdl-layout-spacer"></div>
             <?php if (isLoggedIn()) : ?>
-                <label class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" for="logout">
-                    <i id="logout" class="material-icons">exit_to_app</i>
-                </label>
+                <div id="logout" >
+                    <label class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" for="logout">
+                        <i class="material-icons">exit_to_app</i>
+                    </label>
+                </div>
             <?php endif; ?>
         </div>
         <?php if (isLoggedIn()) : ?>
@@ -105,7 +108,7 @@ if (isLoggedIn()) {
                             <span class="mdl-switch__label">Quick entry</span>
                         </label>
                     </div>
-                    <form action="<?= ROOT ?>/includes/entry/entryCall.php" method="post">
+                    <form action="<?= ROOT ?>/includes/entryCall.php" method="post">
                         <div id="title-field" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-item show-quick-entry">
                             <input class="mdl-textfield__input" type="text" id="title" name="title" value="<?= $title ?>">
                             <label class="mdl-textfield__label" for="title">Titel</label>
@@ -205,11 +208,12 @@ if (isLoggedIn()) {
                     <div class="section-header mdl-color--primary show-quick-entry">
                         <h1 class="mdl-typography--title valign">Inloggen</h1>
                     </div>
-                    <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+                    <button id="google-login-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--primary mdl-button--raised">Inloggen met Google</button>
                 </section>
             <?php endif; ?>
         </div>
     </main>
+    <footer>&copy; <?= date("Y") ?> Niels Otten en Ian Wensink</footer>
 </div>
 <div class="mdl-dialog mdl-js-dialog" id="add-data-info-dialog">
     <div class="mdl-dialog__title">

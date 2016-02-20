@@ -1,6 +1,6 @@
 <?php
-include_once ("../initialize.php");
-include_once ("user.php");
+include_once("initialize.php");
+include_once("objects/User.php");
 
 if ($_POST) {
     $name = (isset($_POST['name']) ? $_POST['name'] : null);
@@ -16,6 +16,7 @@ if ($_POST) {
             case "logOut":
                 if (isLoggedIn()) {
                     $user -> logOut();
+                    return true;
                 }
                 break;
             case "logIn":

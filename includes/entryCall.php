@@ -1,6 +1,6 @@
 <?php
-include_once ("entry.php");
-include_once ("../initialize.php");
+include_once("Entry.php");
+include_once("../initialize.php");
 
 if ($_POST) {
     if (isLoggedIn()) {
