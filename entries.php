@@ -44,6 +44,10 @@ else {
             </div>
             <span class="mdl-layout-title">MT-MEC Tracking Log</span>
             <div class="mdl-layout-spacer"></div>
+            <nav class="mdl-navigation mdl-layout--large-screen-only">
+                <a class="mdl-navigation__link" href="<?= ROOT ?>">Nieuw</a>
+                <a class="mdl-navigation__link active" href="<?= ROOT ?>/entries">Log</a>
+            </nav>
             <div id="logout" >
                 <label class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" for="logout">
                     <i class="material-icons">exit_to_app</i>
@@ -58,6 +62,13 @@ else {
             </label>
         </div>
     </header>
+    <div class="mdl-layout__drawer">
+        <span class="mdl-layout-title">MT-MEC Tracking Log</span>
+        <nav class="mdl-navigation">
+            <a class="mdl-navigation__link" href="<?= ROOT ?>">Nieuw</a>
+            <a class="mdl-navigation__link active" href="<?= ROOT ?>/entries">Log</a>
+        </nav>
+    </div>
     <main class="mdl-layout__content">
         <div class="page-content">
             <section class="content-section centerab" id="items">
@@ -78,13 +89,13 @@ else {
                                 <span class="entry-date valign"><?= date("d-m-Y H:m", strtotime($entry["date"])) ?></span>
                                 <div class="form-container valign">
                                     <form action="<?= ROOT?>/entries/<?= $entry["id"] ?>/edit">
-                                        <button type="submit" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect entry-edit">
+                                        <button type="submit" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect entry-edit entry-control">
                                             <input type="hidden" value="<?= $entry["id"] ?>">
                                             <i class="material-icons">mode_edit</i>
                                         </button>
                                     </form>
                                     <form action="<?= ROOT?>/entries/<?= $entry["id"] ?>/delete">
-                                        <button type="submit" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect entry-remove">
+                                        <button type="submit" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect entry-remove entry-control">
                                             <input type="hidden" value="<?= $entry["id"] ?>">
                                             <i class="material-icons">delete</i>
                                         </button>
@@ -141,6 +152,7 @@ else {
                     </div>
                 <?php endforeach; ?>
             </section>
+            <?php include("includes/footer.php"); ?>
         </div>
     </main>
 </div>
