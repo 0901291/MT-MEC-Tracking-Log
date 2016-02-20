@@ -5,6 +5,7 @@ var googleUser = {};
 function initApp() {
     if ($("#google-login-button").length > 0) loadGoogleLogin();
     $(".add-info-dialog-button").on("click", openAddInfoDialog);
+    $("#add-data-info").on("keydown", keyDownNewDataInfo);
     $("#save-add-info-button").on("click", saveDataInfo);
     $("#cancel-add-info-button").on("click", closeAddInfoDialog);
     $("#quick-entry-switch-mobile, #quick-entry-switch-desktop").on("change", toggleQuickEntry);
@@ -16,11 +17,9 @@ function initApp() {
     });
     $("#logout").on("click", logout);
     $(".entry-card-header").on("click", toggleItem);
-    $("body").on("click", ".select-wrapper", function () {alert()});
     $(".field-add-button-container").on("contentChange", function () {
         $(this).find(".dropdown-content").css("top", 0);
     });
-    onResize();
     $(window).on("resize", onResize);
     resizeContent();
     if ($("#map").length > 0) {
@@ -43,6 +42,7 @@ function initApp() {
             $(this).css("max-height", maxHeight + "px");
         });
     }, 10);
+    setTimeout(onResize,10);
 }
 
 function loadGoogleLogin() {
@@ -85,6 +85,13 @@ function openAddInfoDialog(e) {
     }, 50);
 }
 
+function keyDownNewDataInfo(e) {
+    if (e.keyCode == 13) {
+        e.preventDefault();
+        saveDataInfo();
+    }
+}
+
 function saveDataInfo() {
     var name = $("#add-data-info").val();
     var type = $("#add-data-info-type").val();
@@ -94,7 +101,7 @@ function saveDataInfo() {
             function: "create",
             type: type
         },
-        url: "includes/dataInfo.php",
+        url: ROOT + "/includes/dataInfo.php",
         method: "POST",
         success: function (id) {
             addDataInfoToList(type, id, name);
@@ -237,13 +244,16 @@ function toggleMap(action) {
 
 function getCurrentLocation() {
     if (navigator.geolocation) {
+        var icon = $("#current-location");
         navigator.geolocation.getCurrentPosition(function (position) {
             setLocation({
                 lat: position.coords.latitude,
                 lng: position.coords.longitude
             });
+            map.setZoom(14);
+            icon.removeClass("searching");
         });
-        $("#current-location").addClass("selected");
+        icon.addClass("searching selected");
     }
 }
 
@@ -253,7 +263,6 @@ function getCustomLocation(e) {
 }
 
 function setLocation(pos) {
-    map.setCenter(pos);
     map.panTo(pos);
     if(marker) marker.setMap(null);
     marker = new google.maps.Marker({
@@ -291,6 +300,6 @@ function isMobile () {
 
 function resizeContent() {
     var content = $("#add-item");
-    content.css("max-height", content.height() + parseInt(content.css("padding-top")) + parseInt(content.css("padding-bottom")) + 250);
+    content.css("max-height", content.height() + parseInt(content.css("padding-top")) + parseInt(content.css("padding-bottom")) + 300);
     onResize();
 }

@@ -10,11 +10,11 @@ $type = (isset($_POST['type']) ? $_POST['type'] : null);
 if (isLoggedIn()) {
     if ($function != null) {
         if ($function == "create") {
-            create($type, $name, $conn);
+            create($type, $name, $db->getConnection());
         } else if ($function == "delete") {
-            delete($type, $id, $conn);
+            delete($type, $id, $db->getConnection());
         } else if ($function == "edit") {
-            edit($type, $id, $name, $conn);
+            edit($type, $id, $name, $db->getConnection());
         }
     }
 }

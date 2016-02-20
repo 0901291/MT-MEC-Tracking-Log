@@ -39,6 +39,7 @@ if (isLoggedIn()) {
             $categoryId = $entry["category"]["id"];
             foreach($entry["dataTypes"] as $dataType) $dataTypeIds[] = $dataType["id"];
             foreach($entry["companies"] as $company) $companyIds[] = $company["id"];
+            echo "";
         }
     }
 }
@@ -55,9 +56,6 @@ if (isLoggedIn()) {
     <link rel="stylesheet" href="<?= ROOT ?>/css/lib/material.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
     <link rel="stylesheet" href="<?= ROOT ?>/css/style.css">
-<!--    <meta name="google-signin-scope" content="profile email">-->
-<!--    <meta name="google-signin-client_id" content="953285646027-r3rsel8atqu2g8nbn45ag1jc24lah7lg.apps.googleusercontent.com">-->
-<!--    <script src="https://apis.google.com/js/platform.js" async defer></script>-->
     <script src="https://apis.google.com/js/api:client.js"></script>
 </head>
 <body class="<?= $edit ? "edit-mode" : ""?>">
@@ -75,6 +73,10 @@ if (isLoggedIn()) {
             <?php endif; ?>
             <span class="mdl-layout-title">MT-MEC Tracking Log</span>
             <div class="mdl-layout-spacer"></div>
+            <nav class="mdl-navigation mdl-layout--large-screen-only">
+                <a class="mdl-navigation__link active" href="<?= ROOT ?>">Nieuw</a>
+                <a class="mdl-navigation__link" href="<?= ROOT ?>/entries">Log</a>
+            </nav>
             <?php if (isLoggedIn()) : ?>
                 <div id="logout" >
                     <label class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" for="logout">
@@ -97,6 +99,13 @@ if (isLoggedIn()) {
             </div>
         <?php endif; ?>
     </header>
+    <div class="mdl-layout__drawer">
+        <span class="mdl-layout-title">MT-MEC Tracking Log</span>
+        <nav class="mdl-navigation">
+            <a class="mdl-navigation__link active" href="<?= ROOT ?>">Nieuw</a>
+            <a class="mdl-navigation__link" href="<?= ROOT ?>/entries">Log</a>
+        </nav>
+    </div>
     <main class="mdl-layout__content">
         <div class="page-content">
             <?php if (isLoggedIn()) : ?>
@@ -139,7 +148,7 @@ if (isLoggedIn()) {
                                 <select multiple name="dataTypes[]" id="data-type-list" class="col s11">
                                     <option value="" disabled selected>Data types</option>
                                     <?php foreach($dataTypes as $key => $dataType) : ?>
-                                        <option <?= in_array($key, $dataTypeIds) ? "selected" : "" ?> value="<?= $dataType["id"] ?>"><?= $dataType["name"] ?></option>
+                                        <option <?= in_array($dataType["id"], $dataTypeIds) ? "selected" : "" ?> value="<?= $dataType["id"] ?>"><?= $dataType["name"] ?></option>
                                     <?php endforeach ?>
                                 </select>
                                 <div class="col s1">
@@ -155,7 +164,7 @@ if (isLoggedIn()) {
                                 <select multiple name="companies[]" id="company-list" class="col s11">
                                     <option value="" disabled selected>Bedrijven</option>
                                     <?php foreach($companies as $key => $company) : ?>
-                                        <option <?= in_array($key, $companyIds) ? "selected" : "" ?> value="<?= $company["id"] ?>"><?= $company["name"] ?></option>
+                                        <option <?= in_array($company["id"], $companyIds) ? "selected" : "" ?> value="<?= $company["id"] ?>"><?= $company["name"] ?></option>
                                     <?php endforeach ?>
                                 </select>
                                 <div class="col s1">
@@ -208,12 +217,13 @@ if (isLoggedIn()) {
                     <div class="section-header mdl-color--primary show-quick-entry">
                         <h1 class="mdl-typography--title valign">Inloggen</h1>
                     </div>
+                    <p>Login met je Google account en voeg gelijk nieuwe data toe.</p>
                     <button id="google-login-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--primary mdl-button--raised">Inloggen met Google</button>
                 </section>
             <?php endif; ?>
+            <?php include("includes/footer.php"); ?>
         </div>
     </main>
-    <footer>&copy; <?= date("Y") ?> Niels Otten en Ian Wensink</footer>
 </div>
 <div class="mdl-dialog mdl-js-dialog" id="add-data-info-dialog">
     <div class="mdl-dialog__title">
@@ -233,6 +243,7 @@ if (isLoggedIn()) {
         <button type="button" id="cancel-add-info-button" class="mdl-button mdl-js-button mdl-js-ripple-effect">Annuleren</button>
     </div>
 </div>
+<script><?= "var ROOT = '".ROOT."';"; ?></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 <script src="https://code.getmdl.io/1.1.1/material.min.js"></script>
 <script src="<?= ROOT ?>/js/lib/materialize.min.js"></script>

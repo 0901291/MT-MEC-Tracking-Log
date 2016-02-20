@@ -2,10 +2,6 @@
     background-color: #eee;
 }
 
-.page-content {
-    padding: 0 16px;
-}
-
 .mdl-layout__header-row {
     position: relative;
 }
@@ -41,7 +37,7 @@
     margin: 0 auto 16px;
     max-width: 460px;
     width: 100%;
-    padding: 74px 16px 64px;
+    padding: 74px 16px 72px;
     position: relative;
     transition: all 0.3s ease-in-out;
     overflow: hidden;
@@ -50,6 +46,10 @@
 
 #items {
     padding: 0 16px 8px;
+}
+
+#login {
+    padding: 70px 16px 16px;
 }
 
 #items .section-header {
@@ -69,6 +69,10 @@
 
 #add-item.quick-entry-mode.hide-items form > *:not(.show-quick-entry) {
     display: none;
+}
+
+.mdl-navigation__link.active {
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .section-header {
@@ -143,6 +147,14 @@ button.form-item {
     color: rgba(6, 11, 255, 0.7);
 }
 
+.location-control.searching {
+    animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+    50% { opacity: 0.0; }
+}
+
 #location-map {
     height: 0;
     overflow: hidden;
@@ -214,7 +226,7 @@ button.form-item {
     font-weight: 400;
     margin: 0;
     line-height: 1.2em;
-    width: 40%;
+    width: 47%;
 }
 
 .entry-card-header .concept-icon {
@@ -237,6 +249,10 @@ button.form-item {
 
 .entry-card-header form {
     display: inline;
+}
+
+.entry-control {
+    color: rgba(0, 0, 0, 0.7);
 }
 
 .entry-card-content {
@@ -276,8 +292,9 @@ div:first-child .entry-section-heading {
 
 footer {
     position: fixed;
-    right: 8px;
+    left: 8px;
     bottom: 8px;
+    z-index: 5;
 }
 
 /* SWITCH */
@@ -313,6 +330,10 @@ footer {
 }
 
 @media all and (max-width: 460px) {
+    .page-content {
+        position: relative;
+    }
+
     .header-section-header {
         display: block !important;
         position: relative;
@@ -325,7 +346,8 @@ footer {
         left: 0 !important;
         margin: 0 !important;
         border-radius: 0;
-        padding: 0 8px 8px !important;
+        padding: 8px 8px 80px !important;
+        position: relative;
     }
 
     #add-item {
@@ -338,5 +360,17 @@ footer {
 
     .entry-card-header h2 {
         font-size: 16px;
+        width: 40%;
+    }
+
+    #submit-entry {
+        bottom: 32px;
+    }
+    
+    footer {
+        position: absolute;
+        text-align: center;
+        width: 90%;
+        box-sizing: border-box;
     }
 }
