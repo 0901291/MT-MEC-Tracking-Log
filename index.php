@@ -39,7 +39,6 @@ if (isLoggedIn()) {
             $categoryId = $entry["category"]["id"];
             foreach($entry["dataTypes"] as $dataType) $dataTypeIds[] = $dataType["id"];
             foreach($entry["companies"] as $company) $companyIds[] = $company["id"];
-            echo "";
         }
     }
 }
@@ -76,14 +75,14 @@ if (isLoggedIn()) {
             <nav class="mdl-navigation mdl-layout--large-screen-only">
                 <a class="mdl-navigation__link active" href="<?= ROOT ?>">Nieuw</a>
                 <a class="mdl-navigation__link" href="<?= ROOT ?>/entries">Log</a>
+                <?php if (isLoggedIn()) : ?>
+                    <a href="#" class="mdl-navigation__link" id="logout" >
+                        <label class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" for="logout">
+                            <i class="material-icons">exit_to_app</i>
+                        </label>
+                    </a>
+                <?php endif; ?>
             </nav>
-            <?php if (isLoggedIn()) : ?>
-                <div id="logout" >
-                    <label class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" for="logout">
-                        <i class="material-icons">exit_to_app</i>
-                    </label>
-                </div>
-            <?php endif; ?>
         </div>
         <?php if (isLoggedIn()) : ?>
             <div class="section-header header-section-header mdl-color--primary show-quick-entry hidden">
@@ -128,7 +127,7 @@ if (isLoggedIn()) {
                                 <select name="category" id="category-list" class="col s11">
                                     <option value="" disabled selected>Category</option>
                                     <?php foreach($categories as $key => $category) : ?>
-                                        <option <?= $key === $categoryId ? "selected" : "" ?> value="<?= $category["id"] ?>"><?= $category["name"] ?></option>
+                                        <option <?= $categoryId == $category["id"] ? "selected" : "" ?> value="<?= $category["id"] ?>"><?= $category["name"] ?></option>
                                     <?php endforeach ?>
                                 </select>
                                 <div class="col s1">
@@ -145,7 +144,7 @@ if (isLoggedIn()) {
                         <div class="field-add-button-container form-item">
                             <label class="add-entry-section-heading" for="datatypes">Data types</label>
                             <div class="input-field row">
-                                <select multiple name="dataTypes[]" id="data-type-list" class="col s11">
+                                <select multiple name="dataTypes[]" id="datatype-list" class="col s11">
                                     <option value="" disabled selected>Data types</option>
                                     <?php foreach($dataTypes as $key => $dataType) : ?>
                                         <option <?= in_array($dataType["id"], $dataTypeIds) ? "selected" : "" ?> value="<?= $dataType["id"] ?>"><?= $dataType["name"] ?></option>
@@ -250,9 +249,6 @@ if (isLoggedIn()) {
 <script src="<?= ROOT ?>/js/lib/material.add.min.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6VYBFTcvqfDookMW4Hl1J3TphwJxo6nA"></script>
 <script src="<?= ROOT ?>/js/script.js"></script>
-<script src="<?= ROOT ?>/js/googleLogin.js"></script>
-<script src="<?= ROOT ?>/js/lib/moment.min.js"></script>
-<script src="<?= ROOT ?>/js/lib/moment.nl.js"></script>
 <script>
     $(initApp);
 </script>

@@ -1,9 +1,7 @@
 <?php
 
 class Entry {
-
     private $conn;
-
     public $id,
         $title,
         $date,
@@ -23,23 +21,23 @@ class Entry {
 
     public static function getEntries($status, $acceptType, $conn) {
         $status = htmlentities($status);
-        $state = ($status != 0 ? "AND WHERE = ".$status : "");
+        $state = $status != 0 ? "AND WHERE = ".$status : "";
 
         if (is_numeric($status)) {
             $query =
                 "SELECT
-                  d.id,
-                  d.title,
-                  d.date,
-                  d.description,
-                  d.imgURL,
-                  d.lng,
-                  d.lat,
-                  group_concat(DISTINCT c.name),
-                  group_concat(DISTINCT dt.name),
-                  ca.name,
-                  ca.id,
-                  d.state
+                    d.id,
+                    d.title,
+                    d.date,
+                    d.description,
+                    d.imgURL,
+                    d.lng,
+                    d.lat,
+                    group_concat(DISTINCT c.name),
+                    group_concat(DISTINCT dt.name),
+                    ca.name,
+                    ca.id,
+                    d.state
                 FROM ".DB_PREFIX."data d
                 LEFT OUTER JOIN (".DB_PREFIX."datatype_has_data dhd
                     LEFT OUTER JOIN ".DB_PREFIX."datatype dt
@@ -54,13 +52,13 @@ class Entry {
                 WHERE d.user_id = ? ".$state."
                 GROUP BY d.id
                 ORDER BY d.date DESC";
-            if ($stmt = $conn -> prepare($query)) {
-                $stmt -> bind_param("i", $_SESSION['userId']);
-                $stmt -> execute();
-                $stmt -> store_result();
-                $stmt -> bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $dataType, $category, $categoryId, $state);
+            if ($stmt = $conn->prepare($query)) {
+                $stmt->bind_param("i", $_SESSION['userId']);
+                $stmt->execute();
+                $stmt->store_result();
+                $stmt->bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $dataType, $category, $categoryId, $state);
                 $array = [];
-                while ($stmt -> fetch()) {
+                while ($stmt->fetch()) {
                     $companies = strlen($company) > 0 ? explode(",", $company) : null;
                     $dataTypes = strlen($dataType) > 0 ? explode(",", $dataType) : null;
                     $categoryArray = !empty($category) && !empty($categoryId) ? [
@@ -98,14 +96,14 @@ class Entry {
 
     public function insert () {
         $query = "INSERT INTO ".DB_PREFIX."data (title, date, description, lat, lng, category_id, user_id, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        if ($stmt = $this-> conn -> prepare($query)) {
-            $stmt -> bind_param("ssssssss", $this->title, $this->date, $this->description, $this->lat, $this->lng, $this->category, $_SESSION['userId'], $this ->state);
-            $stmt -> execute();
+        if ($stmt = $this->conn->prepare($query)) {
+            $stmt->bind_param("ssssssss", $this->title, $this->date, $this->description, $this->lat, $this->lng, $this->category, $_SESSION['userId'], $this->state);
+            $stmt->execute();
             if ($this->dataTypes != null) {
                 foreach ($this->dataTypes as $dataType) {
                     $dataType = htmlentities($dataType);
                     $query = "INSERT INTO ".DB_PREFIX."datatype_has_data (dataType_id, data_id) VALUES (?, ".$stmt->insert_id.")";
-                    if ($stm = $this-> conn -> prepare($query)) {
+                    if ($stm = $this->conn->prepare($query)) {
                         $stm -> bind_param('s', $dataType);
                         $stm -> execute();
                     }
@@ -186,7 +184,7 @@ class Entry {
             $stmt -> execute();
             $stmt -> store_result();
             $stmt -> bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $companyId, $dataType, $dataTypeId, $category, $categoryId);
-            $array;
+            $array = "";
             while ($stmt -> fetch()) {
                 $companies = strlen($company) > 0 ? explode(",", $company) : null;
                 $dataTypes = strlen($dataType) > 0 ? explode(",", $dataType) : null;

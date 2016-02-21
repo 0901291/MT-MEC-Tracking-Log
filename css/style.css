@@ -201,6 +201,18 @@ button.form-item {
     display: block;
 }
 
+.row {
+    display: flex;
+}
+
+.col.s1 {
+    flex: 1;
+}
+
+.col.s11 {
+    flex: 9;
+}
+
 /* ENTRY */
 .content-section.concept-mode .entry-card:not(.concept-card) {
     transform: translateX(100%);

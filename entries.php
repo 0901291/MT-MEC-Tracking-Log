@@ -48,11 +48,11 @@ else {
                 <a class="mdl-navigation__link" href="<?= ROOT ?>">Nieuw</a>
                 <a class="mdl-navigation__link active" href="<?= ROOT ?>/entries">Log</a>
             </nav>
-            <div id="logout" >
+            <a href="#" class="mdl-navigation__link" id="logout" >
                 <label class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" for="logout">
                     <i class="material-icons">exit_to_app</i>
                 </label>
-            </div>
+            </a>
         </div>
         <div class="section-header header-section-header mdl-color--primary hidden">
             <h1 class="mdl-typography--title valign">Items</h1>
@@ -86,7 +86,7 @@ else {
                         <div class="entry-card-header">
                             <div class="valign">
                                 <h2 class="ellipsis"><?php if ($concept) echo "<i class=\"material-icons valign concept-icon\">drafts</i>" ?><?= empty($entry["title"]) ? "<em>Geen titel</em>" : $entry["title"] ?></h2>
-                                <span class="entry-date valign"><?= date("d-m-Y H:m", strtotime($entry["date"])) ?></span>
+                                <span class="entry-date valign"><?= date("d-m-Y H:i", strtotime($entry["date"])) ?></span>
                                 <div class="form-container valign">
                                     <form action="<?= ROOT?>/entries/<?= $entry["id"] ?>/edit">
                                         <button type="submit" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect entry-edit entry-control">
@@ -145,7 +145,7 @@ else {
                         </div>
                         <?php if(!empty($entry["location"]["lat"] && !empty($entry["location"]["lng"]))): ?>
                             <div class="entry-location">
-                                <img src="https://maps.googleapis.com/maps/api/staticmap?center=<?= $entry["location"]["lat"] ?>,<?= $entry["location"]["lng"] ?>&zoom=14&size=460x130&maptype=roadmap&markers=color:red%7C<?= $entry["location"]["lat"] ?>,<?= $entry["location"]["lng"] ?>&key=AIzaSyC6VYBFTcvqfDookMW4Hl1J3TphwJxo6nA" alt="">
+                                <img data-src="https://maps.googleapis.com/maps/api/staticmap?center=<?= $entry["location"]["lat"] ?>,<?= $entry["location"]["lng"] ?>&zoom=14&size=460x130&maptype=roadmap&markers=color:red%7C<?= $entry["location"]["lat"] ?>,<?= $entry["location"]["lng"] ?>&key=AIzaSyC6VYBFTcvqfDookMW4Hl1J3TphwJxo6nA" alt="">
                                 <div class="shadow"></div>
                             </div>
                         <?php endif; ?>

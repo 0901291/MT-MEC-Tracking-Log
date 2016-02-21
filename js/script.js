@@ -1,6 +1,4 @@
-var map;
-var marker;
-var googleUser = {};
+var map, marker;
 
 function initApp() {
     if ($("#google-login-button").length > 0) loadGoogleLogin();
@@ -12,39 +10,17 @@ function initApp() {
     $("#concept-switch-mobile, #concept-switch-desktop").on("change", toggleConcept);
     $("#current-location").on("click", getCurrentLocation);
     $("#toggle-map-button").on("click", toggleMap);
-    $("#location-fields").on("keydown", "input[type=text]", function () {
-        $("#current-location").removeClass("selected");
-    });
+    $("#location-fields").on("keydown", "input[type=text]", function () {$("#current-location").removeClass("selected");});
     $(".entry-remove").on("click", confirmDelete);
     $("#logout").on("click", logout);
     $("#submit-entry-button").on("click", checkLocationBeforeSend);
     $(".entry-card-header").on("click", toggleItem);
-    $(".field-add-button-container").on("contentChange", function () {
-        $(this).find(".dropdown-content").css("top", 0);
-    });
+    $(".field-add-button-container").on("contentChange", function () {$(this).find(".dropdown-content").css("top", 0);});
+    initMap();
+    if ($("select").length > 0) $("select").material_select();
+    $.each($(".entry-card"), initializeEntryCard);
+    setTimeout(resizeContent, 50);
     $(window).on("resize", onResize);
-    resizeContent();
-    if ($("#map").length > 0) {
-        initMap();
-        if ($("body").hasClass("edit-mode")) {
-            setLocation({
-                lat: parseFloat($("#lat").val()),
-                lng: parseFloat($("#lng").val())
-            });
-        } else {
-            getCurrentLocation();
-        }
-    }
-    if ($("select").length > 0) $('select').material_select();
-    setTimeout(function () {
-        $.each($(".entry-card"), function (k, v) {
-            $(this).attr("data-max-height", $(this).height());
-            var maxHeight = 56;
-            if (k === 0) maxHeight = $(this).height();
-            $(this).css("max-height", maxHeight + "px");
-        });
-    }, 50);
-    setTimeout(onResize, 50);
 }
 
 function loadGoogleLogin() {
@@ -53,16 +29,29 @@ function loadGoogleLogin() {
             client_id: '953285646027-r3rsel8atqu2g8nbn45ag1jc24lah7lg.apps.googleusercontent.com',
             cookiepolicy: 'single_host_origin'
         });
-        attachSignin(document.getElementById('google-login-button'));
+        auth2.attachClickHandler(document.getElementById('google-login-button'), {}, onSignIn);
     });
 }
 
-function attachSignin(element) {
-    console.log(element.id);
-    auth2.attachClickHandler(element, {},onSignIn);
+function onSignIn(googleUser) {
+    var profile = googleUser.getBasicProfile();
+    $.ajax({
+        data: {
+            name: profile.getName(),
+            id: profile.getId(),
+            email: profile.getEmail(),
+            img: profile.getImageUrl(),
+            method: "logIn"
+        },
+        url: "includes/userCall.php",
+        method: "POST"
+    }).success(function () {
+        location.reload();
+    })
 }
 
 function initMap() {
+    if ($("#map").length == 0) return;
     var image = "https://www.dropbox.com/s/pb99jcgjvrdzk0f/add_marker_icon.png?dl=1";
     map = new google.maps.Map(document.getElementById('map'), {
         zoom: 14,
@@ -70,11 +59,19 @@ function initMap() {
         streetViewControl: false,
         draggableCursor : "url(" + image + ") 24 48, auto"
     });
-    if (!$("body").hasClass("edit-mode")) setLocation({
-        lat: 51.9173624,
-        lng: 4.4826242
-    });
     map.addListener('click', getCustomLocation);
+    if ($("body").hasClass("edit-mode")) {
+        setLocation({
+            lat: parseFloat($("#lat").val()),
+            lng: parseFloat($("#lng").val())
+        });
+    } else {
+        setLocation({
+            lat: 51.9173624,
+            lng: 4.4826242
+        });
+        getCurrentLocation();
+    }
 }
 
 function openAddInfoDialog(e) {
@@ -98,43 +95,48 @@ function keyDownNewDataInfo(e) {
 function saveDataInfo() {
     var name = $("#add-data-info").val();
     var type = $("#add-data-info-type").val();
-    $.ajax({
-        data: {
-            name: name,
-            function: "create",
-            type: type
-        },
-        url: ROOT + "/includes/dataInfo.php",
-        method: "POST",
-        success: function (id) {
-            addDataInfoToList(type, id, name);
-            closeAddInfoDialog();
-        }
+    var item = null;
+    var itemList = $("#" + type + "-list");
+    itemList.find("option").each(function () {
+        if ($(this).text().toLowerCase() == name.toLowerCase()) item = $(this);
     });
+    if (!item) {
+        $.ajax({
+            data: {
+                name: name,
+                function: "create",
+                type: type
+            },
+            url: ROOT + "/includes/dataInfo.php",
+            method: "POST",
+            success: function (id) {
+                addDataInfoToList(type, id, name);
+                closeAddInfoDialog();
+            }
+        });
+    } else {
+        if (itemList.attr("multiple") == "multiple") {
+            var arr = itemList.val();
+            arr.push(item.val());
+            itemList.val(arr);
+        } else {
+            itemList.val(item.val());
+        }
+        itemList.material_select();
+        closeAddInfoDialog();
+    }
 }
 
 function addDataInfoToList(type, id, name) {
-    var item = "<option value=\"" + id + "\">" + name + "</option>";
-    switch (type) {
-        case "category":
-            $("#category-list").append(item);
-            break;
-        case "datatype":
-            $("#data-type-list").append(item);
-            break;
-        case "company":
-            $("#company-list").append(item);
-            break;
-    }
+    var item = "<option selected value=\"" + id + "\">" + name + "</option>";
+    $("#" + type + "-list").append(item);
     $("select").material_select();
     var content = $("#add-item");
-    content.css("max-height", "initial");
-    content.css("max-height", content.height() + parseInt(content.css("padding-top")) + parseInt(content.css("padding-bottom")));
+    content.css("max-height", "initial").css("max-height", content.height() + parseInt(content.css("padding-top")) + parseInt(content.css("padding-bottom")));
 }
 
 function closeAddInfoDialog() {
-    var dialog = $('#add-data-info-dialog');
-    dialog[0].MaterialDialog.close();
+    $('#add-data-info-dialog')[0].MaterialDialog.close();
     $("#add-data-info").val("");
 }
 
@@ -267,7 +269,7 @@ function getCustomLocation(e) {
 
 function setLocation(pos) {
     map.panTo(pos);
-    if(marker) marker.setMap(null);
+    if (marker) marker.setMap(null);
     marker = new google.maps.Marker({
         position: pos,
         map: map
@@ -294,8 +296,20 @@ function confirmDelete(e) {
 }
 
 function checkLocationBeforeSend() {
-    var doneLoading = !$("#current-location").hasClass("searching");
-    if (doneLoading || confirm("Je locatie is nog niet bepaald, toch opslaan?")) $("#entry-form").submit();
+    if (!$("#current-location").hasClass("searching") || confirm("Je locatie is nog niet bepaald, toch opslaan?")) $("#entry-form").submit();
+}
+
+function initializeEntryCard(k, v) {
+    var el = $(this);
+    var img = $(el.find(".entry-location img"));
+    img.attr("src", img.attr("data-src")).on("load", {el: el}, function (e) {
+        var el = $(e.data.el);
+        console.log(el.index());
+        el.attr("data-max-height", el.height());
+        var maxHeight = 56;
+        if (k === 0) maxHeight = el.height();
+        el.css("max-height", maxHeight + "px");
+    });
 }
 
 function onResize() {

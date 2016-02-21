@@ -1,6 +1,6 @@
 <?php
 
-class user
+class User
 {
     private $conn;
 
@@ -11,18 +11,18 @@ class user
 
     function __construct($db)
     {
-        $this -> conn = $db;
+        $this->conn = $db;
     }
 
     public function logIn () {
-        $query = "SELECT name, imgURL, id, email, token FROM ".DB_PREFIX."user WHERE ".DB_PREFIX."user.googleId = ?";
-        if ($stmt = $this -> conn -> prepare($query)) {
-            $stmt -> bind_param('s', $this->googleId);
-            $stmt -> execute();
-            $stmt -> store_result();
-            $stmt -> bind_result($name, $imgURL, $id, $email, $token);
-            if ($stmt -> num_rows == 1) {
-                $stmt -> fetch();
+        $query = "SELECT name, imgURL, id, email, token FROM ".DB_PREFIX."user u WHERE u.googleId = ?";
+        if ($stmt = $this->conn->prepare($query)) {
+            $stmt->bind_param('s', $this->googleId);
+            $stmt->execute();
+            $stmt->store_result();
+            $stmt->bind_result($name, $imgURL, $id, $email, $token);
+            if ($stmt->num_rows == 1) {
+                $stmt->fetch();
                 $_SESSION['userId'] = $id;
                 $_SESSION['name'] = $name;
                 $_SESSION['imgURL'] = $imgURL;
@@ -35,13 +35,11 @@ class user
     }
 
     public function insert () {
-        $query = "INSERT INTO ".DB_PREFIX."user (name, imgURL, email, googleId) VALUES(?, ?, ?, ?)";
-        if ($stmt = $this -> $conn -> prepare($query)) {
-            $stmt -> bind_param('ssss', $this->name, $this->imgURL, $this->email, $this->googleId);
-            $stmt -> execute();
-            if ($stmt) {
-                return true;
-            }
+        $query = "INSERT INTO ".DB_PREFIX."user (name, imgURL, email, googleId) VALUES (?, ?, ?, ?)";
+        if ($stmt = $this->conn->prepare($query)) {
+            $stmt->bind_param('ssss', $this->name, $this->imgURL, $this->email, $this->googleId);
+            $stmt->execute();
+            if ($stmt) return true;
         }
         return false;
     }
