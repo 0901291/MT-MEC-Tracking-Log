@@ -35,10 +35,10 @@ class User
     }
 
     public function insert () {
-        $query = "INSERT INTO ".DB_PREFIX."user (name, imgURL, email, googleId) VALUES (?, ?, ?, ?)";
-        if ($stmt = $this->conn->prepare($query)) {
-            $stmt->bind_param('ssss', $this->name, $this->imgURL, $this->email, $this->googleId);
-            $stmt->execute();
+        $query = "INSERT INTO ".DB_PREFIX."user (name, imgURL, email, googleId) VALUES(?, ?, ?, ?)";
+        if ($stmt = $this -> conn -> prepare($query)) {
+            $stmt -> bind_param('ssss', $this->name, $this->imgURL, $this->email, $this->googleId);
+            $stmt -> execute();
             if ($stmt) return true;
         }
         return false;

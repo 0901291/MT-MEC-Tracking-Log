@@ -9,7 +9,6 @@ if ($_POST) {
     $googleId = isset($_POST['id']) ? htmlentities($_POST['id']) : null;
 
     $user = new User($db->getConnection());
-
     if (isset($_POST['method'])) {
         switch ($_POST['method']) {
             case "logOut":
@@ -22,15 +21,13 @@ if ($_POST) {
                 if (!isLoggedIn()) {
                     $user->googleId = $googleId;
                     if ($user->logIn()) return true;
-                    else $user->insert();
+                    else {
+                        $user->name = $name;
+                        $user->imgURL = $imgURL;
+                        $user->email = $email;
+                        if ($user->insert()) if (!isLoggedIn()) if ($user->logIn()) return true;
+                    }
                 }
-                break;
-            case "insert":
-                $user -> name = $name;
-                $user -> imgURL = $imgURL;
-                $user -> email = $email;
-                $user -> googleId = $googleId;
-                if ($user -> insert()) if (!isLoggedIn()) if ($user -> logIn()) return true;
                 break;
         }
     }

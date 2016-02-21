@@ -16,7 +16,7 @@ class Entry {
 
     public function __construct($db)
     {
-        $this -> conn = $db;
+        $this->conn = $db;
     }
 
     public static function getEntries($status, $acceptType, $conn) {
@@ -104,8 +104,8 @@ class Entry {
                     $dataType = htmlentities($dataType);
                     $query = "INSERT INTO ".DB_PREFIX."datatype_has_data (dataType_id, data_id) VALUES (?, ".$stmt->insert_id.")";
                     if ($stm = $this->conn->prepare($query)) {
-                        $stm -> bind_param('s', $dataType);
-                        $stm -> execute();
+                        $stm->bind_param('s', $dataType);
+                        $stm->execute();
                     }
                 }
             }
@@ -114,8 +114,8 @@ class Entry {
                     $company = htmlentities($company);
                     $query = "INSERT INTO ".DB_PREFIX."company_has_data (company_id, data_id) VALUES (?, ".$stmt->insert_id.")";
                     if ($stm = $this-> conn -> prepare($query)) {
-                        $stm -> bind_param('s', $company);
-                        $stm -> execute();
+                        $stm->bind_param('s', $company);
+                        $stm->execute();
                     }
                 }
             }
@@ -125,20 +125,20 @@ class Entry {
 
     public function edit () {
         $query = "UPDATE ".DB_PREFIX."data SET title = ?, date = ?, description = ?, lat = ?, lng = ?, category_id = ?, user_id = ?, state = ? WHERE id = ? AND user_id = ?";
-        if ($stmt = $this-> conn -> prepare($query)) {
+        if ($stmt = $this-> conn->prepare($query)) {
             $stmt -> bind_param("sssssiiiii", $this->title, $this->date, $this->description, $this->lat, $this->lng, $this->category, $_SESSION['userId'], $this ->state, $this->id, $_SESSION["userId"]);
             $stmt -> execute();
             $query = "DELETE cd FROM ".DB_PREFIX."company_has_data cd INNER JOIN ".DB_PREFIX."data d ON d.id = cd.data_id WHERE cd.data_id = ? AND d.user_id = ?";
-            if ($stmt = $this-> conn -> prepare($query)) {
+            if ($stmt = $this->conn->prepare($query)) {
                 $stmt->bind_param("ii", $this->id, $_SESSION['userId']);
                 $stmt->execute();
             }
             $query = "DELETE dd FROM ".DB_PREFIX."datatype_has_data dd INNER JOIN ".DB_PREFIX."data d ON d.id = dd.data_id WHERE dd.data_id = ? AND d.user_id = ?";
-            if ($stmt = $this-> conn -> prepare($query)) {
-                $stmt -> bind_param("ii", $this->id, $_SESSION['userId']);
-                $stmt -> execute();
+            if ($stmt = $this->conn->prepare($query)) {
+                $stmt->bind_param("ii", $this->id, $_SESSION['userId']);
+                $stmt->execute();
             }
-            if($stmt) {
+            if ($stmt) {
                 if ($this->dataTypes != null) {
                     foreach ($this->dataTypes as $dataType) {
                         $dataType = htmlentities($dataType);
@@ -162,6 +162,7 @@ class Entry {
                 return true;
             }
         }
+        return true;
     }
 
     public function detail () {
@@ -179,13 +180,13 @@ class Entry {
             WHERE d.user_id = ? AND d.id = ?
             GROUP BY d.id
             LIMIT 1";
-        if ($stmt = $this-> conn -> prepare($query)) {
+        if ($stmt = $this->conn->prepare($query)) {
             $stmt -> bind_param("ii", $_SESSION['userId'], $this->id);
             $stmt -> execute();
             $stmt -> store_result();
             $stmt -> bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $companyId, $dataType, $dataTypeId, $category, $categoryId);
             $array = "";
-            while ($stmt -> fetch()) {
+            while ($stmt->fetch()) {
                 $companies = strlen($company) > 0 ? explode(",", $company) : null;
                 $dataTypes = strlen($dataType) > 0 ? explode(",", $dataType) : null;
                 $companiesId = strlen($companyId) > 0 ? explode(",", $companyId) : null;
@@ -223,26 +224,25 @@ class Entry {
             }
             return $array;
         }
+        return true;
     }
 
     public function delete () {
         $query = "DELETE cd FROM ".DB_PREFIX."company_has_data cd INNER JOIN ".DB_PREFIX."data d ON d.id = cd.data_id WHERE cd.data_id = ? AND d.user_id = ?";
-        if ($stmt = $this-> conn -> prepare($query)) {
+        if ($stmt = $this->conn->prepare($query)) {
             $stmt->bind_param("ii", $this->id, $_SESSION['userId']);
             $stmt->execute();
         }
         $query = "DELETE dd FROM ".DB_PREFIX."datatype_has_data dd INNER JOIN ".DB_PREFIX."data d ON d.id = dd.data_id WHERE dd.data_id = ? AND d.user_id = ?";
-        if ($stmt = $this-> conn -> prepare($query)) {
+        if ($stmt = $this->conn->prepare($query)) {
             $stmt -> bind_param("ii", $this->id, $_SESSION['userId']);
             $stmt -> execute();
         }
         $query = "DELETE FROM ".DB_PREFIX."data WHERE id = ? AND user_id = ?";
-        if ($stmt = $this-> conn -> prepare($query)) {
+        if ($stmt = $this->conn->prepare($query)) {
             $stmt -> bind_param("ii", $this->id, $_SESSION['userId']);
             $stmt -> execute();
-            if($stmt) {
-                return true;
-            }
+            if ($stmt) return true;
         }
     }
 }
