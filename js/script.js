@@ -70,7 +70,7 @@ function initMap() {
         streetViewControl: false,
         draggableCursor : "url(" + image + ") 24 48, auto"
     });
-    setLocation({
+    if (!$("body").hasClass("edit-mode")) setLocation({
         lat: 51.9173624,
         lng: 4.4826242
     });
