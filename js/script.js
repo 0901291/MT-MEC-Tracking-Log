@@ -17,6 +17,7 @@ function initApp() {
     });
     $(".entry-remove").on("click", confirmDelete);
     $("#logout").on("click", logout);
+    $("#submit-entry-button").on("click", checkLocationBeforeSend);
     $(".entry-card-header").on("click", toggleItem);
     $(".field-add-button-container").on("contentChange", function () {
         $(this).find(".dropdown-content").css("top", 0);
@@ -118,7 +119,7 @@ function addDataInfoToList(type, id, name) {
         case "category":
             $("#category-list").append(item);
             break;
-        case "dataType":
+        case "datatype":
             $("#data-type-list").append(item);
             break;
         case "company":
@@ -290,7 +291,11 @@ function logout() {
 
 function confirmDelete(e) {
     if (confirm("Weet je zeker dat je deze wilt verwijderen?")) $(e.currentTarget).parent().submit();
+}
 
+function checkLocationBeforeSend() {
+    var doneLoading = !$("#current-location").hasClass("searching");
+    if (doneLoading || confirm("Je locatie is nog niet bepaald, toch opslaan?")) $("#entry-form").submit();
 }
 
 function onResize() {

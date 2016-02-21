@@ -117,7 +117,7 @@ if (isLoggedIn()) {
                             <span class="mdl-switch__label">Quick entry</span>
                         </label>
                     </div>
-                    <form action="<?= ROOT ?>/includes/entryCall.php" method="post">
+                    <form id="entry-form" action="<?= ROOT ?>/includes/entryCall.php" method="post">
                         <div id="title-field" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-item show-quick-entry">
                             <input class="mdl-textfield__input" type="text" id="title" name="title" value="<?= $title ?>">
                             <label class="mdl-textfield__label" for="title">Titel</label>
@@ -152,7 +152,7 @@ if (isLoggedIn()) {
                                     <?php endforeach ?>
                                 </select>
                                 <div class="col s1">
-                                    <button type="button" data-data-info-type="dataType" data-data-info-text="Data type" class="add-info-dialog-button mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect">
+                                    <button type="button" data-data-info-type="datatype" data-data-info-text="Data type" class="add-info-dialog-button mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect">
                                         <i class="material-icons">add</i>
                                     </button>
                                 </div>
@@ -208,7 +208,7 @@ if (isLoggedIn()) {
                         <div id="submit-entry" class="show-quick-entry">
                             <input type="hidden" name="method" value="<?= $edit ? "edit" : "insert" ?>">
                             <input type="hidden" name="id" value="<?= $id ?>">
-                            <button type="submit" id="submit-entry-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised mdl-button--primary"><?= $edit ? "Opslaan" : "Toevoegen" ?></button>
+                            <button type="button" id="submit-entry-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised mdl-button--primary"><?= $edit ? "Opslaan" : "Toevoegen" ?></button>
                         </div>
                     </form>
                 </section>
