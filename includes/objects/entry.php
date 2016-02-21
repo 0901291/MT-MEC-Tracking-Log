@@ -53,7 +53,7 @@ class Entry {
                 ON ca.id = d.category_id
                 WHERE d.user_id = ? ".$state."
                 GROUP BY d.id
-                ORDER BY d.date ASC";
+                ORDER BY d.date DESC";
             if ($stmt = $conn -> prepare($query)) {
                 $stmt -> bind_param("i", $_SESSION['userId']);
                 $stmt -> execute();
