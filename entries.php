@@ -85,7 +85,7 @@ else {
                     <div class="entry-card mdl-card mdl-shadow--2dp <?= ($key === 0 ? "show" : "collapsed") ?> <?= $concept ? "concept-card" : "" ?>" data-state="<?= $entry["state"] ?>">
                         <div class="entry-card-header">
                             <div class="valign">
-                                <h2 class="ellipsis"><?= empty($entry["title"]) ? "<em>Geen titel</em>" : $entry["title"] ?><?php if ($concept) echo "<i class=\"material-icons valign concept-icon\">drafts</i>" ?></h2>
+                                <h2 class="ellipsis"><?php if ($concept) echo "<i class=\"material-icons valign concept-icon\">drafts</i>" ?><?= empty($entry["title"]) ? "<em>Geen titel</em>" : $entry["title"] ?></h2>
                                 <span class="entry-date valign"><?= date("d-m-Y H:m", strtotime($entry["date"])) ?></span>
                                 <div class="form-container valign">
                                     <form action="<?= ROOT?>/entries/<?= $entry["id"] ?>/edit">
