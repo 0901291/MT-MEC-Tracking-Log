@@ -42,8 +42,8 @@ function initApp() {
             if (k === 0) maxHeight = $(this).height();
             $(this).css("max-height", maxHeight + "px");
         });
-    }, 10);
-    setTimeout(onResize,50);
+    }, 50);
+    setTimeout(onResize, 50);
 }
 
 function loadGoogleLogin() {
@@ -241,7 +241,7 @@ function toggleMap(action) {
         button.addClass("selected");
         $("#location-map").height(200);
     }
-    resizeContent();
+    setTimeout(resizeContent, 300);
 }
 
 function getCurrentLocation() {
