@@ -71,6 +71,14 @@
     display: none;
 }
 
+.mdl-layout__header .mdl-layout-title {
+    margin-left: 56px;
+}
+
+.mdl-layout__drawer>.mdl-layout-title, .mdl-layout__drawer>.mdl-layout__title {
+    padding-left: 16px;
+}
+
 .mdl-navigation__link.active {
     background-color: rgba(0, 0, 0, 0.2);
 }
