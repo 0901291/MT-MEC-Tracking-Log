@@ -15,7 +15,7 @@ class user
     }
 
     public function logIn () {
-        $query = "SELECT name, imgURL, id, email, token FROM ".DB_PREFIX."user WHERE ".DB_PREFIX."user.googleId = ?";
+        $query = "SELECT name, imgURL, id, email, token FROM ".DB_PREFIX."user u WHERE u.googleId = ?";
         if ($stmt = $this -> conn -> prepare($query)) {
             $stmt -> bind_param('s', $this->googleId);
             $stmt -> execute();
@@ -36,7 +36,7 @@ class user
 
     public function insert () {
         $query = "INSERT INTO ".DB_PREFIX."user (name, imgURL, email, googleId) VALUES(?, ?, ?, ?)";
-        if ($stmt = $this -> $conn -> prepare($query)) {
+        if ($stmt = $this -> conn -> prepare($query)) {
             $stmt -> bind_param('ssss', $this->name, $this->imgURL, $this->email, $this->googleId);
             $stmt -> execute();
             if ($stmt) {

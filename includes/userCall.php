@@ -8,7 +8,6 @@ if ($_POST) {
     $email = (isset($_POST['email']) ? htmlentities($_POST['email']) : null);
     $googleId = (isset($_POST['id']) ? htmlentities($_POST['id']) : null);
 
-    $db = new database();
     $user = new user($db->getConnection());
 
     if (isset($_POST['method'])) {
@@ -21,9 +20,21 @@ if ($_POST) {
                 break;
             case "logIn":
                 if (!isLoggedIn()) {
+//                    echo "login1";
                     $user -> googleId = $googleId;
                     if($user -> logIn()) {
-                        // iets?
+
+                    } else {
+                        $user -> name = $name;
+                        $user -> imgURL = $imgURL;
+                        $user -> email = $email;
+                        if ($user -> insert()) {
+                            if (!isLoggedIn()) {
+                                if($user -> logIn()) {
+                                    // iets?
+                                }
+                            }
+                        }
                     }
                 }
                 break;
