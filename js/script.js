@@ -48,12 +48,9 @@ function initApp() {
 
 function loadGoogleLogin() {
     gapi.load('auth2', function(){
-        // Retrieve the singleton for the GoogleAuth library and set up the client.
         auth2 = gapi.auth2.init({
             client_id: '953285646027-r3rsel8atqu2g8nbn45ag1jc24lah7lg.apps.googleusercontent.com',
-            cookiepolicy: 'single_host_origin',
-            // Request scopes in addition to 'profile' and 'email'
-            //scope: 'additional_scope'
+            cookiepolicy: 'single_host_origin'
         });
         attachSignin(document.getElementById('google-login-button'));
     });
@@ -71,6 +68,10 @@ function initMap() {
         mapTypeControl: false,
         streetViewControl: false,
         draggableCursor : "url(" + image + ") 24 48, auto"
+    });
+    setLocation({
+        lat: 51.9173624,
+        lng: 4.4826242
     });
     map.addListener('click', getCustomLocation);
 }
