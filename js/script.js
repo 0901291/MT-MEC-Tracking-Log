@@ -44,9 +44,10 @@ function onSignIn(googleUser) {
             method: "logIn"
         },
         url: "includes/userCall.php",
-        method: "POST"
-    }).success(function () {
-        location.reload();
+        method: "POST",
+        success: function () {
+            location.reload();
+        }
     })
 }
 

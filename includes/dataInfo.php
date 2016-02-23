@@ -1,9 +1,11 @@
 <?php
 require("initialize.php");
+use PHP_Crypt\PHP_Crypt as PHP_Crypt;
+$crypt = new PHP_Crypt($_SESSION['key']);
 
-$name = isset($_POST['name']) ? $_POST['name'] : null;
+$name = isset($_POST['name']) ? bin2hex($crypt->encrypt($_POST['name'])) : null;
 $function = isset($_POST['function']) ? $_POST['function'] : null;
-$dataId = isset($_POST['dataId']) ? $_POST['dataId'] : null;
+$dataId = isset($_POST['dataId']) ? bin2hex($crypt->encrypt($_POST['dataId'])) : null;
 $id = isset($_POST['id']) ? $_POST['id'] : null;
 $type = isset($_POST['type']) ? $_POST['type'] : null;
 

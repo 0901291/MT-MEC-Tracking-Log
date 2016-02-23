@@ -1,6 +1,7 @@
 <?php
 include_once("includes/initialize.php");
 require("includes/objects/Entry.php");
+use PHP_Crypt\PHP_Crypt as PHP_Crypt;
 
 $categories; $dataTypes; $companies;
 $conn = $db->getConnection();
@@ -8,14 +9,37 @@ $conn = $db->getConnection();
 $edit = false;
 
 if (isLoggedIn()) {
+    $crypt = new PHP_Crypt($_SESSION['key']);
     $getCategories = "SELECT id, name FROM ".DB_PREFIX."category WHERE user_id = '".$_SESSION["userId"]."' ORDER BY name ASC";
-    $categories = $conn->query($getCategories);
+    $_categories = $conn->query($getCategories);
+    $categories = [];
+    foreach ($_categories as $_category) {
+        $categories[] = [
+            "id" => $_category["id"],
+            "name" => trim($crypt->decrypt(hex2bin($_category["name"])))
+        ];
+    }
 
     $getDataTypes = "SELECT id, name FROM ".DB_PREFIX."datatype WHERE user_id = '".$_SESSION["userId"]."' ORDER BY name ASC";
-    $dataTypes = $conn->query($getDataTypes);
+    $_dataTypes = $conn->query($getDataTypes);
+    $dataTypes = [];
+    foreach ($_dataTypes as $_dataType) {
+        $dataTypes[] = [
+            "id" => $_dataType["id"],
+            "name" => trim($crypt->decrypt(hex2bin($_dataType["name"])))
+        ];
+    }
 
     $getCompaniesQuery = "SELECT id, name FROM ".DB_PREFIX."company WHERE user_id = '".$_SESSION["userId"]."' ORDER BY name ASC";
-    $companies = $conn->query($getCompaniesQuery);
+    $_companies = $conn->query($getCompaniesQuery);
+
+    $companies = [];
+    foreach ($_companies as $_company) {
+        $companies[] = [
+            "id" => $_company["id"],
+            "name" => trim($crypt->decrypt(hex2bin($_company["name"])))
+        ];
+    }
 
     $title = $description = $lat = $lng = $id = "";
     $date = date("Y-m-d");

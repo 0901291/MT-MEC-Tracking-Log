@@ -1,4 +1,5 @@
 <?php
+use PHP_Crypt\PHP_Crypt as PHP_Crypt;
 
 class Entry {
     private $conn;
@@ -22,7 +23,7 @@ class Entry {
     public static function getEntries($status, $acceptType, $conn) {
         $status = htmlentities($status);
         $state = $status != 0 ? "AND WHERE = ".$status : "";
-
+        $crypt = new PHP_Crypt($_SESSION['key']);
         if (is_numeric($status)) {
             $query =
                 "SELECT
@@ -37,7 +38,8 @@ class Entry {
                     group_concat(DISTINCT dt.name),
                     ca.name,
                     ca.id,
-                    d.state
+                    d.state,
+                    d.timestamp
                 FROM ".DB_PREFIX."data d
                 LEFT OUTER JOIN (".DB_PREFIX."datatype_has_data dhd
                     LEFT OUTER JOIN ".DB_PREFIX."datatype dt
@@ -56,25 +58,29 @@ class Entry {
                 $stmt->bind_param("i", $_SESSION['userId']);
                 $stmt->execute();
                 $stmt->store_result();
-                $stmt->bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $dataType, $category, $categoryId, $state);
+                $stmt->bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $dataType, $category, $categoryId, $state, $timestamp);
                 $array = [];
                 while ($stmt->fetch()) {
-                    $companies = strlen($company) > 0 ? explode(",", $company) : null;
-                    $dataTypes = strlen($dataType) > 0 ? explode(",", $dataType) : null;
+                    $_companies = strlen($company) > 0 ? explode(",", $company) : [];
+                    $companies = [];
+                    foreach($_companies as $_company) $companies[] = trim($crypt->decrypt(hex2bin($_company)));
+                    $_dataTypes = strlen($dataType) > 0 ? explode(",", $dataType) : [];
+                    $dataTypes = [];
+                    foreach($_dataTypes as $_dataType) $dataTypes[] = trim($crypt->decrypt(hex2bin($_dataType)));
                     $categoryArray = !empty($category) && !empty($categoryId) ? [
-                        "name" => $category,
+                        "name" => trim($crypt->decrypt(hex2bin($category))),
                         "id" => $categoryId
                     ] : null;
 
                     $array[] = [
                         "id" => $id,
-                        "title" => $title,
+                        "title" => trim($crypt->decrypt(hex2bin($title))),
                         "date" => $date,
-                        "description" => $description,
-                        "imgURL" => $imgURL,
+                        "description" => trim($crypt->decrypt(hex2bin($description))),
+                        "imgURL" => trim($crypt->decrypt(hex2bin($imgURL))),
                         "location" => [
-                            "lat" => $lat,
-                            "lng" => $lng
+                            "lat" => trim($crypt->decrypt(hex2bin($lat))),
+                            "lng" => trim($crypt->decrypt(hex2bin($lng)))
                         ],
                         "companies" => $companies,
                         "dataTypes" => $dataTypes,
@@ -95,9 +101,14 @@ class Entry {
     }
 
     public function insert () {
+        $crypt = new PHP_Crypt($_SESSION['key']);
+        $title = bin2hex($crypt->encrypt($this->title));
+        $description = bin2hex($crypt->encrypt($this->description));
+        $lat = bin2hex($crypt->encrypt($this->lat));
+        $lng = bin2hex($crypt->encrypt($this->lng));
         $query = "INSERT INTO ".DB_PREFIX."data (title, date, description, lat, lng, category_id, user_id, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         if ($stmt = $this->conn->prepare($query)) {
-            $stmt->bind_param("ssssssss", $this->title, $this->date, $this->description, $this->lat, $this->lng, $this->category, $_SESSION['userId'], $this->state);
+            $stmt->bind_param("ssssssss", $title, $this->date, $description, $lat, $lng, $this->category, $_SESSION['userId'], $this->state);
             $stmt->execute();
             if ($this->dataTypes != null) {
                 foreach ($this->dataTypes as $dataType) {
@@ -124,9 +135,14 @@ class Entry {
     }
 
     public function edit () {
+        $crypt = new PHP_Crypt($_SESSION['key']);
+        $title = bin2hex($crypt->encrypt($this->title));
+        $description = bin2hex($crypt->encrypt($this->description));
+        $lat = bin2hex($crypt->encrypt($this->lat));
+        $lng = bin2hex($crypt->encrypt($this->lng));
         $query = "UPDATE ".DB_PREFIX."data SET title = ?, date = ?, description = ?, lat = ?, lng = ?, category_id = ?, user_id = ?, state = ? WHERE id = ? AND user_id = ?";
         if ($stmt = $this-> conn->prepare($query)) {
-            $stmt -> bind_param("sssssiiiii", $this->title, $this->date, $this->description, $this->lat, $this->lng, $this->category, $_SESSION['userId'], $this ->state, $this->id, $_SESSION["userId"]);
+            $stmt -> bind_param("sssssiiiii", $title, $this->date, $description, $lat, $lng, $this->category, $_SESSION['userId'], $this->state, $this->id, $_SESSION["userId"]);
             $stmt -> execute();
             $query = "DELETE cd FROM ".DB_PREFIX."company_has_data cd INNER JOIN ".DB_PREFIX."data d ON d.id = cd.data_id WHERE cd.data_id = ? AND d.user_id = ?";
             if ($stmt = $this->conn->prepare($query)) {
@@ -166,7 +182,8 @@ class Entry {
     }
 
     public function detail () {
-        $query = "SELECT d.id, d.title, d.date, d.description, d.imgURL, d.lng, d.lat, group_concat(DISTINCT c.name), group_concat(DISTINCT c.id), group_concat(DISTINCT dt.name), group_concat(DISTINCT dt.id), ca.name, ca.id from ".DB_PREFIX."data d
+        $crypt = new PHP_Crypt($_SESSION['key']);
+        $query = "SELECT d.id, d.title, d.date, d.description, d.imgURL, d.lng, d.lat, group_concat(DISTINCT c.name), group_concat(DISTINCT c.id), group_concat(DISTINCT dt.name), group_concat(DISTINCT dt.id), ca.name, ca.id, d.timestamp from ".DB_PREFIX."data d
             LEFT OUTER JOIN (".DB_PREFIX."datatype_has_data dhd
                 LEFT OUTER JOIN ".DB_PREFIX."datatype dt
                 ON dt.id = dhd.dataType_id)
@@ -184,7 +201,7 @@ class Entry {
             $stmt -> bind_param("ii", $_SESSION['userId'], $this->id);
             $stmt -> execute();
             $stmt -> store_result();
-            $stmt -> bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $companyId, $dataType, $dataTypeId, $category, $categoryId);
+            $stmt -> bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $companyId, $dataType, $dataTypeId, $category, $categoryId, $timestamp);
             $array = "";
             while ($stmt->fetch()) {
                 $companies = strlen($company) > 0 ? explode(",", $company) : null;
@@ -195,31 +212,32 @@ class Entry {
                 $dataTypesArray = [];
                 for ($i = 0; $i < sizeof($companies); $i++) {
                     $companyArray[] = [
-                        "name" => $companies[$i],
+                        "name" => trim($crypt->decrypt(hex2bin($companies[$i]))),
                         "id" => $companiesId[$i]
                     ];
                 }
                 for ($i = 0; $i < sizeof($dataTypes); $i++) {
                     $dataTypesArray[] = [
-                        "name" => $dataTypes[$i],
+                        "name" => trim($crypt->decrypt(hex2bin($dataTypes[$i]))),
                         "id" => $dataTypesId[$i]
                     ];
                 }
+                $categoryArray = !empty($category) && !empty($categoryId) ? [
+                    "name" => trim($crypt->decrypt(hex2bin($category))),
+                    "id" => $categoryId
+                ] : null;
                 $array = ["id" => $id,
-                    "title" => $title,
+                    "title" => trim($crypt->decrypt(hex2bin($title))),
                     "date" => $date,
-                    "description" => $description,
-                    "imgURL" => $imgURL,
+                    "description" => trim($crypt->decrypt(hex2bin($description))),
+                    "imgURL" => trim($crypt->decrypt(hex2bin($imgURL))),
                     "location" => [
-                        "lat" => $lat,
-                        "lng" => $lng
+                        "lat" => trim($crypt->decrypt(hex2bin($lat))),
+                        "lng" => trim($crypt->decrypt(hex2bin($lng)))
                     ],
                     "companies" => $companyArray,
                     "dataTypes" => $dataTypesArray,
-                    "category" => [
-                        "name" => $category,
-                        "id" => $categoryId
-                    ]
+                    "category" => $categoryArray,
                 ];
             }
             return $array;

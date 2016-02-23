@@ -1,4 +1,5 @@
 <?php
+use PHP_Crypt\PHP_Crypt as PHP_Crypt;
 
 class User
 {
@@ -8,6 +9,7 @@ class User
     public $name;
     public $imgURL;
     public $email;
+    public $key;
 
     function __construct($db)
     {
@@ -28,6 +30,8 @@ class User
                 $_SESSION['imgURL'] = $imgURL;
                 $_SESSION['email'] = $email;
                 $_SESSION['token'] = $token;
+                $_SESSION['googleId'] = $this->googleId;
+                $_SESSION['key'] = $this->getKey();
                 return true;
             }
         }
@@ -35,10 +39,11 @@ class User
     }
 
     public function insert () {
+        $crypt = new PHP_Crypt($this->key);
         $query = "INSERT INTO ".DB_PREFIX."user (name, imgURL, email, googleId) VALUES(?, ?, ?, ?)";
-        if ($stmt = $this -> conn -> prepare($query)) {
-            $stmt -> bind_param('ssss', $this->name, $this->imgURL, $this->email, $this->googleId);
-            $stmt -> execute();
+        if ($stmt = $this->conn->prepare($query)) {
+            $stmt->bind_param('ssss', bin2hex($crypt->encrypt($this->name)), bin2hex($crypt->encrypt($this->imgURL)), bin2hex($crypt->encrypt($this->email)), $this->googleId);
+            $stmt->execute();
             if ($stmt) return true;
         }
         return false;
@@ -46,5 +51,31 @@ class User
 
     public function logOut () {
         session_unset();
+    }
+
+    public function insertKey() {
+        $db = new Database(KDBHST, KDBUSR, KDBPASS, KDBNAME);
+        $query = "INSERT INTO tracklog_key (`key`, googleId) VALUES (?, ?)";
+        if ($stmt = $db->getConnection()->prepare($query)) {
+            $stmt->bind_param('ss', $this->key, $this->googleId);
+            $stmt->execute();
+            if ($stmt) return true;
+            else var_dump($stmt->error);
+        }
+    }
+
+    public function getKey() {
+        $db = new Database(KDBHST, KDBUSR, KDBPASS, KDBNAME);
+        $query = "SELECT `key` FROM tracklog_key k WHERE k.googleId = ?";
+        if ($stmt = $db->getConnection()->prepare($query)) {
+            $stmt->bind_param('s', $_SESSION['googleId']);
+            $stmt->execute();
+            $stmt->store_result();
+            $stmt->bind_result($key);
+            if ($stmt->num_rows == 1) {
+                $stmt->fetch();
+                return $key;
+            } else return null;
+        }
     }
 }
