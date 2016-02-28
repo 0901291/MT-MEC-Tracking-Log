@@ -14,12 +14,13 @@ function initApp() {
     $(".entry-remove").on("click", confirmDelete);
     $(".logout").on("click", logout);
     $("#submit-entry-button").on("click", checkLocationBeforeSend);
-    $(".entry-card-header").on("click", toggleItem);
+    $("#items").on("click", ".entry-card-header", toggleItem);
     $(".field-add-button-container").on("contentChange", function () {$(this).find(".dropdown-content").css("top", 0);});
     $("body").on(isMobile() ? "touchstart" : "click", closeSelectBox);
+    $(".control-buttons button").on("click", loadMoreItems);
     initMap();
     if ($("select").length > 0) $("select").material_select();
-    $.each($(".entry-card"), initializeEntryCard);
+    initializeEntryCards();
     setTimeout(resizeContent, 50);
     $(window).on("resize", onResize);
 }
@@ -217,6 +218,31 @@ function toggleConcept() {
     }
 }
 
+function initializeEntryCards() {
+    $.each($(".not-initialised"), function (k, v) {
+        var open = false;
+        if ($(".entry-card:not(.collapsed)").length == 0 && k == 0) open = true;
+        var el = $(this);
+        var img = $(el.find(".entry-location img"));
+        img.attr("src", img.attr("data-src")).on("load", {el: el}, function (e) {
+            initEntryCard($(e.data.el), open);
+        });
+        initEntryCard(el, open);
+    });
+    onResize();
+}
+
+function initEntryCard(el, open) {
+    el.attr("data-max-height", el[0].scrollHeight);
+    var maxHeight = 56;
+    if (open) {
+        maxHeight = el[0].scrollHeight;
+        el.removeClass("collapsed");
+    }
+    el.css("max-height", maxHeight + "px");
+    el.removeClass("not-initialised");
+}
+
 function toggleItem() {
     var item = $(this).parent(".entry-card");
     var currentItem = $(".entry-card.show");
@@ -291,6 +317,107 @@ function setLocation(pos) {
     $("#lng").val(pos.lng).parent().delay(10).addClass("is-focused");
 }
 
+function loadMoreItems() {
+    var itemsToLoad = $(this).data("items");
+    var start = $('.entry-card').length;
+    $.ajax({
+        url: 'includes/entryCall.php',
+        method: 'post',
+        data: {
+            method: 'getItems',
+            limit: itemsToLoad,
+            offset: start
+        },
+        dataType: 'json',
+        success: function (items) {
+            if (items.length > 0) printMoreItems(items);
+            if (items.length == 0 || itemsToLoad == 0 || items.length < itemsToLoad) {
+                $(".control-buttons button").attr("disabled", "");
+            }
+        },
+        error: function (o) {
+            console.log(o);
+        }
+    })
+}
+
+function printMoreItems(items) {
+    var itemsHTML = "";
+    $.each(items, function (k, v) {
+        var item = "<div class=\"entry-card mdl-card mdl-shadow--2dp collapsed not-initialised " + (v.state == 1 ? "concept-card" : "" ) + " data-state=\"" + v.state + "\">" +
+                        "<div class=\"entry-card-header\">" +
+                            "<div class=\"valign\">" +
+                                "<h2 class=\"ellipsis\">" + (v.state == 1 ? "<i class=\"material-icons valign concept-icon\">drafts</i>" : "") + (v.title.length == 0 ? "<em>Geen titel</em>" : v.title) + "</h2>" +
+                                "<span class=\"entry-date valign\">" + v.date + "</span>" +
+                                "<div class=\"form-container valign\">" +
+                                    "<form action=\"" + ROOT + "/entries/" + v.id + "/edit\">" +
+                                        "<button type=\"submit\" class=\"mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect entry-edit entry-control\">" +
+                                            "<input type=\"hidden\" value=\"" + v.id + "\">" +
+                                            "<i class=\"material-icons\">mode_edit</i>" +
+                                        "</button>" +
+                                    "</form>" +
+                                    "<form action=\"" + ROOT + "/entries/" + v.id + "/delete\">" +
+                                        "<button type=\"button\" class=\"mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect entry-remove entry-control\">" +
+                                            "<input type=\"hidden\" value=\"" + v.id + "\">" +
+                                            "<i class=\"material-icons\">delete</i>" +
+                                        "</button>" +
+                                    "</form>" +
+                                "</div>" +
+                            "</div>" +
+                        "</div>" +
+                    "<div class=\"entry-card-content\">";
+        if (v.title.length > 0) {
+            item += "<div class=\"entry-title\">" +
+                        "<h3 class=\"entry-section-heading\">Titel</h3>" +
+                        "<span>" + v.title + "</span>" +
+                    "</div>";
+        }
+        if (v.category != null) {
+            item += "<div class=\"entry-category\">" +
+                        "<h3 class=\"entry-section-heading\">Categorie</h3>" +
+                        "<span>" + v.category.name + "</span>" +
+                    "</div>";
+        }
+        if (v.description.length > 0) {
+            item += "<div class=\"entry-description\">" +
+                        "<h3 class=\"entry-section-heading\">Omschrijving</h3>" +
+                        "<p>" + v.description + "</p>" +
+                    "</div>";
+        }
+        if (v.dataTypes.length > 0) {
+            item += "<div class=\"entry-datatypes\">" +
+                        "<h3 class=\"entry-section-heading\">Data types</h3>" +
+                        "<ul>";
+            $.each(v.dataTypes, function () {
+                item += "<li>" + this + "</li>";
+            });
+            item += "</ul>" +
+                "</div>";
+        }
+        if (v.companies.length > 0) {
+            item += "<div class=\"entry-companies\">" +
+                "<h3 class=\"entry-section-heading\">Bedrijven</h3>" +
+                "<ul>";
+            $.each(v.companies, function () {
+                item += "<li>" + this + "</li>";
+            });
+            item += "</ul>" +
+                "</div>";
+        }
+        item += "</div>";
+        if (v.location.lat.length > 0 && v.location.lng.length > 0) {
+            item += "<div class=\"entry-location\">" +
+                        "<img src=\"https://maps.googleapis.com/maps/api/staticmap?center=" + v.location.lat + "," + v.location.lng + "&zoom=14&size=460x130&maptype=roadmap&markers=color:red%7C" + v.location.lat + "," + v.location.lng + "&key=AIzaSyC6VYBFTcvqfDookMW4Hl1J3TphwJxo6nA\" alt=\"\">" +
+                        "<div class=\"shadow\"></div>" +
+                    "</div>";
+        }
+        item += "</div>";
+        itemsHTML += item;
+    });
+    $(".control-buttons").before(itemsHTML);
+    initializeEntryCards();
+}
+
 function logout() {
     $.ajax({
         url: "includes/userCall.php",
@@ -310,19 +437,6 @@ function confirmDelete(e) {
 
 function checkLocationBeforeSend() {
     if (!$("#current-location").hasClass("searching") || confirm("Je locatie is nog niet bepaald, toch opslaan?")) $("#entry-form").submit();
-}
-
-function initializeEntryCard(k, v) {
-    var el = $(this);
-    var img = $(el.find(".entry-location img"));
-    img.attr("src", img.attr("data-src")).on("load", {el: el}, function (e) {
-        var el = $(e.data.el);
-        console.log(el.index());
-        el.attr("data-max-height", el.height());
-        var maxHeight = 56;
-        if (k === 0) maxHeight = el.height();
-        el.css("max-height", maxHeight + "px");
-    });
 }
 
 function onResize() {

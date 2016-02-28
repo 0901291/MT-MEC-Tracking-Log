@@ -35,6 +35,8 @@ if ($_POST) {
                     if ($entry -> delete()) header("Location: ../entries.php");
                 }
                 break;
+            case 'getItems':
+                print_r(Entry::getEntries(0, 'json', $db->getConnection(), $_POST['limit'], $_POST['offset']));
         }
     }
 }
