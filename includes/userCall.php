@@ -1,7 +1,6 @@
 <?php
 require("initialize.php");
 require("objects/User.php");
-require('crypto/CryptLib/CryptLib.php');
 
 if ($_POST) {
     $name = isset($_POST['name']) ? htmlentities($_POST['name']) : null;
@@ -23,8 +22,9 @@ if ($_POST) {
                     $user->googleId = $googleId;
                     if ($user->logIn()) return true;
                     else {
-                        $cryptLib = new \CryptLib\CryptLib;
-                        $user->key = $cryptLib->getRandomToken(16);
+                        $length = 16;
+                        $user->key = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, $length);
+                        $user->token = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, $length);
                         $user->insertKey();
                         $user->name = $name;
                         $user->imgURL = $imgURL;
