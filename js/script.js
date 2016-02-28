@@ -16,6 +16,7 @@ function initApp() {
     $("#submit-entry-button").on("click", checkLocationBeforeSend);
     $(".entry-card-header").on("click", toggleItem);
     $(".field-add-button-container").on("contentChange", function () {$(this).find(".dropdown-content").css("top", 0);});
+    $("body").on(isMobile() ? "touchstart" : "click", closeSelectBox);
     initMap();
     if ($("select").length > 0) $("select").material_select();
     $.each($(".entry-card"), initializeEntryCard);
@@ -139,6 +140,17 @@ function addDataInfoToList(type, id, name) {
 function closeAddInfoDialog() {
     $('#add-data-info-dialog')[0].MaterialDialog.close();
     $("#add-data-info").val("");
+}
+
+function closeSelectBox(e) {
+    e.stopPropagation();
+    var el = $(e.target);
+    console.log(el);
+    if ($(".dropdown-content:visible").length > 0 && !el.hasClass("dropdown-content") && el.parents(".dropdown-content").length == 0) {
+        console.log("click!");
+        var dropdown = $("#" + $(".dropdown-content:visible").attr("id"));
+        $("select").material_select();
+    }
 }
 
 function toggleQuickEntry() {
