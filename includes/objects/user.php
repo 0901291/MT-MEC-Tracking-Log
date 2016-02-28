@@ -10,6 +10,7 @@ class User
     public $imgURL;
     public $email;
     public $key;
+    public $token;
 
     function __construct($db)
     {
@@ -25,13 +26,14 @@ class User
             $stmt->bind_result($name, $imgURL, $id, $email, $token);
             if ($stmt->num_rows == 1) {
                 $stmt->fetch();
-                $_SESSION['userId'] = $id;
-                $_SESSION['name'] = $name;
-                $_SESSION['imgURL'] = $imgURL;
-                $_SESSION['email'] = $email;
-                $_SESSION['token'] = $token;
                 $_SESSION['googleId'] = $this->googleId;
                 $_SESSION['key'] = $this->getKey();
+                $crypt = new PHP_Crypt($_SESSION['key']);
+                $_SESSION['userId'] = $id;
+                $_SESSION['name'] = trim($crypt->decrypt(hex2bin($name)));
+                $_SESSION['imgURL'] = trim($crypt->decrypt(hex2bin($imgURL)));
+                $_SESSION['email'] = trim($crypt->decrypt(hex2bin($email)));
+                $_SESSION['token'] = $token;
                 return true;
             }
         }
@@ -40,9 +42,9 @@ class User
 
     public function insert () {
         $crypt = new PHP_Crypt($this->key);
-        $query = "INSERT INTO ".DB_PREFIX."user (name, imgURL, email, googleId) VALUES(?, ?, ?, ?)";
+        $query = "INSERT INTO ".DB_PREFIX."user (name, imgURL, email, googleId, token) VALUES(?, ?, ?, ?)";
         if ($stmt = $this->conn->prepare($query)) {
-            $stmt->bind_param('ssss', bin2hex($crypt->encrypt($this->name)), bin2hex($crypt->encrypt($this->imgURL)), bin2hex($crypt->encrypt($this->email)), $this->googleId);
+            $stmt->bind_param('sssss', bin2hex($crypt->encrypt($this->name)), bin2hex($crypt->encrypt($this->imgURL)), bin2hex($crypt->encrypt($this->email)), $this->googleId, $this->token);
             $stmt->execute();
             if ($stmt) return true;
         }
