@@ -48,8 +48,8 @@ else {
                 <a class="mdl-navigation__link" href="<?= ROOT ?>">Nieuw</a>
                 <a class="mdl-navigation__link active" href="<?= ROOT ?>/entries">Log</a>
             </nav>
-            <a href="#" class="mdl-navigation__link" id="logout" >
-                <label class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" for="logout">
+            <a href="#" class="mdl-navigation__link logout" id="logout-desktop">
+                <label class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" for="logout-desktop">
                     <i class="material-icons">exit_to_app</i>
                 </label>
             </a>
@@ -67,6 +67,7 @@ else {
         <nav class="mdl-navigation">
             <a class="mdl-navigation__link" href="<?= ROOT ?>">Nieuw</a>
             <a class="mdl-navigation__link active" href="<?= ROOT ?>/entries">Log</a>
+            <a class="mdl-navigation__link logout" href="#">Logout</a>
         </nav>
     </div>
     <main class="mdl-layout__content">

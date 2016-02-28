@@ -100,7 +100,7 @@ class Entry {
         return false;
     }
 
-    public function insert () {
+    public function insert() {
         $crypt = new PHP_Crypt($_SESSION['key']);
         $title = bin2hex($crypt->encrypt($this->title));
         $description = bin2hex($crypt->encrypt($this->description));
@@ -134,7 +134,7 @@ class Entry {
         }
     }
 
-    public function edit () {
+    public function edit() {
         $crypt = new PHP_Crypt($_SESSION['key']);
         $title = bin2hex($crypt->encrypt($this->title));
         $description = bin2hex($crypt->encrypt($this->description));
@@ -181,7 +181,7 @@ class Entry {
         return true;
     }
 
-    public function detail () {
+    public function detail() {
         $crypt = new PHP_Crypt($_SESSION['key']);
         $query = "SELECT d.id, d.title, d.date, d.description, d.imgURL, d.lng, d.lat, group_concat(DISTINCT c.name), group_concat(DISTINCT c.id), group_concat(DISTINCT dt.name), group_concat(DISTINCT dt.id), ca.name, ca.id, d.timestamp from ".DB_PREFIX."data d
             LEFT OUTER JOIN (".DB_PREFIX."datatype_has_data dhd

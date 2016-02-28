@@ -12,7 +12,7 @@ function initApp() {
     $("#toggle-map-button").on("click", toggleMap);
     $("#location-fields").on("keydown", "input[type=text]", function () {$("#current-location").removeClass("selected");});
     $(".entry-remove").on("click", confirmDelete);
-    $("#logout").on("click", logout);
+    $(".logout").on("click", logout);
     $("#submit-entry-button").on("click", checkLocationBeforeSend);
     $(".entry-card-header").on("click", toggleItem);
     $(".field-add-button-container").on("contentChange", function () {$(this).find(".dropdown-content").css("top", 0);});

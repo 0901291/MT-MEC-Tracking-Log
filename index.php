@@ -5,7 +5,6 @@ use PHP_Crypt\PHP_Crypt as PHP_Crypt;
 
 $categories; $dataTypes; $companies;
 $conn = $db->getConnection();
-
 $edit = false;
 
 if (isLoggedIn()) {
@@ -100,8 +99,8 @@ if (isLoggedIn()) {
                 <a class="mdl-navigation__link active" href="<?= ROOT ?>">Nieuw</a>
                 <a class="mdl-navigation__link" href="<?= ROOT ?>/entries">Log</a>
                 <?php if (isLoggedIn()) : ?>
-                    <a href="#" class="mdl-navigation__link" id="logout" >
-                        <label class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" for="logout">
+                    <a href="#" class="mdl-navigation__link logout" id="logout-desktop">
+                        <label class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" for="logout-desktop">
                             <i class="material-icons">exit_to_app</i>
                         </label>
                     </a>
@@ -127,6 +126,9 @@ if (isLoggedIn()) {
         <nav class="mdl-navigation">
             <a class="mdl-navigation__link active" href="<?= ROOT ?>">Nieuw</a>
             <a class="mdl-navigation__link" href="<?= ROOT ?>/entries">Log</a>
+            <?php if (isLoggedIn()) : ?>
+                <a class="mdl-navigation__link logout" href="#">Logout</a>
+            <?php endif; ?>
         </nav>
     </div>
     <main class="mdl-layout__content">
