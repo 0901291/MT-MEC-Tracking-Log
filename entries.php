@@ -11,7 +11,7 @@ if (isLoggedIn()) {
             header("Location:".ROOT."/entries");
         };
     }
-    $entries = Entry::getEntries(0, "php", $conn);
+    $entries = Entry::getEntries(0, "php", $conn, 5, 0);
 }
 else {
     header("Location: ".ROOT);
@@ -82,12 +82,13 @@ else {
                 </div>
                 <?php foreach($entries as $key => $entry):
                     $concept = $entry["state"] == 1 ? true : false;
+                    $empty = empty($entry["title"]) && count($entry["category"]) == 0 && empty($entry["description"]) && count($entry["dataTypes"]) == 0 && count($entry["companies"]) == 0 ? 'empty' : '';
                 ?>
-                    <div class="entry-card mdl-card mdl-shadow--2dp <?= ($key === 0 ? "show" : "collapsed") ?> <?= $concept ? "concept-card" : "" ?>" data-state="<?= $entry["state"] ?>">
+                    <div class="entry-card mdl-card mdl-shadow--2dp not-initialised collapsed <?= ($key === 0 ? "show" : "") ?> <?= $concept ? "concept-card" : "" ?> <?= $empty ?>" data-state="<?= $entry["state"] ?>">
                         <div class="entry-card-header">
                             <div class="valign">
                                 <h2 class="ellipsis"><?php if ($concept) echo "<i class=\"material-icons valign concept-icon\">drafts</i>" ?><?= empty($entry["title"]) ? "<em>Geen titel</em>" : $entry["title"] ?></h2>
-                                <span class="entry-date valign"><?= date("d-m-Y H:i", strtotime($entry["date"])) ?></span>
+                                <span class="entry-date valign"><?= $entry['date'] ?></span>
                                 <div class="form-container valign">
                                     <form action="<?= ROOT?>/entries/<?= $entry["id"] ?>/edit">
                                         <button type="submit" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect entry-edit entry-control">
@@ -152,11 +153,16 @@ else {
                         <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
+                <div class="control-buttons">
+                    <button type="button" data-items="5" id="load-more-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised mdl-button--primary">Laad 5 meer</button>
+                    <button type="button" data-items="0" id="load-all-button" class="mdl-button mdl-js-button mdl-js-ripple-effect">Laad alles</button>
+                </div>
             </section>
             <?php include("includes/footer.php"); ?>
         </div>
     </main>
 </div>
+<script><?= "var ROOT = '".ROOT."';"; ?></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 <script src="https://code.getmdl.io/1.1.1/material.min.js"></script>
 <script src="<?= ROOT ?>/js/lib/material.add.min.js"></script>

@@ -42,9 +42,12 @@ class User
 
     public function insert () {
         $crypt = new PHP_Crypt($this->key);
-        $query = "INSERT INTO ".DB_PREFIX."user (name, imgURL, email, googleId, token) VALUES(?, ?, ?, ?)";
+        $query = "INSERT INTO ".DB_PREFIX."user (name, imgURL, email, googleId, token) VALUES(?, ?, ?, ?, ?)";
         if ($stmt = $this->conn->prepare($query)) {
-            $stmt->bind_param('sssss', bin2hex($crypt->encrypt($this->name)), bin2hex($crypt->encrypt($this->imgURL)), bin2hex($crypt->encrypt($this->email)), $this->googleId, $this->token);
+            $encryptedName = bin2hex($crypt->encrypt($this->name));
+            $encryptedIMG = bin2hex($crypt->encrypt($this->imgURL));
+            $encryptedEmail = bin2hex($crypt->encrypt($this->email));
+            $stmt->bind_param('sssss', $encryptedName, $encryptedIMG, $encryptedEmail, $this->googleId, $this->token);
             $stmt->execute();
             if ($stmt) return true;
         }
@@ -58,7 +61,8 @@ class User
     public function insertKey() {
         $db = new Database(KDBHST, KDBUSR, KDBPASS, KDBNAME);
         $query = "INSERT INTO tracklog_key (`key`, googleId) VALUES (?, ?)";
-        if ($stmt = $db->getConnection()->prepare($query)) {
+        $stmt = $db->getConnection()->prepare($query);
+        if ($stmt) {
             $stmt->bind_param('ss', $this->key, $this->googleId);
             $stmt->execute();
             if ($stmt) return true;
