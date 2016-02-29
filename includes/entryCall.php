@@ -26,7 +26,7 @@ if ($_POST) {
             case 'edit':
                 if (is_numeric($_POST['id'])) {
                     $entry -> id = $_POST['id'];
-                    if ($entry -> edit()) header("Location: ".ROOT."/entries/".$_POST['id']);
+                    if ($entry -> edit()) header("Location: ".ROOT."/entries");
                 }
                 break;
             case 'delete':

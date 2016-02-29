@@ -21,7 +21,7 @@ function initApp() {
     initMap();
     if ($("select").length > 0) $("select").material_select();
     initializeEntryCards();
-    setTimeout(resizeContent, 50);
+    $(document).ready(onResize);
     $(window).on("resize", onResize);
 }
 
@@ -166,7 +166,7 @@ function toggleQuickEntry() {
         content.addClass("quick-entry-mode");
         setTimeout(function () {
             content.addClass("hide-items");
-            onResize();
+            setTimeout(onResize, 100);
         }, 310);
     } else {
         $(".quick-entry").removeClass("is-checked");
@@ -176,7 +176,7 @@ function toggleQuickEntry() {
         setTimeout(function () {
             content.removeClass("quick-entry-mode");
             setTimeout(function () {
-                onResize();
+                setTimeout(onResize, 100);
             }, 310);
         }, 10);
     }
