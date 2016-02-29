@@ -235,10 +235,16 @@ button.form-item {
 }
 
 .entry-card-header {
-    padding: 16px;
-    height: 28px;
-    position: relative;
+    padding: 0 16px;
+    height: 56px;
+    position: absolute;
     cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.entry-card.empty .entry-card-content {
+    margin-top: 24px;
 }
 
 .entry-card-header h2 {
@@ -282,7 +288,8 @@ button.form-item {
 }
 
 .entry-card-content {
-    padding: 16px 16px 0;
+    padding: 8px 16px 16px;
+    margin-top: 56px;
 }
 
 .entry-section-heading {

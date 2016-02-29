@@ -18,8 +18,8 @@ function initApp() {
     $(".field-add-button-container").on("contentChange", function () {$(this).find(".dropdown-content").css("top", 0);});
     initMap();
     if ($("select").length > 0) $("select").material_select();
-    $.each($(".entry-card"), initializeEntryCard);
-    setTimeout(resizeContent, 50);
+    initializeEntryCards();
+    $(document).ready(onResize);
     $(window).on("resize", onResize);
 }
 
@@ -153,7 +153,7 @@ function toggleQuickEntry() {
         content.addClass("quick-entry-mode");
         setTimeout(function () {
             content.addClass("hide-items");
-            onResize();
+            setTimeout(onResize, 100);
         }, 310);
     } else {
         $(".quick-entry").removeClass("is-checked");
@@ -163,7 +163,7 @@ function toggleQuickEntry() {
         setTimeout(function () {
             content.removeClass("quick-entry-mode");
             setTimeout(function () {
-                onResize();
+                setTimeout(onResize, 100);
             }, 310);
         }, 10);
     }
