@@ -1,24 +1,25 @@
 <?php
 require('../../includes/initialize.php');
-require(ROOT.'/includes/objects/Entry.php');
-require(ROOT.'/includes/objects/User.php');
+require('objects/Entry.php');
+require('../../includes/objects/User.php');
 
 $method = $_SERVER['REQUEST_METHOD'];
 $accept = $_SERVER['HTTP_ACCEPT'];
-$key = (isset($_GET['api_key']) ? $_GET['api_key'] : null);
-
+$key = isset($_GET['api_key']) ? $_GET['api_key'] : null;
 $userId = User::getUserByToken($key, $db->getConnection());
+$googleId = User::getGoogleIdByUserId($userId, $db->getConnection());
+$key = User::getKey($googleId);
 
 $input = json_decode(file_get_contents('php://input'));
 $post = $_POST;
 $values = null;
 $result = ["No method given."];
 
-$entry = new Entry($db);
-$user = new User($db);
+$entry = new Entry($db->getConnection());
+$user = new User($db->getConnection());
 
 if (isset($input)) $values = $input;
-    elseif (sizeof($_POST) > 0) $values = $_POST;
+    else if (sizeof($_POST) > 0) $values = $_POST;
 
 if ($userId != null) {
     $entry->id = (isset($_GET['id']) ? $_GET['id'] : null);
@@ -37,10 +38,10 @@ if ($userId != null) {
     switch ($method) {
         case 'GET':
             if ($entry->id != null) {
-                $result = $entry->detail();
+                $result = $entry->detail($key, $userId);
             } else {
                 $status = (isset($_GET['state']) ? $_GET['state'] : 0);
-                $result = Entry::getEntries($status, $db->getConnection());
+                $result = Entry::getEntries($status, $db->getConnection(), $key, $userId);
             }
             break;
         case 'PUT':
@@ -57,15 +58,16 @@ if ($userId != null) {
     }
 } else {
     http_response_code(403);
-    $result = ['Acces denied: invalid api_key'];
+    $result = ['message' => 'Acces denied: invalid api_key'];
 }
 
 switch ($accept) {
     case 'application/json':
+        header("Content-type: application/json");
         print_r(json_encode($result));
         break;
     default:
-        print_r(["We don't support this content-type."]);
+        header("Content-type: application/json");
         http_response_code(415);
+        print_r(json_encode(['message' => "We don't support this content-type."]));
 }
-

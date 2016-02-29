@@ -21,10 +21,10 @@ class Entry {
         $this->conn = $db;
     }
 
-    public static function getEntries($status, $conn, $limit = 0, $offset = 0) {
+    public static function getEntries($status, $conn, $key, $userId, $limit = 0, $offset = 0) {
         $status = htmlentities($status);
         $state = $status != 0 ? "AND WHERE = ".$status : "";
-        $crypt = new PHP_Crypt($_SESSION['key']);
+        $crypt = new PHP_Crypt($key);
         if (is_numeric($status)) {
             $query =
                 "SELECT
@@ -57,7 +57,7 @@ class Entry {
                 ORDER BY d.date DESC".
                 ($limit > 0 ? " LIMIT ".$limit." OFFSET ".$offset : " LIMIT 99999999999999 OFFSET ".$offset);
             if ($stmt = $conn->prepare($query)) {
-                $stmt->bind_param("i", $_SESSION['userId']);
+                $stmt->bind_param("i", $userId);
                 $stmt->execute();
                 $stmt->store_result();
                 $stmt->bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $dataType, $category, $categoryId, $state, $timestamp);
@@ -177,8 +177,8 @@ class Entry {
         return true;
     }
 
-    public function detail() {
-        $crypt = new PHP_Crypt($_SESSION['key']);
+    public function detail($key, $userId) {
+        $crypt = new PHP_Crypt($key);
         $query = "SELECT d.id, d.title, d.date, d.description, d.imgURL, d.lng, d.lat, group_concat(DISTINCT c.name), group_concat(DISTINCT c.id), group_concat(DISTINCT dt.name), group_concat(DISTINCT dt.id), ca.name, ca.id, d.timestamp from ".DB_PREFIX."data d
             LEFT OUTER JOIN (".DB_PREFIX."datatype_has_data dhd
                 LEFT OUTER JOIN ".DB_PREFIX."datatype dt
@@ -194,7 +194,7 @@ class Entry {
             GROUP BY d.id
             LIMIT 1";
         if ($stmt = $this->conn->prepare($query)) {
-            $stmt -> bind_param("ii", $_SESSION['userId'], $this->id);
+            $stmt -> bind_param("ii", $userId, $this->id);
             $stmt -> execute();
             $stmt -> store_result();
             $stmt -> bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $companyId, $dataType, $dataTypeId, $category, $categoryId, $timestamp);
