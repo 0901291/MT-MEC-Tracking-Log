@@ -80,4 +80,18 @@ class User
             } else return null;
         }
     }
+
+    public static function getUserByToken($token, $conn) {
+        $query = "SELECT u.id FROM user u WHERE u.token = ?";
+        if ($stmt = $conn->prepare($query)) {
+            $stmt->bind_param('s', $token);
+            $stmt->execute();
+            $stmt->store_result();
+            $stmt->bind_result($id);
+            if ($stmt->num_rows == 1) {
+                $stmt->fetch();
+                return $id;
+            } else return null;
+        }
+    }
 }

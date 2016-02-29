@@ -13,14 +13,15 @@ class Entry {
         $companies,
         $dataTypes,
         $category,
-        $state;
+        $state,
+        $token;
 
     public function __construct($db)
     {
         $this->conn = $db;
     }
 
-    public static function getEntries($status, $acceptType, $conn) {
+    public static function getEntries($status, $conn) {
         $status = htmlentities($status);
         $state = $status != 0 ? "AND WHERE = ".$status : "";
         $crypt = new PHP_Crypt($_SESSION['key']);
@@ -88,13 +89,7 @@ class Entry {
                         "state" => $state
                     ];
                 }
-                switch($acceptType) {
-                    case "json":
-                        return json_encode($array);
-                        break;
-                    default:
-                        return $array;
-                }
+                return $array;
             }
         }
         return false;
