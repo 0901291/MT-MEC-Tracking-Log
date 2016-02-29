@@ -20,7 +20,7 @@ class Entry {
         $this->conn = $db;
     }
 
-    public static function getEntries($status, $acceptType, $conn, $limit = 0, $offset = 0) {
+    public static function getEntries($status, $acceptType, $conn) {
         $status = htmlentities($status);
         $state = $status != 0 ? "AND WHERE = ".$status : "";
         $crypt = new PHP_Crypt($_SESSION['key']);
@@ -53,8 +53,7 @@ class Entry {
                 ON ca.id = d.category_id
                 WHERE d.user_id = ? ".$state."
                 GROUP BY d.id
-                ORDER BY d.date DESC".
-                ($limit > 0 ? " LIMIT ".$limit." OFFSET ".$offset : " LIMIT 99999999999999 OFFSET ".$offset);
+                ORDER BY d.date DESC";
             if ($stmt = $conn->prepare($query)) {
                 $stmt->bind_param("i", $_SESSION['userId']);
                 $stmt->execute();
@@ -76,7 +75,7 @@ class Entry {
                     $array[] = [
                         "id" => $id,
                         "title" => trim($crypt->decrypt(hex2bin($title))),
-                        "date" => date("d-m-Y H:i", strtotime($date)),
+                        "date" => $date,
                         "description" => trim($crypt->decrypt(hex2bin($description))),
                         "imgURL" => trim($crypt->decrypt(hex2bin($imgURL))),
                         "location" => [
