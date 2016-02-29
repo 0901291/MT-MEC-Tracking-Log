@@ -76,7 +76,7 @@ class Entry {
                     $array[] = [
                         "id" => $id,
                         "title" => trim($crypt->decrypt(hex2bin($title))),
-                        "date" => $date,
+                        "date" => date("d-m-Y H:i", strtotime($date)),
                         "description" => trim($crypt->decrypt(hex2bin($description))),
                         "imgURL" => trim($crypt->decrypt(hex2bin($imgURL))),
                         "location" => [

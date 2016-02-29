@@ -87,7 +87,7 @@ else {
                         <div class="entry-card-header">
                             <div class="valign">
                                 <h2 class="ellipsis"><?php if ($concept) echo "<i class=\"material-icons valign concept-icon\">drafts</i>" ?><?= empty($entry["title"]) ? "<em>Geen titel</em>" : $entry["title"] ?></h2>
-                                <span class="entry-date valign"><?= date("d-m-Y H:i", strtotime($entry["date"])) ?></span>
+                                <span class="entry-date valign"><?= $entry['date'] ?></span>
                                 <div class="form-container valign">
                                     <form action="<?= ROOT?>/entries/<?= $entry["id"] ?>/edit">
                                         <button type="submit" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect entry-edit entry-control">
