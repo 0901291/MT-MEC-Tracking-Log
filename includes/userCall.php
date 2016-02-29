@@ -1,6 +1,6 @@
 <?php
-require('initialize.php');
-require('objects/User.php');
+require("initialize.php");
+require("objects/User.php");
 
 if ($_POST) {
     $name = isset($_POST['name']) ? htmlentities($_POST['name']) : null;
@@ -11,25 +11,25 @@ if ($_POST) {
     $user = new User($db->getConnection());
     if (isset($_POST['method'])) {
         switch ($_POST['method']) {
-            case 'logOut':
+            case "logOut":
                 if (isLoggedIn()) {
                     $user->logOut();
                     return true;
                 }
                 break;
-            case 'logIn':
+            case "logIn":
                 if (!isLoggedIn()) {
                     $user->googleId = $googleId;
                     if ($user->logIn()) return true;
                     else {
-                        $user->key = substr(str_shuffle($randString), 0, 16);
-                        $user->token = substr(str_shuffle($randString), 0, 16);
-                        if ($user->insertKey()) {
-                            $user->name = $name;
-                            $user->imgURL = $imgURL;
-                            $user->email = $email;
-                            if ($user->insert()) if (!isLoggedIn()) if ($user->logIn()) return true;
-                        }
+                        $length = 16;
+                        $user->key = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, $length);
+                        $user->token = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, $length);
+                        $user->insertKey();
+                        $user->name = $name;
+                        $user->imgURL = $imgURL;
+                        $user->email = $email;
+                        if ($user->insert()) if (!isLoggedIn()) if ($user->logIn()) return true;
                     }
                 }
                 break;
