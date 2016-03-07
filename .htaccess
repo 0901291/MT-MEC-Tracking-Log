@@ -1,5 +1,5 @@
 RewriteEngine on
-RewriteRule ^api/v([0-9]+)/([a-z]+)/?([0-9]+)?/?$ api/V$1/api_$2.php?id=$3 [NC,L,QSA]
+RewriteRule ^api/v([0-9]+)/([a-z]+)\.?([a-z]+)?/?([0-9]+)?/?$ api/V$1/api_$2.php?id=$4&accept=$3 [NC,L,QSA]
 
 RewriteRule ^entries/([0-9]+)/edit?$ index.php?method=edit&data_id=$1 [NC,L]
 RewriteRule ^entries/([0-9]+)/delete?$ entries.php?method=delete&data_id=$1 [NC,L]
