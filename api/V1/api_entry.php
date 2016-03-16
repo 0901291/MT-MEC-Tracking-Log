@@ -20,7 +20,7 @@ $entry = new Entry($db->getConnection());
 $user = new User($db->getConnection());
 
 if (isset($input)) $values = $input;
-else if (sizeof($_POST) > 0) $values = $_POST;
+else $values = $_POST;
 
 define('APIROOT', ROOT.'/api/v1');
 
@@ -49,8 +49,8 @@ if ($userId != null) {
                 $offset = isset($_GET['offset']) ? $_GET['offset'] : 0;
                 $allItems = Entry::getEntries($status, $db->getConnection(), $key, $userId);
                 $total = count($allItems);
-                $result['items'] = array_slice($allItems, $offset, $limit);
                 $limit = $limit == 0 || $limit > $total ? $total : $limit;
+                $result['items'] = array_slice($allItems, $offset, $limit);
                 $current = count($result['items']);
                 $totalPages = ceil($total / $current);
                 $currentPage = ceil(($offset + 1) / $limit);
@@ -91,7 +91,7 @@ if ($userId != null) {
             break;
         case 'POST':
             $entry->state = $entry->description == null ? 1 : 2;
-            $entry->insert();
+            $result['item'] = $entry->insert($key, $userId);
             break;
     }
 } else {

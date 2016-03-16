@@ -96,17 +96,18 @@ class Entry {
         return false;
     }
 
-    public function insert() {
-        $crypt = new PHP_Crypt($_SESSION['key']);
+    public function insert($key, $userId) {
+        $crypt = new PHP_Crypt($key);
         $title = bin2hex($crypt->encrypt($this->title));
         $description = bin2hex($crypt->encrypt($this->description));
         $lat = bin2hex($crypt->encrypt($this->lat));
         $lng = bin2hex($crypt->encrypt($this->lng));
         $query = "INSERT INTO ".DB_PREFIX."data (title, date, description, lat, lng, category_id, user_id, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         if ($stmt = $this->conn->prepare($query)) {
-            $stmt->bind_param("ssssssss", $title, $this->date, $description, $lat, $lng, $this->category, $_SESSION['userId'], $this->state);
+            $stmt->bind_param("ssssssss", $title, $this->date, $description, $lat, $lng, $this->category, $userId, $this->state);
             $stmt->execute();
             if ($this->dataTypes != null) {
+                if (gettype($this->dataTypes) == 'string') $this->dataTypes = unserialize($this->dataTypes);
                 foreach ($this->dataTypes as $dataType) {
                     $dataType = htmlentities($dataType);
                     $query = "INSERT INTO ".DB_PREFIX."datatype_has_data (dataType_id, data_id) VALUES (?, ".$stmt->insert_id.")";
@@ -117,21 +118,24 @@ class Entry {
                 }
             }
             if ($this->companies != null) {
+                if (gettype($this->companies) == 'string') $this->companies = unserialize($this->companies);
                 foreach ($this->companies as $company) {
                     $company = htmlentities($company);
                     $query = "INSERT INTO ".DB_PREFIX."company_has_data (company_id, data_id) VALUES (?, ".$stmt->insert_id.")";
-                    if ($stm = $this-> conn -> prepare($query)) {
+                    if ($stm = $this->conn->prepare($query)) {
                         $stm->bind_param('s', $company);
                         $stm->execute();
                     }
                 }
             }
-            return true;
+            return $stmt->conn;
+            $this->id = $stmt->insert_id;
+            return $this->detail($key, $userId);
         }
     }
 
-    public function edit() {
-        $crypt = new PHP_Crypt($_SESSION['key']);
+    public function edit($key) {
+        $crypt = new PHP_Crypt($key);
         $title = bin2hex($crypt->encrypt($this->title));
         $description = bin2hex($crypt->encrypt($this->description));
         $lat = bin2hex($crypt->encrypt($this->lat));
