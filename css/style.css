@@ -125,6 +125,19 @@ button.form-item {
     font-weight: 600;
 }
 
+#search-location-wrapper {
+    display: flex;
+}
+
+#search-location-field {
+    flex: 9;
+}
+
+#search-location-wrapper #search-control {
+    flex: 1;
+    margin-top: 40px;
+}
+
 #location {
     display: flex;
     position: relative;
