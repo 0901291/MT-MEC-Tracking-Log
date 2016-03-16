@@ -273,7 +273,7 @@ if (isLoggedIn()) {
 <script src="https://code.getmdl.io/1.1.1/material.min.js"></script>
 <script src="<?= ROOT ?>/js/lib/materialize.min.js"></script>
 <script src="<?= ROOT ?>/js/lib/material.add.min.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6VYBFTcvqfDookMW4Hl1J3TphwJxo6nA"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6VYBFTcvqfDookMW4Hl1J3TphwJxo6nA&libraries=places"></script>
 <script src="<?= ROOT ?>/js/script.js"></script>
 <script>
     $(initApp);
