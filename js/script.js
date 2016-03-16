@@ -63,6 +63,25 @@ function initMap() {
         draggableCursor : "url(" + image + ") 24 48, auto"
     });
     map.addListener('click', getCustomLocation);
+    var input = document.getElementById('search-location');
+    var searchBox = new google.maps.places.SearchBox(input);
+    searchBox.addListener('places_changed', function() {
+        var places = searchBox.getPlaces();
+        var location = places[0].geometry.location;
+        if (places.length > 0) {
+            $("#current-location").removeClass("selected");
+            setLocation({
+                lat: location.lat(),
+                lng: location.lng()
+            });
+        }
+    });
+    $("#search-control").on("click",function () {
+        google.maps.event.trigger(input, 'focus');
+        google.maps.event.trigger(input, 'keydown', {
+            keyCode: 13
+        });
+    });
     if ($("body").hasClass("edit-mode")) {
         setLocation({
             lat: parseFloat($("#lat").val()),
@@ -146,7 +165,6 @@ function closeAddInfoDialog() {
 function closeSelectBox(e) {
     e.stopPropagation();
     var el = $(e.target);
-    console.log(el);
     if ($(".dropdown-content:visible").length > 0 && !el.hasClass("dropdown-content") && el.parents(".dropdown-content").length == 0) {
         console.log("click!");
         var dropdown = $("#" + $(".dropdown-content:visible").attr("id"));
@@ -284,6 +302,16 @@ function toggleMap(action) {
         $("#location-map").height(200);
     }
     setTimeout(resizeContent, 300);
+}
+
+function searchForLocation() {
+    $.ajax({
+        url: 'https://maps.googleapis.com/maps/api/geocode/json?address=' + $('#search-location').val().replace(' ', '+'),
+        dataType: 'json',
+        success: function (output) {
+            console.log(output);
+        }
+    })
 }
 
 function getCurrentLocation() {
