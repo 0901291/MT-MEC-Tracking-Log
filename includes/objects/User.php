@@ -86,7 +86,7 @@ class User
     }
 
     public static function getUserByToken($token, $conn) {
-        $query = "SELECT u.id FROM user u WHERE u.token = ?";
+        $query = "SELECT u.id FROM ".DB_PREFIX."user u WHERE u.token = ?";
         if ($stmt = $conn->prepare($query)) {
             $stmt->bind_param('s', $token);
             $stmt->execute();
@@ -100,7 +100,7 @@ class User
     }
 
     public static function getGoogleIdByUserId($userId, $conn) {
-        $query = "SELECT u.googleId FROM user u WHERE u.id = ?";
+        $query = "SELECT u.googleId FROM ".DB_PREFIX."user u WHERE u.id = ?";
         if ($stmt = $conn->prepare($query)) {
             $stmt->bind_param('s', $userId);
             $stmt->execute();

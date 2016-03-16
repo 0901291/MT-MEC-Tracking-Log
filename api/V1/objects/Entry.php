@@ -128,13 +128,12 @@ class Entry {
                     }
                 }
             }
-            return $stmt->conn;
             $this->id = $stmt->insert_id;
             return $this->detail($key, $userId);
         }
     }
 
-    public function edit($key) {
+    public function edit($key, $userId) {
         $crypt = new PHP_Crypt($key);
         $title = bin2hex($crypt->encrypt($this->title));
         $description = bin2hex($crypt->encrypt($this->description));
@@ -142,16 +141,16 @@ class Entry {
         $lng = bin2hex($crypt->encrypt($this->lng));
         $query = "UPDATE ".DB_PREFIX."data SET title = ?, date = ?, description = ?, lat = ?, lng = ?, category_id = ?, user_id = ?, state = ? WHERE id = ? AND user_id = ?";
         if ($stmt = $this-> conn->prepare($query)) {
-            $stmt -> bind_param("sssssiiiii", $title, $this->date, $description, $lat, $lng, $this->category, $_SESSION['userId'], $this->state, $this->id, $_SESSION["userId"]);
+            $stmt -> bind_param("sssssiiiii", $title, $this->date, $description, $lat, $lng, $this->category, $userId, $this->state, $this->id, $userId);
             $stmt -> execute();
             $query = "DELETE cd FROM ".DB_PREFIX."company_has_data cd INNER JOIN ".DB_PREFIX."data d ON d.id = cd.data_id WHERE cd.data_id = ? AND d.user_id = ?";
             if ($stmt = $this->conn->prepare($query)) {
-                $stmt->bind_param("ii", $this->id, $_SESSION['userId']);
+                $stmt->bind_param("ii", $this->id, $userId);
                 $stmt->execute();
             }
             $query = "DELETE dd FROM ".DB_PREFIX."datatype_has_data dd INNER JOIN ".DB_PREFIX."data d ON d.id = dd.data_id WHERE dd.data_id = ? AND d.user_id = ?";
             if ($stmt = $this->conn->prepare($query)) {
-                $stmt->bind_param("ii", $this->id, $_SESSION['userId']);
+                $stmt->bind_param("ii", $this->id, $userId);
                 $stmt->execute();
             }
             if ($stmt) {

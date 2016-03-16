@@ -6,8 +6,8 @@ require('../../includes/objects/User.php');
 $method = $_SERVER['REQUEST_METHOD'];
 $accept = isset($_GET['accept']) ? 'application/'.$_GET['accept'] : $_SERVER['HTTP_ACCEPT'];
 $friendlyAccept = str_replace('application/', '', $accept);
-$apikey = isset($_GET['api_key']) ? $_GET['api_key'] : null;
-$userId = User::getUserByToken($apikey, $db->getConnection());
+$apiKey = isset($_GET['api_key']) ? $_GET['api_key'] : null;
+$userId = User::getUserByToken($apiKey, $db->getConnection());
 $googleId = User::getGoogleIdByUserId($userId, $db->getConnection());
 $key = User::getKey($googleId);
 
@@ -19,7 +19,7 @@ $result = [];
 $entry = new Entry($db->getConnection());
 $user = new User($db->getConnection());
 
-if (isset($input)) $values = $input;
+if (isset($input)) $values = (array)$input;
 else $values = $_POST;
 
 define('APIROOT', ROOT.'/api/v1');
@@ -37,13 +37,14 @@ if ($userId != null) {
     $date = (isset($values['date']) ? htmlentities($values['date']) : date('Y-m-d'));
     $time = (isset($values['time']) ? htmlentities($values['time']) : date('H:i:s'));
     $entry->date = date('Y-m-d H:i:s', strtotime($date.' '.$time));
+    $entry->userId = $userId;
 
     switch ($method) {
         case 'GET':
             if ($entry->id != null) {
                 $result['item'] = $entry->detail($key, $userId);
             } else {
-                $apiRoot = APIROOT.'/entry.'.$friendlyAccept.'?api_key='.$apikey;
+                $apiRoot = APIROOT.'/entry.'.$friendlyAccept.'?api_key='.$apiKey;
                 $status = isset($_GET['state']) ? $_GET['state'] : 0;
                 $limit = isset($_GET['limit']) ? $_GET['limit'] : 0;
                 $offset = isset($_GET['offset']) ? $_GET['offset'] : 0;
@@ -84,7 +85,7 @@ if ($userId != null) {
             break;
         case 'PUT':
             $entry->state = $entry->description == null ? 1 : 2;
-            $result = $entry->edit();
+            $result = $entry->edit($key, $userId);
                 break;
         case 'DELETE':
             $result = $entry->delete();
