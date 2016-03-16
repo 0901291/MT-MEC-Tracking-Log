@@ -207,6 +207,17 @@ if (isLoggedIn()) {
                             <input class="mdl-textfield__input" type="text" id="time" name="time" value="<?= $time ?>">
                             <label class="mdl-textfield__label" for="time">Tijd</label>
                         </div>
+                        <div id="search-location-wrapper">
+                            <div id="search-location-field" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-item">
+                                <input class="mdl-textfield__input" placeholder="" type="text" id="search-location" name="search-location">
+                                <label class="mdl-textfield__label" for="date">Search location</label>
+                            </div>
+                            <div id="search-control">
+                                <button id="search-location-button" type="button" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect valign">
+                                    <i class="material-icons">search</i>
+                                </button>
+                            </div>
+                        </div>
                         <div id="location">
                             <div id="location-fields">
                                 <div id="lat-field" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-item">
@@ -273,7 +284,7 @@ if (isLoggedIn()) {
 <script src="https://code.getmdl.io/1.1.1/material.min.js"></script>
 <script src="<?= ROOT ?>/js/lib/materialize.min.js"></script>
 <script src="<?= ROOT ?>/js/lib/material.add.min.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6VYBFTcvqfDookMW4Hl1J3TphwJxo6nA"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6VYBFTcvqfDookMW4Hl1J3TphwJxo6nA&libraries=places"></script>
 <script src="<?= ROOT ?>/js/script.js"></script>
 <script>
     $(initApp);
