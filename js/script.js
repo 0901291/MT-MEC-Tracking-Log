@@ -239,10 +239,6 @@ function toggleConcept() {
 }
 
 function initializeEntryCards() {
-        var img = $(el.find(".entry-location img"));
-        img.attr("src", img.attr("data-src")).on("load", {el: el}, function (e) {
-            initEntryCard($(e.data.el), open);
-        });
     $.each($(".not-initialised"), initEntryCard);
 }
 
@@ -272,6 +268,9 @@ function toggleItem() {
         setTimeout(function () {
             item.addClass("show").css("max-height", item.attr("data-max-height") + "px");
             setTimeout(function () {
+                var img = $(item.find(".entry-location img"));
+                img.attr("src", img.attr("data-src"));
+                resizeContent();
             }, 210);
         }, 10);
     } else {
