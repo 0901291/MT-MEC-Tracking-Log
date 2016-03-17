@@ -21,8 +21,9 @@ function initApp() {
     initMap();
     if ($("select").length > 0) $("select").material_select();
     initializeEntryCards();
-    $(document).ready(onResize);
-    $(window).on("resize", onResize);
+    $(document).ready(resizeContent);
+    setTimeout(resizeContent, 100);
+    $(window).on("resize", resizeContent);
 }
 
 function loadGoogleLogin() {
@@ -50,7 +51,7 @@ function onSignIn(googleUser) {
         success: function () {
             location.reload();
         }
-    })
+    });
 }
 
 function initMap() {
@@ -247,7 +248,6 @@ function initializeEntryCards() {
         });
         initEntryCard(el, open);
     });
-    onResize();
 }
 
 function initEntryCard(el, open) {
@@ -259,6 +259,7 @@ function initEntryCard(el, open) {
     }
     el.css("max-height", maxHeight + "px");
     el.removeClass("not-initialised");
+    resizeContent();
 }
 
 function toggleItem() {
@@ -453,7 +454,7 @@ function logout() {
         data: {
             method: "logOut"
         },
-        success: function(o) {
+        success: function() {
             location.reload();
         }
     })
