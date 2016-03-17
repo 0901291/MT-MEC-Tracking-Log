@@ -72,7 +72,7 @@ else {
     </div>
     <main class="mdl-layout__content">
         <div class="page-content">
-            <section class="content-section centerab" id="items">
+            <section class="content-section centerab static" id="items">
                 <div class="section-header mdl-color--primary show-quick-entry mdl-card mdl-shadow--2dp">
                     <h1 class="mdl-typography--title valign">Items</h1>
                     <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect valign concept-switch header-switch" for="concept-switch-desktop">
