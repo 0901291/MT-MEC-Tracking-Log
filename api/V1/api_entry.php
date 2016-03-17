@@ -97,7 +97,7 @@ if ($userId != null) {
             }
             break;
         case 'DELETE':
-            $result = $entry->delete($key, $userId);
+            $resultCode = $entry->delete($key, $userId);
             break;
         case 'POST':
             $entry->state = $entry->description == null ? 1 : 2;

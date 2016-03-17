@@ -1,5 +1,6 @@
 <?php
 use PHP_Crypt\PHP_Crypt as PHP_Crypt;
+require 'DataInfo.php';
 
 class Entry {
     private $conn;
@@ -104,6 +105,10 @@ class Entry {
         $lng = bin2hex($crypt->encrypt($this->lng));
         $stmt = false;
 
+        $_category = new DataInfo($this->conn);
+        $_category->name = $this->category;
+        $this->category = $_category->save($key, $userId, 'insert', 'category')['id'];
+
         switch ($method) {
             case "edit" :
                 $result = $this->detail($key,$userId);
@@ -139,7 +144,10 @@ class Entry {
         if ($this->dataTypes != null) {
             if (gettype($this->dataTypes) == 'string') $this->dataTypes = unserialize($this->dataTypes);
             foreach ($this->dataTypes as $dataType) {
-                $dataType = htmlentities($dataType);
+                $_dataType = new DataInfo($this->conn);
+                $_dataType->name = $dataType;
+                $dataType = $_dataType->save($key, $userId, 'insert', 'datatype');
+                $dataType = htmlentities($dataType['id']);
                 $query = "INSERT INTO ".DB_PREFIX."datatype_has_data (dataType_id, data_id) VALUES (?, ?)";
                 if ($stm = $this->conn->prepare($query)) {
                     $stm->bind_param('si', $dataType, $this->id);
@@ -150,7 +158,10 @@ class Entry {
         if ($this->companies != null) {
             if (gettype($this->companies) == 'string') $this->companies = unserialize($this->companies);
             foreach ($this->companies as $company) {
-                $company = htmlentities($company);
+                $_company = new DataInfo($this->conn);
+                $_company->name = $company;
+                $company = $_company->save($key, $userId, 'insert', 'company');
+                $company = htmlentities($company['id']);
                 $query = "INSERT INTO ".DB_PREFIX."company_has_data (company_id, data_id) VALUES (?, ?)";
                 if ($stm = $this->conn->prepare($query)) {
                     $stm->bind_param('si', $company, $this->id);
@@ -182,73 +193,75 @@ class Entry {
             GROUP BY d.id
             LIMIT 1";
         if ($stmt = $this->conn->prepare($query)) {
-            $stmt -> bind_param("i",  $this->id);
-            $stmt -> execute();
-            $stmt -> store_result();
-            $stmt -> bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $companyId, $dataType, $dataTypeId, $category, $categoryId, $timestamp, $dataUserId);
+            $stmt->bind_param("i",  $this->id);
+            $stmt->execute();
+            $stmt->store_result();
+            $stmt->bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $companyId, $dataType, $dataTypeId, $category, $categoryId, $timestamp, $dataUserId);
             $array = "";
-            while ($stmt->fetch()) {
-                $companies = strlen($company) > 0 ? explode(",", $company) : null;
-                $dataTypes = strlen($dataType) > 0 ? explode(",", $dataType) : null;
-                $companiesId = strlen($companyId) > 0 ? explode(",", $companyId) : null;
-                $dataTypesId = strlen($dataTypeId) > 0 ? explode(",", $dataTypeId) : null;
-                $companyArray = [];
-                $dataTypesArray = [];
-                for ($i = 0; $i < sizeof($companies); $i++) {
-                    $companyArray[] = [
-                        "name" => trim($crypt->decrypt(hex2bin($companies[$i]))),
-                        "id" => $companiesId[$i]
+            if ($stmt->num_rows > 0) {
+                while ($stmt->fetch()) {
+                    $companies = strlen($company) > 0 ? explode(",", $company) : null;
+                    $dataTypes = strlen($dataType) > 0 ? explode(",", $dataType) : null;
+                    $companiesId = strlen($companyId) > 0 ? explode(",", $companyId) : null;
+                    $dataTypesId = strlen($dataTypeId) > 0 ? explode(",", $dataTypeId) : null;
+                    $companyArray = [];
+                    $dataTypesArray = [];
+                    for ($i = 0; $i < sizeof($companies); $i++) {
+                        $companyArray[] = [
+                            "name" => trim($crypt->decrypt(hex2bin($companies[$i]))),
+                            "id" => $companiesId[$i]
+                        ];
+                    }
+                    for ($i = 0; $i < sizeof($dataTypes); $i++) {
+                        $dataTypesArray[] = [
+                            "name" => trim($crypt->decrypt(hex2bin($dataTypes[$i]))),
+                            "id" => $dataTypesId[$i]
+                        ];
+                    }
+                    $categoryArray = !empty($category) && !empty($categoryId) ? [
+                        "name" => trim($crypt->decrypt(hex2bin($category))),
+                        "id" => $categoryId
+                    ] : null;
+                    $array = ["id" => $id,
+                        "title" => trim($crypt->decrypt(hex2bin($title))),
+                        "date" => $date,
+                        "description" => trim($crypt->decrypt(hex2bin($description))),
+                        "imgURL" => trim($crypt->decrypt(hex2bin($imgURL))),
+                        "location" => [
+                            "lat" => trim($crypt->decrypt(hex2bin($lat))),
+                            "lng" => trim($crypt->decrypt(hex2bin($lng)))
+                        ],
+                        "companies" => $companyArray,
+                        "dataTypes" => $dataTypesArray,
+                        "category" => $categoryArray,
                     ];
                 }
-                for ($i = 0; $i < sizeof($dataTypes); $i++) {
-                    $dataTypesArray[] = [
-                        "name" => trim($crypt->decrypt(hex2bin($dataTypes[$i]))),
-                        "id" => $dataTypesId[$i]
-                    ];
+                if ($userId == $dataUserId) {
+                    return $array;
+                } else {
+                    return 403;
                 }
-                $categoryArray = !empty($category) && !empty($categoryId) ? [
-                    "name" => trim($crypt->decrypt(hex2bin($category))),
-                    "id" => $categoryId
-                ] : null;
-                $array = ["id" => $id,
-                    "title" => trim($crypt->decrypt(hex2bin($title))),
-                    "date" => $date,
-                    "description" => trim($crypt->decrypt(hex2bin($description))),
-                    "imgURL" => trim($crypt->decrypt(hex2bin($imgURL))),
-                    "location" => [
-                        "lat" => trim($crypt->decrypt(hex2bin($lat))),
-                        "lng" => trim($crypt->decrypt(hex2bin($lng)))
-                    ],
-                    "companies" => $companyArray,
-                    "dataTypes" => $dataTypesArray,
-                    "category" => $categoryArray,
-                ];
-            }
-            if ($userId == $dataUserId) {
-                return $array;
-            } else {
-                return 403;
             }
         }
         return 404;
     }
 
-    public function delete ($key, $userid) {
-        $result = $this->detail($key, $userid);
+    public function delete ($key, $userId) {
+        $result = $this->detail($key, $userId);
         if (is_array($result)) {
             $query = "DELETE cd FROM ".DB_PREFIX."company_has_data cd INNER JOIN ".DB_PREFIX."data d ON d.id = cd.data_id WHERE cd.data_id = ? AND d.user_id = ?";
             if ($stmt = $this->conn->prepare($query)) {
-                $stmt->bind_param("ii", $this->id, $_SESSION['userId']);
+                $stmt->bind_param("ii", $this->id, $userId);
                 $stmt->execute();
             }
             $query = "DELETE dd FROM ".DB_PREFIX."datatype_has_data dd INNER JOIN ".DB_PREFIX."data d ON d.id = dd.data_id WHERE dd.data_id = ? AND d.user_id = ?";
             if ($stmt = $this->conn->prepare($query)) {
-                $stmt -> bind_param("ii", $this->id, $_SESSION['userId']);
+                $stmt -> bind_param("ii", $this->id, $userId);
                 $stmt -> execute();
             }
             $query = "DELETE FROM ".DB_PREFIX."data WHERE id = ? AND user_id = ?";
             if ($stmt = $this->conn->prepare($query)) {
-                $stmt -> bind_param("ii", $this->id, $_SESSION['userId']);
+                $stmt -> bind_param("ii", $this->id, $userId);
                 $stmt -> execute();
                 if ($stmt) return 204;
             }

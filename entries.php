@@ -68,7 +68,7 @@ else {
     </div>
     <main class="mdl-layout__content">
         <div class="page-content">
-            <section class="content-section centerab" id="items">
+            <section class="content-section centerab static" id="items">
                 <div class="section-header mdl-color--primary show-quick-entry mdl-card mdl-shadow--2dp">
                     <h1 class="mdl-typography--title valign">Items</h1>
                     <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect valign concept-switch header-switch" for="concept-switch-desktop">
@@ -80,7 +80,7 @@ else {
                     $concept = $entry->state == 1 ? true : false;
                     $empty = empty($entry->title) && count($entry->category) == 0 && empty($entry->description) && count($entry->dataTypes) == 0 && count($entry->companies) == 0 ? 'empty' : '';
                 ?>
-                    <div class="entry-card mdl-card mdl-shadow--2dp not-initialised collapsed <?= ($key === 0 ? "show" : "") ?> <?= $concept ? "concept-card" : "" ?> <?= $empty ?>" data-state="<?= $entry->state ?>">
+                    <div class="entry-card mdl-card mdl-shadow--2dp not-initialised collapsed ?> <?= $concept ? "concept-card" : "" ?> <?= $empty ?>" data-state="<?= $entry->state ?>">
                         <div class="entry-card-header">
                             <div class="valign">
                                 <h2 class="ellipsis"><?php if ($concept) echo "<i class=\"material-icons valign concept-icon\">drafts</i>" ?><?= empty($entry->title) ? "<em>Geen titel</em>" : $entry->title ?></h2>
