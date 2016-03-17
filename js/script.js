@@ -123,19 +123,7 @@ function saveDataInfo() {
         if ($(this).text().toLowerCase() == name.toLowerCase()) item = $(this);
     });
     if (!item) {
-        $.ajax({
-            data: {
-                name: name,
-                function: "create",
-                type: type
-            },
-            url: ROOT + "/includes/dataInfo.php",
-            method: "POST",
-            success: function (id) {
-                addDataInfoToList(type, id, name);
-                closeAddInfoDialog();
-            }
-        });
+        addDataInfoToList(type, id, name);
     } else {
         if (itemList.attr("multiple") == "multiple") {
             var arr = itemList.val();
@@ -145,8 +133,8 @@ function saveDataInfo() {
             itemList.val(item.val());
         }
         itemList.material_select();
-        closeAddInfoDialog();
     }
+    closeAddInfoDialog();
 }
 
 function addDataInfoToList(type, id, name) {
