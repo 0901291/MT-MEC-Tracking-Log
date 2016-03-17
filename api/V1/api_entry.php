@@ -85,14 +85,14 @@ if ($userId != null) {
             break;
         case 'PUT':
             $entry->state = $entry->description == null ? 1 : 2;
-            $result = $entry->edit($key, $userId);
+            $result = $entry->save($key, $userId, 'edit');
                 break;
         case 'DELETE':
             $result = $entry->delete();
             break;
         case 'POST':
             $entry->state = $entry->description == null ? 1 : 2;
-            $result['item'] = $entry->insert($key, $userId);
+            $result['item'] = $entry->save($key, $userId, 'insert');
             break;
     }
 } else {

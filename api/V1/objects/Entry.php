@@ -96,88 +96,68 @@ class Entry {
         return false;
     }
 
-    public function insert($key, $userId) {
+    public function save($key, $userId, $method) {
         $crypt = new PHP_Crypt($key);
         $title = bin2hex($crypt->encrypt($this->title));
         $description = bin2hex($crypt->encrypt($this->description));
         $lat = bin2hex($crypt->encrypt($this->lat));
         $lng = bin2hex($crypt->encrypt($this->lng));
-        $query = "INSERT INTO ".DB_PREFIX."data (title, date, description, lat, lng, category_id, user_id, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        if ($stmt = $this->conn->prepare($query)) {
-            $stmt->bind_param("ssssssss", $title, $this->date, $description, $lat, $lng, $this->category, $userId, $this->state);
-            $stmt->execute();
-            if ($this->dataTypes != null) {
-                if (gettype($this->dataTypes) == 'string') $this->dataTypes = unserialize($this->dataTypes);
-                foreach ($this->dataTypes as $dataType) {
-                    $dataType = htmlentities($dataType);
-                    $query = "INSERT INTO ".DB_PREFIX."datatype_has_data (dataType_id, data_id) VALUES (?, ".$stmt->insert_id.")";
-                    if ($stm = $this->conn->prepare($query)) {
-                        $stm->bind_param('s', $dataType);
-                        $stm->execute();
-                    }
-                }
-            }
-            if ($this->companies != null) {
-                if (gettype($this->companies) == 'string') $this->companies = unserialize($this->companies);
-                foreach ($this->companies as $company) {
-                    $company = htmlentities($company);
-                    $query = "INSERT INTO ".DB_PREFIX."company_has_data (company_id, data_id) VALUES (?, ".$stmt->insert_id.")";
-                    if ($stm = $this->conn->prepare($query)) {
-                        $stm->bind_param('s', $company);
-                        $stm->execute();
-                    }
-                }
-            }
-            $this->id = $stmt->insert_id;
-            return $this->detail($key, $userId);
-        }
-    }
+        $stmt = false;
 
-    public function edit($key, $userId) {
-        $crypt = new PHP_Crypt($key);
-        $title = bin2hex($crypt->encrypt($this->title));
-        $description = bin2hex($crypt->encrypt($this->description));
-        $lat = bin2hex($crypt->encrypt($this->lat));
-        $lng = bin2hex($crypt->encrypt($this->lng));
-        $query = "UPDATE ".DB_PREFIX."data SET title = ?, date = ?, description = ?, lat = ?, lng = ?, category_id = ?, user_id = ?, state = ? WHERE id = ? AND user_id = ?";
-        if ($stmt = $this-> conn->prepare($query)) {
-            $stmt -> bind_param("sssssiiiii", $title, $this->date, $description, $lat, $lng, $this->category, $userId, $this->state, $this->id, $userId);
-            $stmt -> execute();
-            $query = "DELETE cd FROM ".DB_PREFIX."company_has_data cd INNER JOIN ".DB_PREFIX."data d ON d.id = cd.data_id WHERE cd.data_id = ? AND d.user_id = ?";
-            if ($stmt = $this->conn->prepare($query)) {
-                $stmt->bind_param("ii", $this->id, $userId);
-                $stmt->execute();
-            }
-            $query = "DELETE dd FROM ".DB_PREFIX."datatype_has_data dd INNER JOIN ".DB_PREFIX."data d ON d.id = dd.data_id WHERE dd.data_id = ? AND d.user_id = ?";
-            if ($stmt = $this->conn->prepare($query)) {
-                $stmt->bind_param("ii", $this->id, $userId);
-                $stmt->execute();
-            }
-            if ($stmt) {
-                if ($this->dataTypes != null) {
-                    foreach ($this->dataTypes as $dataType) {
-                        $dataType = htmlentities($dataType);
-                        $query = "INSERT INTO " . DB_PREFIX . "datatype_has_data (dataType_id, data_id) VALUES (?, ?)";
-                        if ($stm = $this->conn->prepare($query)) {
-                            $stm->bind_param('ss', $dataType, $this->id);
-                            $stm->execute();
-                        }
+        switch ($method) {
+            case "edit" :
+                $query = "UPDATE ".DB_PREFIX."data SET title = ?, date = ?, description = ?, lat = ?, lng = ?, category_id = ?, user_id = ?, state = ? WHERE id = ? AND user_id = ?";
+                if ($stmt = $this-> conn->prepare($query)) {
+                    $stmt->bind_param("sssssiiiii", $title, $this->date, $description, $lat, $lng, $this->category, $userId, $this->state, $this->id, $userId);
+                    $stmt->execute();
+                    $query = "DELETE cd FROM " . DB_PREFIX . "company_has_data cd INNER JOIN " . DB_PREFIX . "data d ON d.id = cd.data_id WHERE cd.data_id = ? AND d.user_id = ?";
+                    if ($stmt_delete = $this->conn->prepare($query)) {
+                        $stmt_delete->bind_param("ii", $this->id, $userId);
+                        $stmt_delete->execute();
+                    }
+                    $query = "DELETE dd FROM " . DB_PREFIX . "datatype_has_data dd INNER JOIN " . DB_PREFIX . "data d ON d.id = dd.data_id WHERE dd.data_id = ? AND d.user_id = ?";
+                    if ($stmt_delete = $this->conn->prepare($query)) {
+                        $stmt_delete->bind_param("ii", $this->id, $userId);
+                        $stmt_delete->execute();
                     }
                 }
-                if ($this->companies != null) {
-                    foreach ($this->companies as $company) {
-                        $company = htmlentities($company);
-                        $query = "INSERT INTO " . DB_PREFIX . "company_has_data (company_id, data_id) VALUES (?, ?)";
-                        if ($stm = $this->conn->prepare($query)) {
-                            $stm->bind_param('ss', $company, $this->id);
-                            $stm->execute();
-                        }
-                    }
+                break;
+            case "insert" :
+                $query = "INSERT INTO ".DB_PREFIX."data (title, date, description, lat, lng, category_id, user_id, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                if ($stmt = $this->conn->prepare($query)) {
+                    $stmt->bind_param("ssssssss", $title, $this->date, $description, $lat, $lng, $this->category, $userId, $this->state);
+                    $stmt->execute();
+                    $this->id = $stmt->insert_id;
                 }
-                return true;
+                break;
+        }
+        if ($this->dataTypes != null) {
+            if (gettype($this->dataTypes) == 'string') $this->dataTypes = unserialize($this->dataTypes);
+            foreach ($this->dataTypes as $dataType) {
+                $dataType = htmlentities($dataType);
+                $query = "INSERT INTO ".DB_PREFIX."datatype_has_data (dataType_id, data_id) VALUES (?, ?)";
+                if ($stm = $this->conn->prepare($query)) {
+                    $stm->bind_param('si', $dataType, $this->id);
+                    $stm->execute();
+                }
             }
         }
-        return true;
+        if ($this->companies != null) {
+            if (gettype($this->companies) == 'string') $this->companies = unserialize($this->companies);
+            foreach ($this->companies as $company) {
+                $company = htmlentities($company);
+                $query = "INSERT INTO ".DB_PREFIX."company_has_data (company_id, data_id) VALUES (?, ?)";
+                if ($stm = $this->conn->prepare($query)) {
+                    $stm->bind_param('si', $company, $this->id);
+                    $stm->execute();
+                }
+            }
+        }
+        if ($stmt) {
+            return $this->detail($key, $userId);
+        } else {
+            http_response_code(400);
+        }
     }
 
     public function detail($key, $userId) {
