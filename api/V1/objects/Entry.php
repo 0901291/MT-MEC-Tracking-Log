@@ -209,36 +209,47 @@ class Entry {
                     $companyArray[] = [
                         "name" => trim($crypt->decrypt(hex2bin($companies[$i]))),
                         "id" => $companiesId[$i]
+                    $companies = strlen($company) > 0 ? explode(",", $company) : null;
+                    $dataTypes = strlen($dataType) > 0 ? explode(",", $dataType) : null;
+                    $companiesId = strlen($companyId) > 0 ? explode(",", $companyId) : null;
+                    $dataTypesId = strlen($dataTypeId) > 0 ? explode(",", $dataTypeId) : null;
+                    $companyArray = [];
+                    $dataTypesArray = [];
+                    for ($i = 0; $i < sizeof($companies); $i++) {
+                        $companyArray[] = [
+                            "name" => trim($crypt->decrypt(hex2bin($companies[$i]))),
+                            "id" => $companiesId[$i]
+                        ];
+                    }
+                    for ($i = 0; $i < sizeof($dataTypes); $i++) {
+                        $dataTypesArray[] = [
+                            "name" => trim($crypt->decrypt(hex2bin($dataTypes[$i]))),
+                            "id" => $dataTypesId[$i]
+                        ];
+                    }
+                    $categoryArray = !empty($category) && !empty($categoryId) ? [
+                        "name" => trim($crypt->decrypt(hex2bin($category))),
+                        "id" => $categoryId
+                    ] : null;
+                    $array = ["id" => $id,
+                        "title" => trim($crypt->decrypt(hex2bin($title))),
+                        "date" => $date,
+                        "description" => trim($crypt->decrypt(hex2bin($description))),
+                        "imgURL" => trim($crypt->decrypt(hex2bin($imgURL))),
+                        "location" => [
+                            "lat" => trim($crypt->decrypt(hex2bin($lat))),
+                            "lng" => trim($crypt->decrypt(hex2bin($lng)))
+                        ],
+                        "companies" => $companyArray,
+                        "dataTypes" => $dataTypesArray,
+                        "category" => $categoryArray,
                     ];
                 }
-                for ($i = 0; $i < sizeof($dataTypes); $i++) {
-                    $dataTypesArray[] = [
-                        "name" => trim($crypt->decrypt(hex2bin($dataTypes[$i]))),
-                        "id" => $dataTypesId[$i]
-                    ];
+                if ($userId == $dataUserId) {
+                    return $array;
+                } else {
+                    return 403;
                 }
-                $categoryArray = !empty($category) && !empty($categoryId) ? [
-                    "name" => trim($crypt->decrypt(hex2bin($category))),
-                    "id" => $categoryId
-                ] : null;
-                $array = ["id" => $id,
-                    "title" => trim($crypt->decrypt(hex2bin($title))),
-                    "date" => $date,
-                    "description" => trim($crypt->decrypt(hex2bin($description))),
-                    "imgURL" => trim($crypt->decrypt(hex2bin($imgURL))),
-                    "location" => [
-                        "lat" => trim($crypt->decrypt(hex2bin($lat))),
-                        "lng" => trim($crypt->decrypt(hex2bin($lng)))
-                    ],
-                    "companies" => $companyArray,
-                    "dataTypes" => $dataTypesArray,
-                    "category" => $categoryArray,
-                ];
-            }
-            if ($userId == $dataUserId) {
-                return $array;
-            } else {
-                return 403;
             }
         }
         return 404;
