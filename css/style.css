@@ -322,6 +322,7 @@ div:first-child .entry-section-heading {
 .entry-location {
     position: relative;
     margin-top: 8px;
+    min-height: 120px;
 }
 
 .entry-location img {
