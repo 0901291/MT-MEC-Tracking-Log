@@ -1,5 +1,6 @@
 <?php
 use PHP_Crypt\PHP_Crypt as PHP_Crypt;
+require 'DataInfo.php';
 
 class Entry {
     private $conn;
@@ -93,7 +94,7 @@ class Entry {
                 return $array;
             }
         }
-        return false;
+        return 400;
     }
 
     public function save($key, $userId, $method) {
@@ -103,6 +104,10 @@ class Entry {
         $lat = bin2hex($crypt->encrypt($this->lat));
         $lng = bin2hex($crypt->encrypt($this->lng));
         $stmt = false;
+
+        $_category = new DataInfo($this->conn);
+        $_category->name = $this->category;
+        $this->category = $_category->save($key, $userId, 'insert', 'category')['id'];
 
         switch ($method) {
             case "edit" :
@@ -134,7 +139,10 @@ class Entry {
         if ($this->dataTypes != null) {
             if (gettype($this->dataTypes) == 'string') $this->dataTypes = unserialize($this->dataTypes);
             foreach ($this->dataTypes as $dataType) {
-                $dataType = htmlentities($dataType);
+                $_dataType = new DataInfo($this->conn);
+                $_dataType->name = $dataType;
+                $dataType = $_dataType->save($key, $userId, 'insert', 'datatype');
+                $dataType = htmlentities($dataType['id']);
                 $query = "INSERT INTO ".DB_PREFIX."datatype_has_data (dataType_id, data_id) VALUES (?, ?)";
                 if ($stm = $this->conn->prepare($query)) {
                     $stm->bind_param('si', $dataType, $this->id);
@@ -145,7 +153,10 @@ class Entry {
         if ($this->companies != null) {
             if (gettype($this->companies) == 'string') $this->companies = unserialize($this->companies);
             foreach ($this->companies as $company) {
-                $company = htmlentities($company);
+                $_company = new DataInfo($this->conn);
+                $_company->name = $company;
+                $company = $_company->save($key, $userId, 'insert', 'company');
+                $company = htmlentities($company['id']);
                 $query = "INSERT INTO ".DB_PREFIX."company_has_data (company_id, data_id) VALUES (?, ?)";
                 if ($stm = $this->conn->prepare($query)) {
                     $stm->bind_param('si', $company, $this->id);
