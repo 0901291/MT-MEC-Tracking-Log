@@ -15,6 +15,7 @@ $input = json_decode(file_get_contents('php://input'));
 $post = $_POST;
 $values = null;
 $result = [];
+$resultCode = 200;
 
 $entry = new Entry($db->getConnection());
 $user = new User($db->getConnection());
@@ -43,6 +44,9 @@ if ($userId != null) {
         case 'GET':
             if ($entry->id != null) {
                 $result['item'] = $entry->detail($key, $userId);
+                if (!is_array($result['item'])) {
+                    $resultCode = $result['item'];
+                }
             } else {
                 $apiRoot = APIROOT.'/entry.'.$friendlyAccept.'?api_key='.$apiKey;
                 $status = isset($_GET['state']) ? $_GET['state'] : 0;
@@ -86,27 +90,57 @@ if ($userId != null) {
         case 'PUT':
             $entry->state = $entry->description == null ? 1 : 2;
             $result = $entry->save($key, $userId, 'edit');
-                break;
+            if (is_array($result['item'])) {
+                $resultCode = 201;
+            } else {
+                $resultCode = $result;
+            }
+            break;
         case 'DELETE':
-            $result = $entry->delete();
+            $result = $entry->delete($key, $userId);
             break;
         case 'POST':
             $entry->state = $entry->description == null ? 1 : 2;
             $result['item'] = $entry->save($key, $userId, 'insert');
+            if (is_array($result['item'])) {
+                $resultCode = 201;
+            } else {
+                $resultCode = $result;
+            }
             break;
     }
 } else {
-    http_response_code(403);
-    $result = ['message' => 'Access denied: invalid api_key'];
+    $resultCode = 400;
 }
 
-switch ($accept) {
-    case 'application/json':
-        header('Content-type: application/json');
-        print_r(json_encode($result));
-        break;
-    default:
-        header('Content-type: application/json');
-        http_response_code(415);
-        print_r(json_encode(['message' => 'We don\'t support this content-type.']));
+if ($accept != 'application/json') {
+    $resultCode = 415;
+} else {
+    header('Content-type: application/json');
 }
+
+switch ($resultCode) {
+    case 400:
+        $result = ["error" => 400, "message" => "Bad request, api_key not valid."];
+        http_response_code(400);
+        break;
+    case 404:
+        $result = ["error" => 404, "message" => "Content not found"];
+        http_response_code(404);
+        break;
+    case 403:
+        $result = ["error" => 403, "message" => "Access denied"];
+        http_response_code(403);
+        break;
+    case 415:
+        $result = ["error" => 415, "message" => "We don't support this content-type."];
+        http_response_code(415);
+        break;
+    case 204:
+        $result = ["code" => 204, "message" => "No content"];
+        http_response_code(204);
+        break;
+}
+
+print_r(json_encode($result));
+
