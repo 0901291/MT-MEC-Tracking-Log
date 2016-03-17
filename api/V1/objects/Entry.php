@@ -111,20 +111,25 @@ class Entry {
 
         switch ($method) {
             case "edit" :
-                $query = "UPDATE ".DB_PREFIX."data SET title = ?, date = ?, description = ?, lat = ?, lng = ?, category_id = ?, user_id = ?, state = ? WHERE id = ? AND user_id = ?";
-                if ($stmt = $this-> conn->prepare($query)) {
-                    $stmt->bind_param("sssssiiiii", $title, $this->date, $description, $lat, $lng, $this->category, $userId, $this->state, $this->id, $userId);
-                    $stmt->execute();
-                    $query = "DELETE cd FROM " . DB_PREFIX . "company_has_data cd INNER JOIN " . DB_PREFIX . "data d ON d.id = cd.data_id WHERE cd.data_id = ? AND d.user_id = ?";
-                    if ($stmt_delete = $this->conn->prepare($query)) {
-                        $stmt_delete->bind_param("ii", $this->id, $userId);
-                        $stmt_delete->execute();
+                $result = $this->detail($key,$userId);
+                if (is_array($result)) {
+                    $query = "UPDATE ".DB_PREFIX."data SET title = ?, date = ?, description = ?, lat = ?, lng = ?, category_id = ?, state = ? WHERE id = ? AND user_id = ?";
+                    if ($stmt = $this-> conn->prepare($query)) {
+                        $stmt->bind_param("sssssiiii", $title, $this->date, $description, $lat, $lng, $this->category, $this->state, $this->id, $userId);
+                        $stmt->execute();
+                        $query = "DELETE cd FROM " . DB_PREFIX . "company_has_data cd INNER JOIN " . DB_PREFIX . "data d ON d.id = cd.data_id WHERE cd.data_id = ? AND d.user_id = ?";
+                        if ($stmt_delete = $this->conn->prepare($query)) {
+                            $stmt_delete->bind_param("ii", $this->id, $userId);
+                            $stmt_delete->execute();
+                        }
+                        $query = "DELETE dd FROM " . DB_PREFIX . "datatype_has_data dd INNER JOIN " . DB_PREFIX . "data d ON d.id = dd.data_id WHERE dd.data_id = ? AND d.user_id = ?";
+                        if ($stmt_delete = $this->conn->prepare($query)) {
+                            $stmt_delete->bind_param("ii", $this->id, $userId);
+                            $stmt_delete->execute();
+                        }
                     }
-                    $query = "DELETE dd FROM " . DB_PREFIX . "datatype_has_data dd INNER JOIN " . DB_PREFIX . "data d ON d.id = dd.data_id WHERE dd.data_id = ? AND d.user_id = ?";
-                    if ($stmt_delete = $this->conn->prepare($query)) {
-                        $stmt_delete->bind_param("ii", $this->id, $userId);
-                        $stmt_delete->execute();
-                    }
+                } else {
+                    return $result;
                 }
                 break;
             case "insert" :
@@ -167,13 +172,13 @@ class Entry {
         if ($stmt) {
             return $this->detail($key, $userId);
         } else {
-            http_response_code(400);
+            return 400;
         }
     }
 
     public function detail($key, $userId) {
         $crypt = new PHP_Crypt($key);
-        $query = "SELECT d.id, d.title, d.date, d.description, d.imgURL, d.lng, d.lat, group_concat(DISTINCT c.name), group_concat(DISTINCT c.id), group_concat(DISTINCT dt.name), group_concat(DISTINCT dt.id), ca.name, ca.id, d.timestamp from ".DB_PREFIX."data d
+        $query = "SELECT d.id, d.title, d.date, d.description, d.imgURL, d.lng, d.lat, group_concat(DISTINCT c.name), group_concat(DISTINCT c.id), group_concat(DISTINCT dt.name), group_concat(DISTINCT dt.id), ca.name, ca.id, d.timestamp, d.user_id from ".DB_PREFIX."data d
             LEFT OUTER JOIN (".DB_PREFIX."datatype_has_data dhd
                 LEFT OUTER JOIN ".DB_PREFIX."datatype dt
                 ON dt.id = dhd.dataType_id)
@@ -184,14 +189,14 @@ class Entry {
             on chd.data_id = d.id
             LEFT OUTER JOIN ".DB_PREFIX."category ca
             ON ca.id = d.category_id
-            WHERE d.user_id = ? AND d.id = ?
+            WHERE d.id = ?
             GROUP BY d.id
             LIMIT 1";
         if ($stmt = $this->conn->prepare($query)) {
-            $stmt -> bind_param("ii", $userId, $this->id);
+            $stmt -> bind_param("i",  $this->id);
             $stmt -> execute();
             $stmt -> store_result();
-            $stmt -> bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $companyId, $dataType, $dataTypeId, $category, $categoryId, $timestamp);
+            $stmt -> bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $companyId, $dataType, $dataTypeId, $category, $categoryId, $timestamp, $dataUserId);
             $array = "";
             while ($stmt->fetch()) {
                 $companies = strlen($company) > 0 ? explode(",", $company) : null;
@@ -230,27 +235,35 @@ class Entry {
                     "category" => $categoryArray,
                 ];
             }
-            return $array;
+            if ($userId == $dataUserId) {
+                return $array;
+            } else {
+                return 403;
+            }
         }
-        return true;
+        return 404;
     }
 
-    public function delete () {
-        $query = "DELETE cd FROM ".DB_PREFIX."company_has_data cd INNER JOIN ".DB_PREFIX."data d ON d.id = cd.data_id WHERE cd.data_id = ? AND d.user_id = ?";
-        if ($stmt = $this->conn->prepare($query)) {
-            $stmt->bind_param("ii", $this->id, $_SESSION['userId']);
-            $stmt->execute();
+    public function delete ($key, $userid) {
+        $result = $this->detail($key, $userid);
+        if (is_array($result)) {
+            $query = "DELETE cd FROM ".DB_PREFIX."company_has_data cd INNER JOIN ".DB_PREFIX."data d ON d.id = cd.data_id WHERE cd.data_id = ? AND d.user_id = ?";
+            if ($stmt = $this->conn->prepare($query)) {
+                $stmt->bind_param("ii", $this->id, $_SESSION['userId']);
+                $stmt->execute();
+            }
+            $query = "DELETE dd FROM ".DB_PREFIX."datatype_has_data dd INNER JOIN ".DB_PREFIX."data d ON d.id = dd.data_id WHERE dd.data_id = ? AND d.user_id = ?";
+            if ($stmt = $this->conn->prepare($query)) {
+                $stmt -> bind_param("ii", $this->id, $_SESSION['userId']);
+                $stmt -> execute();
+            }
+            $query = "DELETE FROM ".DB_PREFIX."data WHERE id = ? AND user_id = ?";
+            if ($stmt = $this->conn->prepare($query)) {
+                $stmt -> bind_param("ii", $this->id, $_SESSION['userId']);
+                $stmt -> execute();
+                if ($stmt) return 204;
+            }
         }
-        $query = "DELETE dd FROM ".DB_PREFIX."datatype_has_data dd INNER JOIN ".DB_PREFIX."data d ON d.id = dd.data_id WHERE dd.data_id = ? AND d.user_id = ?";
-        if ($stmt = $this->conn->prepare($query)) {
-            $stmt -> bind_param("ii", $this->id, $_SESSION['userId']);
-            $stmt -> execute();
-        }
-        $query = "DELETE FROM ".DB_PREFIX."data WHERE id = ? AND user_id = ?";
-        if ($stmt = $this->conn->prepare($query)) {
-            $stmt -> bind_param("ii", $this->id, $_SESSION['userId']);
-            $stmt -> execute();
-            if ($stmt) return true;
-        }
+        return $result;
     }
 }
