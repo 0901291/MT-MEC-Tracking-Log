@@ -153,7 +153,7 @@ if (isLoggedIn()) {
                                 <select name="category" id="category-list" class="col s11">
                                     <option value="" disabled selected>Category</option>
                                     <?php foreach($categories as $key => $category) : ?>
-                                        <option <?= $categoryId == $category["id"] ? "selected" : "" ?> value="<?= $category["id"] ?>"><?= $category["name"] ?></option>
+                                        <option <?= $categoryId == $category["id"] ? "selected" : "" ?> value="<?= $category["name"] ?>"><?= $category["name"] ?></option>
                                     <?php endforeach ?>
                                 </select>
                                 <div class="col s1">
@@ -173,7 +173,7 @@ if (isLoggedIn()) {
                                 <select multiple name="dataTypes[]" id="datatype-list" class="col s11">
                                     <option value="" disabled selected>Data types</option>
                                     <?php foreach($dataTypes as $key => $dataType) : ?>
-                                        <option <?= in_array($dataType["id"], $dataTypeIds) ? "selected" : "" ?> value="<?= $dataType["id"] ?>"><?= $dataType["name"] ?></option>
+                                        <option <?= in_array($dataType["id"], $dataTypeIds) ? "selected" : "" ?> value="<?= $dataType["name"] ?>"><?= $dataType["name"] ?></option>
                                     <?php endforeach ?>
                                 </select>
                                 <div class="col s1">
@@ -189,7 +189,7 @@ if (isLoggedIn()) {
                                 <select multiple name="companies[]" id="company-list" class="col s11">
                                     <option value="" disabled selected>Bedrijven</option>
                                     <?php foreach($companies as $key => $company) : ?>
-                                        <option <?= in_array($company["id"], $companyIds) ? "selected" : "" ?> value="<?= $company["id"] ?>"><?= $company["name"] ?></option>
+                                        <option <?= in_array($company["id"], $companyIds) ? "selected" : "" ?> value="<?= $company["name"] ?>"><?= $company["name"] ?></option>
                                     <?php endforeach ?>
                                 </select>
                                 <div class="col s1">
