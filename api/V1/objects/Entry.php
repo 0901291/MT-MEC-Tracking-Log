@@ -244,22 +244,22 @@ class Entry {
         return 404;
     }
 
-    public function delete ($key, $userid) {
-        $result = $this->detail($key, $userid);
+    public function delete ($key, $userId) {
+        $result = $this->detail($key, $userId);
         if (is_array($result)) {
             $query = "DELETE cd FROM ".DB_PREFIX."company_has_data cd INNER JOIN ".DB_PREFIX."data d ON d.id = cd.data_id WHERE cd.data_id = ? AND d.user_id = ?";
             if ($stmt = $this->conn->prepare($query)) {
-                $stmt->bind_param("ii", $this->id, $_SESSION['userId']);
+                $stmt->bind_param("ii", $this->id, $userId);
                 $stmt->execute();
             }
             $query = "DELETE dd FROM ".DB_PREFIX."datatype_has_data dd INNER JOIN ".DB_PREFIX."data d ON d.id = dd.data_id WHERE dd.data_id = ? AND d.user_id = ?";
             if ($stmt = $this->conn->prepare($query)) {
-                $stmt -> bind_param("ii", $this->id, $_SESSION['userId']);
+                $stmt -> bind_param("ii", $this->id, $userId);
                 $stmt -> execute();
             }
             $query = "DELETE FROM ".DB_PREFIX."data WHERE id = ? AND user_id = ?";
             if ($stmt = $this->conn->prepare($query)) {
-                $stmt -> bind_param("ii", $this->id, $_SESSION['userId']);
+                $stmt -> bind_param("ii", $this->id, $userId);
                 $stmt -> execute();
                 if ($stmt) return 204;
             }
