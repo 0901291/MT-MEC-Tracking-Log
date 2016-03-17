@@ -125,7 +125,7 @@ function saveDataInfo() {
         if ($(this).text().toLowerCase() == name.toLowerCase()) item = $(this);
     });
     if (!item) {
-        addDataInfoToList(type, id, name);
+        addDataInfoToList(type, name);
     } else {
         if (itemList.attr("multiple") == "multiple") {
             var arr = itemList.val();
@@ -139,8 +139,8 @@ function saveDataInfo() {
     closeAddInfoDialog();
 }
 
-function addDataInfoToList(type, id, name) {
-    var item = "<option selected value=\"" + id + "\">" + name + "</option>";
+function addDataInfoToList(type, name) {
+    var item = "<option selected value=\"" + name + "\">" + name + "</option>";
     $("#" + type + "-list").append(item);
     $("select").material_select();
     var content = $("#add-item");
