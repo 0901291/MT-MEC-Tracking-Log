@@ -89,7 +89,7 @@ if ($userId != null) {
             break;
         case 'PUT':
             $entry->state = $entry->description == null ? 1 : 2;
-            $result = $entry->save($key, $userId, 'edit');
+            $result['item'] = $entry->save($key, $userId, 'edit');
             if (is_array($result['item'])) {
                 $resultCode = 201;
             } else {

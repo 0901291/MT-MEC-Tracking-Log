@@ -27,7 +27,7 @@ class User
             if ($stmt->num_rows == 1) {
                 $stmt->fetch();
                 $_SESSION['googleId'] = $this->googleId;
-                $_SESSION['key'] = $this->getKey($_SESSION['key']);
+                $_SESSION['key'] = $this->getKey($this->googleId);
                 $crypt = new PHP_Crypt($_SESSION['key']);
                 $_SESSION['userId'] = $id;
                 $_SESSION['name'] = trim($crypt->decrypt(hex2bin($name)));

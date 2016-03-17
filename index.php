@@ -1,6 +1,8 @@
 <?php
-include_once("includes/initialize.php");
-require("includes/objects/Entry.php");
+require ("includes/initialize.php");
+require ('includes/objects/User.php');
+require ('api/V1/objects/DataInfo.php');
+
 use PHP_Crypt\PHP_Crypt as PHP_Crypt;
 
 $categories; $dataTypes; $companies;
@@ -49,19 +51,22 @@ if (isLoggedIn()) {
     if (isset($_GET["method"]) && isset($_GET["data_id"])) {
         if ($_GET["method"] == "edit") {
             $edit = true;
-            $entryInstance = new entry($conn);
-            $entryInstance->id = $_GET["data_id"];
-            $entry = $entryInstance->detail();
-            $id = $entry["id"];
-            $title = $entry["title"];
-            $description = $entry["description"];
-            $lat = $entry["location"]["lat"];
-            $lng = $entry["location"]["lng"];
-            $date = date("Y-m-d", strtotime($entry["date"]));
-            $time = date("H:i", strtotime($entry["date"]));
-            $categoryId = $entry["category"]["id"];
-            foreach($entry["dataTypes"] as $dataType) $dataTypeIds[] = $dataType["id"];
-            foreach($entry["companies"] as $company) $companyIds[] = $company["id"];
+            $client = new GuzzleHttp\Client();
+            $url = ROOT.'/api/V1/entry/'.$_GET['data_id'];
+            $key = $_SESSION['token'];
+            $response = $client->request('GET', $url, ["query" => ["api_key" => $key]]);
+            $entry = (array)json_decode($response->getBody());
+            var_dump($entry);
+            $id = $entry['item']->id;
+            $title = $entry['item']->title;
+            $description = $entry['item']->description;
+            $lat = $entry['item']->location->lat;
+            $lng = $entry['item']->location->lng;
+            $date = date("Y-m-d", strtotime($entry['item']->date));
+            $time = date("H:i", strtotime($entry['item']->date));
+            $categoryId = isset($entry['item']->category->id) ? $entry['item']->category->id : null;
+            foreach($entry['item']->dataTypes as $dataType) $dataTypeIds[] = $dataType->id;
+            foreach($entry['item']->companies as $company) $companyIds[] = $company->id;
         }
     }
 }
@@ -153,7 +158,7 @@ if (isLoggedIn()) {
                                 <select name="category" id="category-list" class="col s11">
                                     <option value="" disabled selected>Category</option>
                                     <?php foreach($categories as $key => $category) : ?>
-                                        <option <?= $categoryId == $category["id"] ? "selected" : "" ?> value="<?= $category["name"] ?>"><?= $category["name"] ?></option>
+                                        <option <?= $categoryId == $category['id'] ? "selected" : "" ?> value="<?= $category["name"] ?>"><?= $category["name"] ?></option>
                                     <?php endforeach ?>
                                 </select>
                                 <div class="col s1">
@@ -173,7 +178,7 @@ if (isLoggedIn()) {
                                 <select multiple name="dataTypes[]" id="datatype-list" class="col s11">
                                     <option value="" disabled selected>Data types</option>
                                     <?php foreach($dataTypes as $key => $dataType) : ?>
-                                        <option <?= in_array($dataType["id"], $dataTypeIds) ? "selected" : "" ?> value="<?= $dataType["name"] ?>"><?= $dataType["name"] ?></option>
+                                        <option <?= in_array($dataType['id'], $dataTypeIds) ? "selected" : "" ?> value="<?= $dataType["name"] ?>"><?= $dataType["name"] ?></option>
                                     <?php endforeach ?>
                                 </select>
                                 <div class="col s1">
@@ -189,7 +194,7 @@ if (isLoggedIn()) {
                                 <select multiple name="companies[]" id="company-list" class="col s11">
                                     <option value="" disabled selected>Bedrijven</option>
                                     <?php foreach($companies as $key => $company) : ?>
-                                        <option <?= in_array($company["id"], $companyIds) ? "selected" : "" ?> value="<?= $company["name"] ?>"><?= $company["name"] ?></option>
+                                        <option <?= in_array($company['id'], $companyIds) ? "selected" : "" ?> value="<?= $company["name"] ?>"><?= $company["name"] ?></option>
                                     <?php endforeach ?>
                                 </select>
                                 <div class="col s1">
