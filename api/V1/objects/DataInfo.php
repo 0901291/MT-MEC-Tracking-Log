@@ -42,6 +42,37 @@ class DataInfo {
         return 400;
     }
 
+    public function detail($key, $userId, $type) {
+        $crypt = new PHP_Crypt($key);
+        $query = "SELECT
+                    d.id,
+                    d.name,
+                    d.user_id
+                FROM ".DB_PREFIX.$type." d
+                WHERE d.id = ?
+                LIMIT 1";
+        if ($stmt = $this->conn->prepare($query)) {
+            $stmt->bind_param("i", $this->id);
+            $stmt->execute();
+            $stmt->store_result();
+            $stmt->bind_result($id, $name, $dataInfoUserId);
+            $array = "";
+            if ($stmt->num_rows > 0) {
+                while ($stmt->fetch()) {
+                    $array = [
+                        "id" => $id,
+                        "name" => trim($crypt->decrypt(hex2bin($name))),
+                    ];
+                }
+                if ($userId == $dataInfoUserId) {
+                    return $array;
+                }
+                return 403;
+            }
+        }
+        return 404;
+    }
+
     public function save($key, $userId, $method, $type) {
         if (in_array($type, self::$types)) {
             $crypt = new PHP_Crypt($key);
@@ -87,35 +118,6 @@ class DataInfo {
             }
         }
         return 400;
-    }
-
-    public function detail($key, $userId, $type) {
-        $crypt = new PHP_Crypt($key);
-        $query = "SELECT
-                    d.id,
-                    d.name,
-                    d.user_id
-                FROM ".DB_PREFIX.$type." d
-                WHERE d.id = ?
-                LIMIT 1";
-        if ($stmt = $this->conn->prepare($query)) {
-            $stmt->bind_param("i", $this->id);
-            $stmt->execute();
-            $stmt->store_result();
-            $stmt->bind_result($id, $name, $dataInfoUserId);
-            $array = "";
-            while ($stmt->fetch()) {
-                $array = [
-                    "id" => $id,
-                    "name" => trim($crypt->decrypt(hex2bin($name))),
-                ];
-            }
-            if ($userId == $dataInfoUserId) {
-                return $array;
-            }
-            return 403;
-        }
-        return 404;
     }
 
     public function delete () {

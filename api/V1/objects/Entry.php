@@ -193,22 +193,13 @@ class Entry {
             GROUP BY d.id
             LIMIT 1";
         if ($stmt = $this->conn->prepare($query)) {
-            $stmt -> bind_param("i",  $this->id);
-            $stmt -> execute();
-            $stmt -> store_result();
-            $stmt -> bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $companyId, $dataType, $dataTypeId, $category, $categoryId, $timestamp, $dataUserId);
+            $stmt->bind_param("i",  $this->id);
+            $stmt->execute();
+            $stmt->store_result();
+            $stmt->bind_result($id, $title, $date, $description, $imgURL, $lng, $lat, $company, $companyId, $dataType, $dataTypeId, $category, $categoryId, $timestamp, $dataUserId);
             $array = "";
-            while ($stmt->fetch()) {
-                $companies = strlen($company) > 0 ? explode(",", $company) : null;
-                $dataTypes = strlen($dataType) > 0 ? explode(",", $dataType) : null;
-                $companiesId = strlen($companyId) > 0 ? explode(",", $companyId) : null;
-                $dataTypesId = strlen($dataTypeId) > 0 ? explode(",", $dataTypeId) : null;
-                $companyArray = [];
-                $dataTypesArray = [];
-                for ($i = 0; $i < sizeof($companies); $i++) {
-                    $companyArray[] = [
-                        "name" => trim($crypt->decrypt(hex2bin($companies[$i]))),
-                        "id" => $companiesId[$i]
+            if ($stmt->num_rows > 0) {
+                while ($stmt->fetch()) {
                     $companies = strlen($company) > 0 ? explode(",", $company) : null;
                     $dataTypes = strlen($dataType) > 0 ? explode(",", $dataType) : null;
                     $companiesId = strlen($companyId) > 0 ? explode(",", $companyId) : null;
