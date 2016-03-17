@@ -21,6 +21,7 @@ function initApp() {
     initMap();
     if ($("select").length > 0) $("select").material_select();
     initializeEntryCards();
+    $($(".entry-card")[0]).find('.entry-card-header').trigger('click');
     $(document).ready(resizeContent);
     setTimeout(resizeContent, 100);
     $(window).on("resize", resizeContent);
@@ -238,25 +239,13 @@ function toggleConcept() {
 }
 
 function initializeEntryCards() {
-    $.each($(".not-initialised"), function (k, v) {
-        var open = false;
-        if ($(".entry-card:not(.collapsed)").length == 0 && k == 0) open = true;
-        var el = $(this);
-        var img = $(el.find(".entry-location img"));
-        img.attr("src", img.attr("data-src")).on("load", {el: el}, function (e) {
-            initEntryCard($(e.data.el), open);
-        });
-        initEntryCard(el, open);
-    });
+    $.each($(".not-initialised"), initEntryCard);
 }
 
-function initEntryCard(el, open) {
+function initEntryCard(k, el) {
+    el = $(el);
     el.attr("data-max-height", el[0].scrollHeight);
     var maxHeight = 56;
-    if (open) {
-        maxHeight = el[0].scrollHeight;
-        el.removeClass("collapsed");
-    }
     el.css("max-height", maxHeight + "px");
     el.removeClass("not-initialised");
     resizeContent();
@@ -272,14 +261,16 @@ function toggleItem() {
         setTimeout(function () {
             currentItem.addClass("collapsed");
             setTimeout(function () {
-                onResize();
+                resizeContent();
             }, 10);
         }, 210);
         item.removeClass("collapsed");
         setTimeout(function () {
             item.addClass("show").css("max-height", item.attr("data-max-height") + "px");
             setTimeout(function () {
-                onResize();
+                var img = $(item.find(".entry-location img"));
+                img.attr("src", img.attr("data-src"));
+                resizeContent();
             }, 210);
         }, 10);
     } else {
@@ -287,7 +278,7 @@ function toggleItem() {
         setTimeout(function () {
             item.addClass("collapsed");
             setTimeout(function () {
-                onResize();
+                resizeContent();
             }, 10);
         }, 210);
     }
@@ -363,9 +354,6 @@ function loadMoreItems() {
             if (items.length == 0 || itemsToLoad == 0 || items.length < itemsToLoad) {
                 $(".control-buttons button").attr("disabled", "");
             }
-        },
-        error: function (o) {
-            console.log(o);
         }
     })
 }
