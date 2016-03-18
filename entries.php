@@ -1,7 +1,6 @@
 <?php
 require_once('includes/initialize.php');
 
-$conn = $db->getConnection();
 if (isLoggedIn()) {
     $client = new GuzzleHttp\Client();
     $url = ROOT.'/api/V1/entry/';
@@ -43,12 +42,13 @@ else {
             <nav class="mdl-navigation mdl-layout--large-screen-only">
                 <a class="mdl-navigation__link" href="<?= ROOT ?>">Nieuw</a>
                 <a class="mdl-navigation__link active" href="<?= ROOT ?>/entries">Log</a>
+                <a class="mdl-navigation__link" href="<?= ROOT ?>/export">Export</a>
+                <a href="#" class="mdl-navigation__link logout" id="logout-desktop">
+                    <label class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" for="logout-desktop">
+                        <i class="material-icons">exit_to_app</i>
+                    </label>
+                </a>
             </nav>
-            <a href="#" class="mdl-navigation__link logout" id="logout-desktop">
-                <label class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" for="logout-desktop">
-                    <i class="material-icons">exit_to_app</i>
-                </label>
-            </a>
         </div>
         <div class="section-header header-section-header mdl-color--primary hidden">
             <h1 class="mdl-typography--title valign">Items</h1>
@@ -63,6 +63,7 @@ else {
         <nav class="mdl-navigation">
             <a class="mdl-navigation__link" href="<?= ROOT ?>">Nieuw</a>
             <a class="mdl-navigation__link active" href="<?= ROOT ?>/entries">Log</a>
+            <a class="mdl-navigation__link" href="<?= ROOT ?>/export">Export</a>
             <a class="mdl-navigation__link logout" href="#">Logout</a>
         </nav>
     </div>
