@@ -329,15 +329,10 @@ function loadMoreItems() {
     var itemsToLoad = $(this).data("items");
     var start = $('.entry-card').length;
     $.ajax({
-        url: 'includes/entryCall.php',
-        method: 'post',
-        data: {
-            method: 'getItems',
-            limit: itemsToLoad,
-            offset: start
-        },
+        url: ROOT + '/api/v1/entry?limit=' + itemsToLoad + '&offset=' + start + '&api_key=' + API_KEY,
         dataType: 'json',
-        success: function (items) {
+        success: function (output) {
+            items = output.items;
             if (items.length > 0) printMoreItems(items);
             if (items.length == 0 || itemsToLoad == 0 || items.length < itemsToLoad) {
                 $(".control-buttons button").attr("disabled", "");
