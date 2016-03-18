@@ -1,20 +1,15 @@
 <?php
-require_once("includes/initialize.php");
-require("includes/objects/Entry.php");
-$conn = $db->getConnection();
+require_once('includes/initialize.php');
+
 if (isLoggedIn()) {
-    if (isset($_GET["method"]) && isset($_GET["data_id"])) {
-        if ($_GET["method"] === "delete") {
-            $entry = new entry($conn);
-            $entry->id = $_GET["data_id"];
-            $entry->delete();
-            header("Location:".ROOT."/entries");
-        };
-    }
-    $entries = Entry::getEntries(0, "php", $conn, 5, 0);
+    $client = new GuzzleHttp\Client();
+    $url = ROOT.'/api/V1/entry/';
+    $key = $_SESSION['token'];
+    $response = $client->request('GET', $url, ['query' => ['api_key' => $key, 'limit' => 5]]);
+    $entries = (array)json_decode($response->getBody());
 }
 else {
-    header("Location: ".ROOT);
+    header('Location: '.ROOT);
     die();
 }
 
@@ -47,12 +42,13 @@ else {
             <nav class="mdl-navigation mdl-layout--large-screen-only">
                 <a class="mdl-navigation__link" href="<?= ROOT ?>">Nieuw</a>
                 <a class="mdl-navigation__link active" href="<?= ROOT ?>/entries">Log</a>
+                <a class="mdl-navigation__link" href="<?= ROOT ?>/export">Export</a>
+                <a href="#" class="mdl-navigation__link logout" id="logout-desktop">
+                    <label class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" for="logout-desktop">
+                        <i class="material-icons">exit_to_app</i>
+                    </label>
+                </a>
             </nav>
-            <a href="#" class="mdl-navigation__link logout" id="logout-desktop">
-                <label class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" for="logout-desktop">
-                    <i class="material-icons">exit_to_app</i>
-                </label>
-            </a>
         </div>
         <div class="section-header header-section-header mdl-color--primary hidden">
             <h1 class="mdl-typography--title valign">Items</h1>
@@ -67,6 +63,7 @@ else {
         <nav class="mdl-navigation">
             <a class="mdl-navigation__link" href="<?= ROOT ?>">Nieuw</a>
             <a class="mdl-navigation__link active" href="<?= ROOT ?>/entries">Log</a>
+            <a class="mdl-navigation__link" href="<?= ROOT ?>/export">Export</a>
             <a class="mdl-navigation__link logout" href="#">Logout</a>
         </nav>
     </div>
@@ -80,25 +77,26 @@ else {
                         <span class="mdl-switch__label">Concepten</span>
                     </label>
                 </div>
-                <?php foreach($entries as $key => $entry):
-                    $concept = $entry["state"] == 1 ? true : false;
-                    $empty = empty($entry["title"]) && count($entry["category"]) == 0 && empty($entry["description"]) && count($entry["dataTypes"]) == 0 && count($entry["companies"]) == 0 ? 'empty' : '';
+                <?php foreach($entries['items'] as $key => $entry):
+                    $concept = $entry->state == 1 ? true : false;
+                    $empty = empty($entry->title) && count($entry->category) == 0 && empty($entry->description) && count($entry->dataTypes) == 0 && count($entry->companies) == 0 ? 'empty' : '';
                 ?>
-                    <div class="entry-card mdl-card mdl-shadow--2dp not-initialised collapsed ?> <?= $concept ? "concept-card" : "" ?> <?= $empty ?>" data-state="<?= $entry["state"] ?>">
+                    <div class="entry-card mdl-card mdl-shadow--2dp not-initialised collapsed ?> <?= $concept ? "concept-card" : "" ?> <?= $empty ?>" data-state="<?= $entry->state ?>">
                         <div class="entry-card-header">
                             <div class="valign">
-                                <h2 class="ellipsis"><?php if ($concept) echo "<i class=\"material-icons valign concept-icon\">drafts</i>" ?><?= empty($entry["title"]) ? "<em>Geen titel</em>" : $entry["title"] ?></h2>
-                                <span class="entry-date valign"><?= $entry['date'] ?></span>
+                                <h2 class="ellipsis"><?php if ($concept) echo "<i class=\"material-icons valign concept-icon\">drafts</i>" ?><?= empty($entry->title) ? "<em>Geen titel</em>" : $entry->title ?></h2>
+                                <span class="entry-date valign"><?= $entry->date ?></span>
                                 <div class="form-container valign">
-                                    <form action="<?= ROOT?>/entries/<?= $entry["id"] ?>/edit">
+                                    <form action="<?= ROOT?>/entries/<?= $entry->id ?>/edit">
                                         <button type="submit" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect entry-edit entry-control">
-                                            <input type="hidden" value="<?= $entry["id"] ?>">
+                                            <input type="hidden" value="<?= $entry->id ?>">
                                             <i class="material-icons">mode_edit</i>
                                         </button>
                                     </form>
-                                    <form action="<?= ROOT?>/entries/<?= $entry["id"] ?>/delete" class="delete-entry">
+                                    <form action="<?= ROOT?>/includes/entryCall.php" method="post" class="delete-entry">
                                         <button type="button" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect entry-remove entry-control">
-                                            <input type="hidden" value="<?= $entry["id"] ?>">
+                                            <input type="hidden" name="method" value="delete">
+                                            <input type="hidden" name="id" value="<?= $entry->id ?>">
                                             <i class="material-icons">delete</i>
                                         </button>
                                     </form>
@@ -106,48 +104,48 @@ else {
                             </div>
                         </div>
                         <div class="entry-card-content">
-                            <?php if(!empty($entry["title"])): ?>
+                            <?php if(!empty($entry->title)): ?>
                                 <div class="entry-title">
                                     <h3 class="entry-section-heading">Titel</h3>
-                                    <span><?= $entry["title"] ?></span>
+                                    <span><?= $entry->title ?></span>
                                 </div>
                             <?php endif; ?>
-                            <?php if(count($entry["category"]) > 0): ?>
+                            <?php if(count($entry->category) > 0): ?>
                                 <div class="entry-category">
                                     <h3 class="entry-section-heading">Categorie</h3>
-                                    <span><?= $entry["category"]["name"] ?></span>
+                                    <span><?= $entry->category->name ?></span>
                                 </div>
                             <?php endif; ?>
-                            <?php if(!empty($entry["description"])): ?>
+                            <?php if(!empty($entry->description)): ?>
                                 <div class="entry-description">
                                     <h3 class="entry-section-heading">Omschrijving</h3>
-                                    <p><?= $entry["description"] ?></p>
+                                    <p><?= $entry->description ?></p>
                                 </div>
                             <?php endif; ?>
-                            <?php if(count($entry["dataTypes"]) > 0): ?>
+                            <?php if(count($entry->dataTypes) > 0): ?>
                                 <div class="entry-datatypes">
                                     <h3 class="entry-section-heading">Data types</h3>
                                     <ul>
-                                        <?php foreach($entry["dataTypes"] as $key => $dataType): ?>
+                                        <?php foreach($entry->dataTypes as $key => $dataType): ?>
                                             <li><?= $dataType ?></li>
                                         <?php endforeach; ?>
                                     </ul>
                                 </div>
                             <?php endif; ?>
-                            <?php if(count($entry["companies"]) > 0): ?>
+                            <?php if(count($entry->companies) > 0): ?>
                                 <div class="entry-companies">
                                     <h3 class="entry-section-heading">Bedrijven</h3>
                                     <ul>
-                                        <?php foreach($entry["companies"] as $key => $company): ?>
+                                        <?php foreach($entry->companies as $key => $company): ?>
                                             <li><?= $company ?></li>
                                         <?php endforeach; ?>
                                     </ul>
                                 </div>
                             <?php endif; ?>
                         </div>
-                        <?php if(!empty($entry["location"]["lat"] && !empty($entry["location"]["lng"]))): ?>
+                        <?php if(!empty($entry->location->lat && !empty($entry->location->lng))): ?>
                             <div class="entry-location">
-                                <img data-src="https://maps.googleapis.com/maps/api/staticmap?center=<?= $entry["location"]["lat"] ?>,<?= $entry["location"]["lng"] ?>&zoom=14&size=460x130&maptype=roadmap&markers=color:red%7C<?= $entry["location"]["lat"] ?>,<?= $entry["location"]["lng"] ?>&key=AIzaSyC6VYBFTcvqfDookMW4Hl1J3TphwJxo6nA" alt="">
+                                <img data-src="https://maps.googleapis.com/maps/api/staticmap?center=<?= $entry->location->lat ?>,<?= $entry->location->lng ?>&zoom=14&size=460x130&maptype=roadmap&markers=color:red%7C<?= $entry->location->lat ?>,<?= $entry->location->lng ?>&key=AIzaSyC6VYBFTcvqfDookMW4Hl1J3TphwJxo6nA" alt="">
                                 <div class="shadow"></div>
                             </div>
                         <?php endif; ?>
@@ -162,7 +160,7 @@ else {
         </div>
     </main>
 </div>
-<script><?= "var ROOT = '".ROOT."';"; ?></script>
+<script><?= "var ROOT = '".ROOT."'; var API_KEY = '".$_SESSION['token']."'"; ?></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 <script src="https://code.getmdl.io/1.1.1/material.min.js"></script>
 <script src="<?= ROOT ?>/js/lib/material.add.min.js"></script>
