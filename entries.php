@@ -93,7 +93,7 @@ else {
                                             <i class="material-icons">mode_edit</i>
                                         </button>
                                     </form>
-                                    <form action="<?= ROOT?>/includes/entryCall.php" class="delete-entry">
+                                    <form action="<?= ROOT?>/includes/entryCall.php" method="post" class="delete-entry">
                                         <button type="button" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect entry-remove entry-control">
                                             <input type="hidden" name="method" value="delete">
                                             <input type="hidden" name="id" value="<?= $entry->id ?>">
