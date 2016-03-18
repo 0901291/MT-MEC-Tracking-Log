@@ -1,11 +1,6 @@
 <?php
 require ("includes/initialize.php");
 if (isLoggedIn()) {
-//    $client = new GuzzleHttp\Client();
-//    $url = ROOT.'/api/V1/entry/';
-//    $key = $_SESSION['token'];
-//    $response = $client->request('GET', $url, ['query' => ['api_key' => $key]]);
-//    $entries = (array)json_decode($response->getBody());
 }
 else {
     header('Location: '.ROOT);
@@ -26,7 +21,7 @@ else {
     <link rel="stylesheet" href="<?= ROOT ?>/css/style.css">
     <script src="https://apis.google.com/js/api:client.js"></script>
 </head>
-<body class="<?= $edit ? "edit-mode" : ""?>">
+<body>
 <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
     <header class="mdl-layout__header">
         <div class="mdl-layout__header-row">
@@ -70,6 +65,12 @@ else {
                     <p>
                         De Traclog API is een RESTful webservice. Je stuurt met elk request jouw unieke API key mee (<?= $_SESSION['token'] ?>). Ook geef je aan welke versie van de API je wilt gebruiken (meest recente versie: 1). Bij collections is het ook mogelijk om het resultaat te beperken tot een bepaald aantal (?limit=) en een offset mee te geven (?offset=).
                     </p>
+                    <h2 class="mdl-typography--headline">Excel</h2>
+                    <ul>
+                        <li>
+                            GET entries: <a target="_blank" href="<?=ROOT?>/api/v1/entry.xls?api_key=<?=$_SESSION['token']?>"><?=ROOT?>/api/v1/entry.xls?api_key=<?=$_SESSION['token']?></a>
+                        </li>
+                    </ul>
                     <h2 class="mdl-typography--headline">Entry</h2>
                     <ul>
                         <li>
@@ -77,6 +78,27 @@ else {
                         </li>
                         <li>
                            POST entry:  <a target="_blank" href="<?=ROOT?>/api/v1/entry/?api_key=<?=$_SESSION['token']?>"><?=ROOT?>/api/v1/entry?api_key=<?=$_SESSION['token']?></a>
+                            <p>
+                                Bedrijven, data types en categorieën kunnen textueel worden ingevoerd. Als deze bij het versturen nog niet bestaan, worden ze aangemaakt. Bestonden ze al, worden de bestaande items gebruikt. Let hierbij wel op hoofdletters.
+                            </p>
+                            <p>Voorbeeld POST request:</p>
+<pre>{
+    "title": "Inchecken trein",
+    "date": <?= date("d/m/Y H:i") ?>,
+    "description": "",
+    "imgURL": "",
+    "lat": "52.063443",
+    "lng": "5.1165763",
+    "companies": [
+        "NS",
+        "Albert Heijn"
+    ],
+    "dataTypes": [
+        "Visueel",
+        "Locatie"
+    ],
+    "category": "Openbaar vervoer"
+}</pre>
                         </li>
                         <li>
                             GET entry:  <a target="_blank" href="<?=ROOT?>/api/v1/entry/0?api_key=<?=$_SESSION['token']?>"><?=ROOT?>/api/v1/entry/<strong>{id}</strong>?api_key=<?=$_SESSION['token']?></a>
