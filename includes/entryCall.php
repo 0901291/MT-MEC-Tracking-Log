@@ -14,15 +14,17 @@ if (isset($_POST['method'])) {
         case 'edit':
             $response = $client->request('PUT', $url, ['json' => $_POST, 'query' => ['api_key' => $key]]);
             $code = $response->getStatusCode();
-            if ($code = 200) {
+            if ($code == 200) {
                 header('Location: '.ROOT.'/entries');
+                die();
             }
             break;
         case 'delete':
-            $response = $client->request('DELETE', $url, ['query' => ['api_key' => $key]]);
+            $response = $client->request('DELETE', $url, ['query' => ['api_key' => $key, 'id' => $id]]);
             $code = $response->getStatusCode();
-            if ($code = 204) {
+            if ($code == 204) {
                 header('Location: '.ROOT.'/entries');
+                die();
             }
             break;
     }
