@@ -56,6 +56,7 @@ if (isLoggedIn()) {
             $key = $_SESSION['token'];
             $response = $client->request('GET', $url, ["query" => ["api_key" => $key]]);
             $entry = (array)json_decode($response->getBody());
+            var_dump($entry);
             $id = $entry['item']->id;
             $title = $entry['item']->title;
             $description = $entry['item']->description;
