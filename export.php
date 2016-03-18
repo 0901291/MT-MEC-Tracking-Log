@@ -26,7 +26,7 @@ else {
     <link rel="stylesheet" href="<?= ROOT ?>/css/style.css">
     <script src="https://apis.google.com/js/api:client.js"></script>
 </head>
-<body class="<?= $edit ? "edit-mode" : ""?>">
+<body>
 <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
     <header class="mdl-layout__header">
         <div class="mdl-layout__header-row">
@@ -70,6 +70,12 @@ else {
                     <p>
                         De Traclog API is een RESTful webservice. Je stuurt met elk request jouw unieke API key mee (<?= $_SESSION['token'] ?>). Ook geef je aan welke versie van de API je wilt gebruiken (meest recente versie: 1). Bij collections is het ook mogelijk om het resultaat te beperken tot een bepaald aantal (?limit=) en een offset mee te geven (?offset=).
                     </p>
+                    <h2 class="mdl-typography--headline">Excel</h2>
+                    <ul>
+                        <li>
+                            GET entries: <a target="_blank" href="<?=ROOT?>/api/v1/entry.xls?api_key=<?=$_SESSION['token']?>"><?=ROOT?>/api/v1/entry.xls?api_key=<?=$_SESSION['token']?></a>
+                        </li>
+                    </ul>
                     <h2 class="mdl-typography--headline">Entry</h2>
                     <ul>
                         <li>

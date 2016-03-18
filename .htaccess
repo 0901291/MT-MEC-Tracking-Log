@@ -1,4 +1,5 @@
 RewriteEngine on
+RewriteRule ^api/v([0-9]+)/([a-z]+)/?([0-9]+)?\.xls/?$ api/V$1/api_$2_excel.php?id=$3&accept=xls [NC,L,QSA]
 RewriteRule ^api/v([0-9]+)/([a-z]+)/?([0-9]+)?/?$ api/V$1/api_$2.php?id=$3&accept=json [NC,L,QSA]
 RewriteRule ^api/v([0-9]+)/([a-z]+)/?([0-9]+)?\.?([a-z]+)?/?$ api/V$1/api_$2.php?id=$3&accept=$4 [NC,L,QSA]
 
