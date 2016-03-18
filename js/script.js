@@ -125,19 +125,7 @@ function saveDataInfo() {
         if ($(this).text().toLowerCase() == name.toLowerCase()) item = $(this);
     });
     if (!item) {
-        $.ajax({
-            data: {
-                name: name,
-                function: "create",
-                type: type
-            },
-            url: ROOT + "/includes/dataInfo.php",
-            method: "POST",
-            success: function (id) {
-                addDataInfoToList(type, id, name);
-                closeAddInfoDialog();
-            }
-        });
+        addDataInfoToList(type, name);
     } else {
         if (itemList.attr("multiple") == "multiple") {
             var arr = itemList.val();
@@ -147,12 +135,12 @@ function saveDataInfo() {
             itemList.val(item.val());
         }
         itemList.material_select();
-        closeAddInfoDialog();
     }
+    closeAddInfoDialog();
 }
 
-function addDataInfoToList(type, id, name) {
-    var item = "<option selected value=\"" + id + "\">" + name + "</option>";
+function addDataInfoToList(type, name) {
+    var item = "<option selected value=\"" + name + "\">" + name + "</option>";
     $("#" + type + "-list").append(item);
     $("select").material_select();
     var content = $("#add-item");
@@ -341,15 +329,10 @@ function loadMoreItems() {
     var itemsToLoad = $(this).data("items");
     var start = $('.entry-card').length;
     $.ajax({
-        url: 'includes/entryCall.php',
-        method: 'post',
-        data: {
-            method: 'getItems',
-            limit: itemsToLoad,
-            offset: start
-        },
+        url: ROOT + '/api/v1/entry?limit=' + itemsToLoad + '&offset=' + start + '&api_key=' + API_KEY,
         dataType: 'json',
-        success: function (items) {
+        success: function (output) {
+            items = output.items;
             if (items.length > 0) printMoreItems(items);
             if (items.length == 0 || itemsToLoad == 0 || items.length < itemsToLoad) {
                 $(".control-buttons button").attr("disabled", "");
