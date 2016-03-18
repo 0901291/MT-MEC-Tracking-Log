@@ -5,7 +5,7 @@ if (isLoggedIn()) {
     $client = new GuzzleHttp\Client();
     $url = ROOT.'/api/V1/entry/';
     $key = $_SESSION['token'];
-    $response = $client->request('GET', $url, ['query' => ['api_key' => $key]]);
+    $response = $client->request('GET', $url, ['query' => ['api_key' => $key, 'limit' => 5]]);
     $entries = (array)json_decode($response->getBody());
 }
 else {
