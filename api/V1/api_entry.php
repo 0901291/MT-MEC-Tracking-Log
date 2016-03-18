@@ -142,5 +142,9 @@ switch ($resultCode) {
         break;
 }
 
-print_r(json_encode($result));
+switch($accept) {
+    case 'application/json':
+        print_r(json_encode($result));
+        break;
+}
 
