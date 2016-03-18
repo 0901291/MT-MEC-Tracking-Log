@@ -160,7 +160,7 @@ else {
         </div>
     </main>
 </div>
-<script><?= "var ROOT = '".ROOT."';"; ?></script>
+<script><?= "var ROOT = '".ROOT."'; var API_KEY = '".$_SESSION['token']."'"; ?></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 <script src="https://code.getmdl.io/1.1.1/material.min.js"></script>
 <script src="<?= ROOT ?>/js/lib/material.add.min.js"></script>
