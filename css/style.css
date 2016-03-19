@@ -245,7 +245,6 @@ button.form-item {
     width: 100%;
     transition: max-height 0.2s ease-in-out, all 0.3s ease-in-out;
     opacity: 1;
-    max-height: 56px;
 }
 
 .entry-card-header {
