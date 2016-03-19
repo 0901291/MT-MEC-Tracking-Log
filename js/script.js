@@ -257,7 +257,7 @@ function toggleItem() {
             item.addClass("show").css("max-height", item.attr("data-max-height") + "px");
             setTimeout(function () {
                 var img = $(item.find(".entry-location img"));
-                img.attr("src", img.attr("data-src"));
+                img.attr("src", img.attr("data-src")).load(resizeContent);
                 resizeContent();
             }, 210);
         }, 10);
