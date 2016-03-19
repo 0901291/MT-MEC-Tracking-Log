@@ -7,6 +7,8 @@ if (isLoggedIn()) {
     $key = $_SESSION['token'];
     $response = $client->request('GET', $url, ['query' => ['api_key' => $key, 'limit' => 5]]);
     $entries = (array)json_decode($response->getBody());
+    $result = false;
+    if (isset($entries['items']) && count($entries['items']) > 0) $result = true;
 }
 else {
     header('Location: '.ROOT);
@@ -77,83 +79,85 @@ else {
                         <span class="mdl-switch__label">Concepten</span>
                     </label>
                 </div>
-                <?php foreach($entries['items'] as $key => $entry):
-                    $concept = $entry->state == 1 ? true : false;
-                    $empty = empty($entry->title) && count($entry->category) == 0 && empty($entry->description) && count($entry->dataTypes) == 0 && count($entry->companies) == 0 ? 'empty' : '';
-                ?>
-                    <div class="entry-card mdl-card mdl-shadow--2dp not-initialised collapsed ?> <?= $concept ? "concept-card" : "" ?> <?= $empty ?>" data-state="<?= $entry->state ?>">
-                        <div class="entry-card-header">
-                            <div class="valign">
-                                <h2 class="ellipsis"><?php if ($concept) echo "<i class=\"material-icons valign concept-icon\">drafts</i>" ?><?= empty($entry->title) ? "<em>Geen titel</em>" : $entry->title ?></h2>
-                                <span class="entry-date valign"><?= $entry->date ?></span>
-                                <div class="form-container valign">
-                                    <form action="<?= ROOT?>/entries/<?= $entry->id ?>/edit">
-                                        <button type="submit" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect entry-edit entry-control">
-                                            <input type="hidden" value="<?= $entry->id ?>">
-                                            <i class="material-icons">mode_edit</i>
-                                        </button>
-                                    </form>
-                                    <form action="<?= ROOT?>/includes/entryCall.php" method="post" class="delete-entry">
-                                        <button type="button" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect entry-remove entry-control">
-                                            <input type="hidden" name="method" value="delete">
-                                            <input type="hidden" name="id" value="<?= $entry->id ?>">
-                                            <i class="material-icons">delete</i>
-                                        </button>
-                                    </form>
+                <?php if ($result): ?>
+                    <?php foreach($entries['items'] as $key => $entry):
+                        $concept = $entry->state == 1 ? true : false;
+                        $empty = empty($entry->title) && count($entry->category) == 0 && empty($entry->description) && count($entry->dataTypes) == 0 && count($entry->companies) == 0 ? 'empty' : '';
+                    ?>
+                        <div class="entry-card mdl-card mdl-shadow--2dp not-initialised collapsed ?> <?= $concept ? "concept-card" : "" ?> <?= $empty ?>" data-state="<?= $entry->state ?>">
+                            <div class="entry-card-header">
+                                <div class="valign">
+                                    <h2 class="ellipsis"><?php if ($concept) echo "<i class=\"material-icons valign concept-icon\">drafts</i>" ?><?= empty($entry->title) ? "<em>Geen titel</em>" : $entry->title ?></h2>
+                                    <span class="entry-date valign"><?= $entry->date ?></span>
+                                    <div class="form-container valign">
+                                        <form action="<?= ROOT?>/entries/<?= $entry->id ?>/edit">
+                                            <button type="submit" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect entry-edit entry-control">
+                                                <input type="hidden" value="<?= $entry->id ?>">
+                                                <i class="material-icons">mode_edit</i>
+                                            </button>
+                                        </form>
+                                        <form action="<?= ROOT?>/includes/entryCall.php" method="post" class="delete-entry">
+                                            <button type="button" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect entry-remove entry-control">
+                                                <input type="hidden" name="method" value="delete">
+                                                <input type="hidden" name="id" value="<?= $entry->id ?>">
+                                                <i class="material-icons">delete</i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="entry-card-content">
-                            <?php if(!empty($entry->title)): ?>
-                                <div class="entry-title">
-                                    <h3 class="entry-section-heading">Titel</h3>
-                                    <span><?= $entry->title ?></span>
-                                </div>
-                            <?php endif; ?>
-                            <?php if(count($entry->category) > 0): ?>
-                                <div class="entry-category">
-                                    <h3 class="entry-section-heading">Categorie</h3>
-                                    <span><?= $entry->category->name ?></span>
-                                </div>
-                            <?php endif; ?>
-                            <?php if(!empty($entry->description)): ?>
-                                <div class="entry-description">
-                                    <h3 class="entry-section-heading">Omschrijving</h3>
-                                    <p><?= $entry->description ?></p>
-                                </div>
-                            <?php endif; ?>
-                            <?php if(count($entry->dataTypes) > 0): ?>
-                                <div class="entry-datatypes">
-                                    <h3 class="entry-section-heading">Data types</h3>
-                                    <ul>
-                                        <?php foreach($entry->dataTypes as $key => $dataType): ?>
-                                            <li><?= $dataType ?></li>
-                                        <?php endforeach; ?>
-                                    </ul>
-                                </div>
-                            <?php endif; ?>
-                            <?php if(count($entry->companies) > 0): ?>
-                                <div class="entry-companies">
-                                    <h3 class="entry-section-heading">Bedrijven</h3>
-                                    <ul>
-                                        <?php foreach($entry->companies as $key => $company): ?>
-                                            <li><?= $company ?></li>
-                                        <?php endforeach; ?>
-                                    </ul>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                        <?php if(!empty($entry->location->lat && !empty($entry->location->lng))): ?>
-                            <div class="entry-location">
-                                <img data-src="https://maps.googleapis.com/maps/api/staticmap?center=<?= $entry->location->lat ?>,<?= $entry->location->lng ?>&zoom=14&size=460x130&maptype=roadmap&markers=color:red%7C<?= $entry->location->lat ?>,<?= $entry->location->lng ?>&key=AIzaSyC6VYBFTcvqfDookMW4Hl1J3TphwJxo6nA" alt="">
-                                <div class="shadow"></div>
+                            <div class="entry-card-content">
+                                <?php if(!empty($entry->title)): ?>
+                                    <div class="entry-title">
+                                        <h3 class="entry-section-heading">Titel</h3>
+                                        <span><?= $entry->title ?></span>
+                                    </div>
+                                <?php endif; ?>
+                                <?php if(count($entry->category) > 0): ?>
+                                    <div class="entry-category">
+                                        <h3 class="entry-section-heading">Categorie</h3>
+                                        <span><?= $entry->category->name ?></span>
+                                    </div>
+                                <?php endif; ?>
+                                <?php if(!empty($entry->description)): ?>
+                                    <div class="entry-description">
+                                        <h3 class="entry-section-heading">Omschrijving</h3>
+                                        <p><?= $entry->description ?></p>
+                                    </div>
+                                <?php endif; ?>
+                                <?php if(count($entry->dataTypes) > 0): ?>
+                                    <div class="entry-datatypes">
+                                        <h3 class="entry-section-heading">Data types</h3>
+                                        <ul>
+                                            <?php foreach($entry->dataTypes as $key => $dataType): ?>
+                                                <li><?= $dataType ?></li>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                    </div>
+                                <?php endif; ?>
+                                <?php if(count($entry->companies) > 0): ?>
+                                    <div class="entry-companies">
+                                        <h3 class="entry-section-heading">Bedrijven</h3>
+                                        <ul>
+                                            <?php foreach($entry->companies as $key => $company): ?>
+                                                <li><?= $company ?></li>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                    </div>
+                                <?php endif; ?>
                             </div>
-                        <?php endif; ?>
-                    </div>
-                <?php endforeach; ?>
+                            <?php if(!empty($entry->location->lat && !empty($entry->location->lng))): ?>
+                                <div class="entry-location">
+                                    <img data-src="https://maps.googleapis.com/maps/api/staticmap?center=<?= $entry->location->lat ?>,<?= $entry->location->lng ?>&zoom=14&size=460x130&maptype=roadmap&markers=color:red%7C<?= $entry->location->lat ?>,<?= $entry->location->lng ?>&key=AIzaSyC6VYBFTcvqfDookMW4Hl1J3TphwJxo6nA" alt="">
+                                    <div class="shadow"></div>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
                 <div class="control-buttons">
-                    <button type="button" data-items="5" id="load-more-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised mdl-button--primary">Laad 5 meer</button>
-                    <button type="button" data-items="0" id="load-all-button" class="mdl-button mdl-js-button mdl-js-ripple-effect">Laad alles</button>
+                    <button type="button" data-items="5" <?= !$result ? 'disabled' : '' ?> id="load-more-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised mdl-button--primary">Laad 5 meer</button>
+                    <button type="button" data-items="0" <?= !$result ? 'disabled' : '' ?> id="load-all-button" class="mdl-button mdl-js-button mdl-js-ripple-effect">Laad alles</button>
                 </div>
             </section>
             <?php include("includes/footer.php"); ?>
