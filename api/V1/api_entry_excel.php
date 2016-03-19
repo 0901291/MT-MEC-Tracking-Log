@@ -36,6 +36,7 @@ foreach ($headers as $key => $value) {
 }
 $data = [];
 $json = json_decode(file_get_contents(ROOT.'/api/v1/entry/?api_key='.$_GET['api_key']), true)['items'];
+if ($json == null) $json = [];
 $categories = [];
 $totalItems = 0;
 
@@ -75,14 +76,15 @@ foreach ($data as $row) {
 
 $r += 2;
 
-$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$r, 'Category:');
-$r++;
-foreach ($categories as $category => $count) {
-    $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$r, $category.':')
-                                        ->setCellValue('B'.$r, $count);
+if (count($categories) > 0) {
+    $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A' . $r, 'Category:');
     $r++;
+    foreach ($categories as $category => $count) {
+        $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A' . $r, $category . ':')
+            ->setCellValue('B' . $r, $count);
+        $r++;
+    }
 }
-
 $r++;
 $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$r, 'Total:')
                                     ->setCellValue('B'.$r, $totalItems);
