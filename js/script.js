@@ -232,9 +232,8 @@ function initializeEntryCards() {
 
 function initEntryCard(k, el) {
     el = $(el);
-    el.attr("data-max-height", el[0].scrollHeight);
-    var maxHeight = 56;
-    el.css("max-height", maxHeight + "px");
+    el.attr("data-max-height", el.prop('scrollHeight'));
+    el.css("max-height", "56px");
     el.removeClass("not-initialised");
     resizeContent();
 }
