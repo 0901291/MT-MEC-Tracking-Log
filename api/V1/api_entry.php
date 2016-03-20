@@ -35,9 +35,16 @@ if ($userId != null) {
     $entry->companies = (isset($values['companies']) ? $values['companies'] : null);
     $entry->dataTypes = (isset($values['dataTypes']) ? $values['dataTypes'] : null);
     $entry->category = (isset($values['category']) ? htmlentities($values['category']) : null);
-    $date = (isset($values['date']) ? htmlentities($values['date']) : date('Y-m-d'));
-    $time = (isset($values['time']) ? htmlentities($values['time']) : date('H:i:s'));
-    $entry->date = date('Y-m-d H:i:s', strtotime($date.' '.$time));
+    $date = isset($values['date']) ? htmlentities($values['date']) : date('Y-m-d');
+    $date = str_replace('/', '-', $date);
+    $dateInfo = date_parse($date);
+    if ($dateInfo['hour'] == false) {
+        $time = isset($values['time']) ? ' '.htmlentities($values['time']) : ' '.date('H:i:s');
+    } else {
+        $time = '';
+    }
+    $date = date('Y-m-d H:i:s', strtotime($date.$time));
+    $entry->date = $date;
     $entry->userId = $userId;
 
     switch ($method) {
