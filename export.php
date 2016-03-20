@@ -84,7 +84,7 @@ else {
                             <p>Voorbeeld POST request:</p>
 <pre>{
     "title": "Inchecken trein",
-    "date": <?= date("d/m/Y H:i") ?>,
+    "date": "<?= date("Y-m-d H:i:s") ?>",
     "description": "",
     "imgURL": "",
     "lat": "52.063443",
