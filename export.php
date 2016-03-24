@@ -63,7 +63,7 @@ else {
                 </div>
                 <div>
                     <p>
-                        De Traclog API is een RESTful webservice. Je stuurt met elk request jouw unieke API key mee (<?= $_SESSION['token'] ?>). Ook geef je aan welke versie van de API je wilt gebruiken (meest recente versie: 1). Bij collections is het ook mogelijk om het resultaat te beperken tot een bepaald aantal (?limit=) en een offset mee te geven (?offset=).
+                        De Tracklog API is een RESTful webservice. Je stuurt met elk request jouw unieke API key mee (<?= $_SESSION['token'] ?>). Ook geef je aan welke versie van de API je wilt gebruiken (meest recente versie: 1). Bij collections is het ook mogelijk om het resultaat te beperken tot een bepaald aantal (?limit=) en een offset mee te geven (?offset=).
                     </p>
                     <h2 class="mdl-typography--headline">Excel</h2>
                     <ul>
