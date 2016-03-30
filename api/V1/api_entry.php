@@ -3,6 +3,8 @@ require('../../includes/initialize.php');
 require('objects/Entry.php');
 require('../../includes/objects/User.php');
 
+use PHP_Crypt\PHP_Crypt as PHP_Crypt;
+
 $method = $_SERVER['REQUEST_METHOD'];
 $accept = isset($_GET['accept']) ? 'application/'.$_GET['accept'] : $_SERVER['HTTP_ACCEPT'];
 $friendlyAccept = str_replace('application/', '', $accept);
@@ -20,8 +22,57 @@ $resultCode = 200;
 $entry = new Entry($db->getConnection());
 $user = new User($db->getConnection());
 
+$crypt = new PHP_Crypt($key);
+
 if (isset($input)) $values = (array)$input;
 else $values = $_POST;
+
+$where = '';
+
+if (isset($_GET['startDate'])) {
+    $startDate = date('Y-m-d', strtotime($_GET['startDate'])).' 00:01:00';
+    if(isset($_GET['endDate'])) {
+        $endDate = date('Y-m-d', strtotime($_GET['endDate'])).' 23:59:00';
+        $where .= ' AND (d.date BETWEEN \''.$startDate.'\' AND \''.$endDate.'\')';
+    } else {
+        $where .= ' AND d.date > \''.$startDate.'\'';
+    }
+} else if (isset($_GET['endDate'])) {
+    $where .= ' AND d.date < \''.$endDate.'\'';
+}
+
+if (isset($_GET['dataTypes'])) {
+    $dataTypes = explode(',', $_GET['dataTypes']);
+    $where .= ' AND (';
+    foreach ($dataTypes as $k => $dataType) {
+        $dataType= bin2hex($crypt->encrypt($dataType));
+        if ($k > 0) {
+            $where .= ' OR dt.name = \''.$dataType.'\'';
+        } else {
+            $where .= ' dt.name = \''.$dataType.'\'';
+        }
+    }
+    $where .= ')';
+}
+
+if (isset($_GET['companies'])) {
+    $companies = explode(',', $_GET['companies']);
+    $where .= ' AND (';
+    foreach ($companies as $k => $company) {
+        $company= bin2hex($crypt->encrypt($company));
+        if ($k > 0) {
+            $where .= ' OR c.name = \''.$company.'\'';
+        } else {
+            $where .= ' c.name = \''.$company.'\'';
+        }
+    }
+    $where .= ')';
+}
+
+if (isset($_GET['category'])) {
+    $category = bin2hex($crypt->encrypt($_GET['category']));
+    $where .= ' AND ca.name = \''.$category.'\'';
+}
 
 define('APIROOT', ROOT.'/api/v1');
 
@@ -50,7 +101,7 @@ if ($userId != null) {
     switch ($method) {
         case 'GET':
             if ($entry->id != null) {
-                $result['item'] = $entry->detail($key, $userId);
+                $result['item'] = $entry->detail($crypt, $userId);
                 if (!is_array($result['item'])) {
                     $resultCode = $result['item'];
                 }
@@ -59,7 +110,7 @@ if ($userId != null) {
                 $status = isset($_GET['state']) ? $_GET['state'] : 0;
                 $limit = isset($_GET['limit']) ? $_GET['limit'] : 0;
                 $offset = isset($_GET['offset']) ? $_GET['offset'] : 0;
-                $allItems = Entry::getEntries($status, $db->getConnection(), $key, $userId);
+                $allItems = Entry::getEntries($crypt, $status, $db->getConnection(), $key, $userId, $where);
                 $total = count($allItems);
                 $limit = $limit == 0 || $limit > $total ? $total : $limit;
                 $result['items'] = array_slice($allItems, $offset, $limit);
@@ -96,7 +147,7 @@ if ($userId != null) {
             break;
         case 'PUT':
             $entry->state = $entry->description == null ? 1 : 2;
-            $result['item'] = $entry->save($key, $userId, 'edit');
+            $result['item'] = $entry->save($crypt, $key, $userId, 'edit');
             if (is_array($result['item'])) {
                 $resultCode = 201;
             } else {
@@ -104,11 +155,11 @@ if ($userId != null) {
             }
             break;
         case 'DELETE':
-            $resultCode = $entry->delete($key, $userId);
+            $resultCode = $entry->delete($crypt, $key, $userId);
             break;
         case 'POST':
             $entry->state = $entry->description == null ? 1 : 2;
-            $result['item'] = $entry->save($key, $userId, 'insert');
+            $result['item'] = $entry->save($crypt, $key, $userId, 'insert');
             if (is_array($result['item'])) {
                 $resultCode = 201;
             } else {

@@ -1,5 +1,4 @@
 <?php
-use PHP_Crypt\PHP_Crypt as PHP_Crypt;
 require 'DataInfo.php';
 
 class Entry {
@@ -22,10 +21,9 @@ class Entry {
         $this->conn = $db;
     }
 
-    public static function getEntries($status, $conn, $key, $userId, $limit = 0, $offset = 0) {
+    public static function getEntries($crypt, $status, $conn, $key, $userId, $where = '', $limit = 0, $offset = 0) {
         $status = htmlentities($status);
         $state = $status != 0 ? "AND WHERE = ".$status : "";
-        $crypt = new PHP_Crypt($key);
         if (is_numeric($status)) {
             $query =
                 "SELECT
@@ -36,8 +34,8 @@ class Entry {
                     d.imgURL,
                     d.lng,
                     d.lat,
-                    group_concat(DISTINCT c.name),
-                    group_concat(DISTINCT dt.name),
+                    group_concat(DISTINCT c2.name),
+                    group_concat(DISTINCT dt2.name),
                     ca.name,
                     ca.id,
                     d.state,
@@ -47,13 +45,21 @@ class Entry {
                     LEFT OUTER JOIN ".DB_PREFIX."datatype dt
                     ON dt.id = dhd.dataType_id)
                 ON dhd.data_id = d.id
+                LEFT OUTER JOIN (".DB_PREFIX."datatype_has_data dhd2
+                    LEFT OUTER JOIN ".DB_PREFIX."datatype dt2
+                    ON dt2.id = dhd2.dataType_id)
+                ON dhd2.data_id = d.id
                 LEFT OUTER JOIN (".DB_PREFIX."company_has_data chd
                     LEFT OUTER JOIN ".DB_PREFIX."company c
                     ON c.id = chd.company_id)
                 ON chd.data_id = d.id
+                LEFT OUTER JOIN (".DB_PREFIX."company_has_data chd2
+                    LEFT OUTER JOIN ".DB_PREFIX."company c2
+                    ON c2.id = chd2.company_id)
+                ON chd2.data_id = d.id
                 LEFT OUTER JOIN ".DB_PREFIX."category ca
                 ON ca.id = d.category_id
-                WHERE d.user_id = ? ".$state."
+                WHERE d.user_id = ?".$state.$where."
                 GROUP BY d.id
                 ORDER BY d.date DESC".
                 ($limit > 0 ? " LIMIT ".$limit." OFFSET ".$offset : " LIMIT 99999999999999 OFFSET ".$offset);
@@ -97,8 +103,7 @@ class Entry {
         return 400;
     }
 
-    public function save($key, $userId, $method) {
-        $crypt = new PHP_Crypt($key);
+    public function save($crypt, $key, $userId, $method) {
         $title = bin2hex($crypt->encrypt($this->title));
         $description = bin2hex($crypt->encrypt($this->description));
         $lat = bin2hex($crypt->encrypt($this->lat));
@@ -107,11 +112,11 @@ class Entry {
 
         $_category = new DataInfo($this->conn);
         $_category->name = $this->category;
-        $this->category = $_category->save($key, $userId, 'insert', 'category')['id'];
+        $this->category = $_category->save($crypt, $key, $userId, 'insert', 'category')['id'];
 
         switch ($method) {
             case "edit" :
-                $result = $this->detail($key,$userId);
+                $result = $this->detail($crypt, $userId);
                 if (is_array($result)) {
                     $query = "UPDATE ".DB_PREFIX."data SET title = ?, date = ?, description = ?, lat = ?, lng = ?, category_id = ?, state = ? WHERE id = ? AND user_id = ?";
                     if ($stmt = $this-> conn->prepare($query)) {
@@ -146,7 +151,7 @@ class Entry {
             foreach ($this->dataTypes as $dataType) {
                 $_dataType = new DataInfo($this->conn);
                 $_dataType->name = $dataType;
-                $dataType = $_dataType->save($key, $userId, 'insert', 'datatype');
+                $dataType = $_dataType->save($crypt, $key, $userId, 'insert', 'datatype');
                 $dataType = htmlentities($dataType['id']);
                 $query = "INSERT INTO ".DB_PREFIX."datatype_has_data (dataType_id, data_id) VALUES (?, ?)";
                 if ($stm = $this->conn->prepare($query)) {
@@ -160,7 +165,7 @@ class Entry {
             foreach ($this->companies as $company) {
                 $_company = new DataInfo($this->conn);
                 $_company->name = $company;
-                $company = $_company->save($key, $userId, 'insert', 'company');
+                $company = $_company->save($crypt, $key, $userId, 'insert', 'company');
                 $company = htmlentities($company['id']);
                 $query = "INSERT INTO ".DB_PREFIX."company_has_data (company_id, data_id) VALUES (?, ?)";
                 if ($stm = $this->conn->prepare($query)) {
@@ -170,14 +175,13 @@ class Entry {
             }
         }
         if ($stmt) {
-            return $this->detail($key, $userId);
+            return $this->detail($crypt, $userId);
         } else {
             return 400;
         }
     }
 
-    public function detail($key, $userId) {
-        $crypt = new PHP_Crypt($key);
+    public function detail($crypt, $userId) {
         $query = "SELECT d.id, d.title, d.date, d.description, d.imgURL, d.lng, d.lat, group_concat(DISTINCT c.name), group_concat(DISTINCT c.id), group_concat(DISTINCT dt.name), group_concat(DISTINCT dt.id), ca.name, ca.id, d.timestamp, d.user_id from ".DB_PREFIX."data d
             LEFT OUTER JOIN (".DB_PREFIX."datatype_has_data dhd
                 LEFT OUTER JOIN ".DB_PREFIX."datatype dt
@@ -246,8 +250,8 @@ class Entry {
         return 404;
     }
 
-    public function delete ($key, $userId) {
-        $result = $this->detail($key, $userId);
+    public function delete ($crypt, $key, $userId) {
+        $result = $this->detail($crypt, $userId);
         if (is_array($result)) {
             $query = "DELETE cd FROM ".DB_PREFIX."company_has_data cd INNER JOIN ".DB_PREFIX."data d ON d.id = cd.data_id WHERE cd.data_id = ? AND d.user_id = ?";
             if ($stmt = $this->conn->prepare($query)) {
