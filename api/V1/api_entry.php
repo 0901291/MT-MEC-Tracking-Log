@@ -101,7 +101,7 @@ if ($userId != null) {
     switch ($method) {
         case 'GET':
             if ($entry->id != null) {
-                $result['item'] = $entry->detail($key, $userId);
+                $result['item'] = $entry->detail($crypt, $userId);
                 if (!is_array($result['item'])) {
                     $resultCode = $result['item'];
                 }
@@ -110,7 +110,7 @@ if ($userId != null) {
                 $status = isset($_GET['state']) ? $_GET['state'] : 0;
                 $limit = isset($_GET['limit']) ? $_GET['limit'] : 0;
                 $offset = isset($_GET['offset']) ? $_GET['offset'] : 0;
-                $allItems = Entry::getEntries($status, $db->getConnection(), $key, $userId);
+                $allItems = Entry::getEntries($crypt, $status, $db->getConnection(), $key, $userId, $where);
                 $total = count($allItems);
                 $limit = $limit == 0 || $limit > $total ? $total : $limit;
                 $result['items'] = array_slice($allItems, $offset, $limit);
@@ -147,7 +147,7 @@ if ($userId != null) {
             break;
         case 'PUT':
             $entry->state = $entry->description == null ? 1 : 2;
-            $result['item'] = $entry->save($key, $userId, 'edit');
+            $result['item'] = $entry->save($crypt, $key, $userId, 'edit');
             if (is_array($result['item'])) {
                 $resultCode = 201;
             } else {
@@ -155,11 +155,11 @@ if ($userId != null) {
             }
             break;
         case 'DELETE':
-            $resultCode = $entry->delete($key, $userId);
+            $resultCode = $entry->delete($crypt, $key, $userId);
             break;
         case 'POST':
             $entry->state = $entry->description == null ? 1 : 2;
-            $result['item'] = $entry->save($key, $userId, 'insert');
+            $result['item'] = $entry->save($crypt, $key, $userId, 'insert');
             if (is_array($result['item'])) {
                 $resultCode = 201;
             } else {
