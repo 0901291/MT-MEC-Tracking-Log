@@ -34,8 +34,8 @@ class Entry {
                     d.imgURL,
                     d.lng,
                     d.lat,
-                    group_concat(DISTINCT c.name),
-                    group_concat(DISTINCT dt.name),
+                    group_concat(DISTINCT c2.name),
+                    group_concat(DISTINCT dt2.name),
                     ca.name,
                     ca.id,
                     d.state,
@@ -45,13 +45,21 @@ class Entry {
                     LEFT OUTER JOIN ".DB_PREFIX."datatype dt
                     ON dt.id = dhd.dataType_id)
                 ON dhd.data_id = d.id
+                LEFT OUTER JOIN (".DB_PREFIX."datatype_has_data dhd2
+                    LEFT OUTER JOIN ".DB_PREFIX."datatype dt2
+                    ON dt2.id = dhd2.dataType_id)
+                ON dhd2.data_id = d.id
                 LEFT OUTER JOIN (".DB_PREFIX."company_has_data chd
                     LEFT OUTER JOIN ".DB_PREFIX."company c
                     ON c.id = chd.company_id)
                 ON chd.data_id = d.id
+                LEFT OUTER JOIN (".DB_PREFIX."company_has_data chd2
+                    LEFT OUTER JOIN ".DB_PREFIX."company c2
+                    ON c2.id = chd2.company_id)
+                ON chd2.data_id = d.id
                 LEFT OUTER JOIN ".DB_PREFIX."category ca
                 ON ca.id = d.category_id
-                WHERE d.user_id = ? ".$state."
+                WHERE d.user_id = ?".$state.$where."
                 GROUP BY d.id
                 ORDER BY d.date DESC".
                 ($limit > 0 ? " LIMIT ".$limit." OFFSET ".$offset : " LIMIT 99999999999999 OFFSET ".$offset);
